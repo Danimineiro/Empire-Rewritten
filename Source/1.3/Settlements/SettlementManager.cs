@@ -17,6 +17,7 @@ namespace Empire_Rewritten
         private Dictionary<Settlement, FacilityManager> settlements = new Dictionary<Settlement, FacilityManager>();
         private StorageTracker storageTracker = new StorageTracker();
 
+
         public SettlementManager()
         {
 

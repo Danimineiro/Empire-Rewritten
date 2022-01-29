@@ -7,7 +7,17 @@ using System.Threading.Tasks;
 namespace Empire_Rewritten
 {
     /// <summary>
-    /// this struct holds the offset and multipliers for a resource.
+    /// This is for use in defs, because structs cannot be loaded from XML. Holds a resource multiplier and offset value.
+    /// </summary>
+    public class ResourceMod
+    {
+        public float multiplier = 1;
+        public int offset = 0;
+    }
+
+
+    /// <summary>
+    /// This is for use in code. Holds a resource multiplier and offset value.
     /// </summary>
     public struct ResourceModifier
     {
