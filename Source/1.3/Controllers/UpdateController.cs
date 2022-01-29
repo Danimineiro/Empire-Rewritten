@@ -8,11 +8,12 @@ namespace Empire_Rewritten
     /// <summary>
     /// The "Main" function of the mod, updates other modules and components occasionally
     /// </summary>
-    public class UpdateController : WorldComponent, IExposable
+    public class UpdateController : WorldComponent
     {
         private FactionController factionController;
         private static readonly Dictionary<Action<FactionController>, int> updateFunctionDic = new Dictionary<Action<FactionController>,int>();
         private static readonly List<Action<FactionController>> finalizeInitHooks = new List<Action<FactionController>>();
+        private static UpdateController updateControllerCached;
 
         /// <summary>
         /// Required Constructor
@@ -20,12 +21,32 @@ namespace Empire_Rewritten
         /// <param name="world"></param>
         public UpdateController(World world) : base(world) 
         {
+            updateControllerCached = this;
         }
 
-        internal void RegisterFactionController(FactionController factionController)
+        /// <summary>
+        /// Returns true if there is a FactionController, false otherwise
+        /// </summary>
+        internal bool HasFactionController => factionController != null;
+
+        /// <summary>
+        /// Sets the FactionController, if it doesn't exist already
+        /// </summary>
+        internal FactionController FactionController 
         {
-            this.factionController = factionController; 
+            set
+            {
+                if (HasFactionController)
+                {
+                    Log.Error("factionController is already set, skipping assignment");
+                    return;
+                }
+
+                factionController = value;
+            }
         }
+
+        public static UpdateController GetUpdateController => updateControllerCached;
 
         /// <summary>
         /// Registers an <paramref name="updateCall"/> to be called every <paramref name="intervall"/>
@@ -63,6 +84,11 @@ namespace Empire_Rewritten
         public override void FinalizeInit()
         {
             finalizeInitHooks.ForEach(action => action.Invoke(factionController));
+        }
+
+        public override void ExposeData()
+        {
+            Scribe_Deep.Look(ref factionController, "factionController");
         }
     }
 }

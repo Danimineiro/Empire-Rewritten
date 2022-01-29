@@ -23,28 +23,16 @@ namespace Empire_Rewritten
         }
 
         /// <summary>
-        /// Appends a function to <code>UpdateController.finalizeInitHooks</code> that creates FactionSettlementDatas for every faction, then gives that list to the FactionController
+        /// If the <c>UpdateController</c> doesn't have a FactionController already,
+        /// appends a function to <c>UpdateController.finalizeInitHooks</c> that creates FactionSettlementDatas for every faction, then gives that list to the FactionController
         /// </summary>
         private static void AppendCreateFactionDatasFunction()
         {
             UpdateController.AddFinalizeInitHook((controller) =>
             {
-                List<FactionSettlementData> factionSettlementDatas = CreateFactionSettlementDatas();
-
-                FactionController factionController = new FactionController(factionSettlementDatas);
-
+                if (UpdateController.GetUpdateController.HasFactionController) return;
+                UpdateController.GetUpdateController.FactionController = new FactionController(FactionSettlementData.CreateFactionSettlementDatas());
             });
-        }
-
-        private static List<FactionSettlementData> CreateFactionSettlementDatas()
-        {
-            List<FactionSettlementData> factionSettlementDatas = new List<FactionSettlementData>();
-            foreach (Faction faction in Find.FactionManager.AllFactionsListForReading)
-            {
-                factionSettlementDatas.Add(new FactionSettlementData(faction, new SettlementManager()));
-            }
-
-            return factionSettlementDatas;
         }
     }
 }

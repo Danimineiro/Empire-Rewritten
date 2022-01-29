@@ -41,11 +41,26 @@ namespace Empire_Rewritten
         /// </summary>
         public SettlementManager SettlementManager => settlementManager;
 
+        /// <summary>
+        /// Creates all required FactionSettlementDatas
+        /// </summary>
+        /// <returns>the FactionSettlementDatas</returns>
+        internal static List<FactionSettlementData> CreateFactionSettlementDatas()
+        {
+            List<FactionSettlementData> factionSettlementDatas = new List<FactionSettlementData>();
+            foreach (Faction faction in Find.FactionManager.AllFactionsListForReading)
+            {
+                factionSettlementDatas.Add(new FactionSettlementData(faction, new SettlementManager()));
+            }
+
+            return factionSettlementDatas;
+        }
+
         public void ExposeData()
         {
             Scribe_References.Look(ref owner, "Owner");
             Scribe_References.Look(ref originalOwner, "originalOwner");
-            Scribe_References.Look(ref settlementManager, "settlementManager");
+            Scribe_Deep.Look(ref settlementManager, "settlementManager");
         }
 
         public override string ToString()
