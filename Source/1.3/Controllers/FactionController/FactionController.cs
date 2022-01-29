@@ -25,7 +25,19 @@ namespace Empire_Rewritten
         }
 
         private List<FactionSettlementData> factionSettlementDataList = new List<FactionSettlementData>();
-        
+
+        /// <param name="faction"></param>
+        /// <returns>The <c>SettlementManager</c>s owned by a given <paramref name="faction"/></returns>
+        public IEnumerable<SettlementManager> GetOwnedSettlementManagers(Faction faction)
+        {
+            foreach (FactionSettlementData factionSettlementData in factionSettlementDataList)
+            {
+                if (factionSettlementData.owner == faction) yield return factionSettlementData.SettlementManager;
+            }
+
+            yield break;
+        }
+
         public void ExposeData()
         {
             Scribe_Collections.Look(ref factionSettlementDataList, "FactionSettlementDataList");
