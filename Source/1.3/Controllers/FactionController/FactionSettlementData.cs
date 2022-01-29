@@ -13,6 +13,10 @@ namespace Empire_Rewritten
     /// </summary>
     public class FactionSettlementData : IExposable
     {
+        public FactionSettlementData()
+        {
+
+        }
         /// <summary>
         /// Used for saving/loading
         /// </summary>

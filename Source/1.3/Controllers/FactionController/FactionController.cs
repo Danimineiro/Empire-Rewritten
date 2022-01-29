@@ -24,6 +24,11 @@ namespace Empire_Rewritten
             this.factionSettlementDataList = factionSettlementDataList;
         }
 
+        public FactionController()
+        {
+
+        }
+
         private List<FactionSettlementData> factionSettlementDataList = new List<FactionSettlementData>();
 
         /// <param name="faction"></param>
