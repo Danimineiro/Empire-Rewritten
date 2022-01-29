@@ -15,7 +15,7 @@ namespace Empire_Rewritten
     {
 
         private Dictionary<Settlement, FacilityManager> settlements = new Dictionary<Settlement, FacilityManager>();
-
+        private StorageTracker storageTracker;
 
         public Dictionary<Settlement,FacilityManager> Settlements
         {
@@ -31,6 +31,7 @@ namespace Empire_Rewritten
         public void ExposeData()
         {
             Scribe_Collections.Look(ref settlements, "settlements", LookMode.Undefined, LookMode.Deep);
+            Scribe_Deep.Look(ref storageTracker, "storageTracker");
 
         }
 
