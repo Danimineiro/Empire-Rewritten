@@ -13,10 +13,11 @@ namespace Empire_Rewritten
     /// </summary>
     public class FactionSettlementData : IExposable
     {
-        public FactionSettlementData()
-        {
+        /// <summary>
+        /// Used for saving/loading
+        /// </summary>
+        public FactionSettlementData() { }
 
-        }
         /// <summary>
         /// Creates a new <c>FactionSettlementData</c> struct.
         /// Saves <paramref name="owner"/> into the <code>owner</code> and <code>originalOwner</code> field; saves <paramref name="settlementManager"/> into the <code>settlementManager field</code>
