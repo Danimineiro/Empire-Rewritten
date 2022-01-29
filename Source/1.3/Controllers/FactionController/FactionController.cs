@@ -29,14 +29,14 @@ namespace Empire_Rewritten
 
         /// <param name="faction"></param>
         /// <returns>The <c>SettlementManager</c>s owned by a given <paramref name="faction"/></returns>
-        public IEnumerable<SettlementManager> GetOwnedSettlementManagers(Faction faction)
+        public SettlementManager GetOwnedSettlementManagers(Faction faction)
         {
             foreach (FactionSettlementData factionSettlementData in factionSettlementDataList)
             {
-                if (factionSettlementData.owner == faction) yield return factionSettlementData.SettlementManager;
+                if (factionSettlementData.owner == faction) return factionSettlementData.SettlementManager;
             }
 
-            yield break;
+            return null;
         }
 
         public void ExposeData()
