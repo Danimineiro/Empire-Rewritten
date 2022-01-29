@@ -10,18 +10,21 @@ namespace Empire_Rewritten
     public class FacilityDef : Def
     {
         public Dictionary<ResourceDef, float> resourceMultipliers = new Dictionary<ResourceDef, float>();
+        public Dictionary<ResourceDef,int> resourceOffsets = new Dictionary<ResourceDef, int>();
 
-        public float GetResourceModifier(ResourceDef resourceDef)
+
+        public Type facilityWorker;
+
+        public override IEnumerable<string> ConfigErrors()
         {
-            if (resourceMultipliers.ContainsKey(resourceDef))
+            if (facilityWorker!=null && !facilityWorker.IsSubclassOf(typeof(FacilityWorker)))
             {
-                return resourceMultipliers[resourceDef];
+                yield return $"{facilityWorker} does not inherit from FacilityWorker!";
             }
-            //No effect on the resource
-            return 1f;
+            foreach(string str in base.ConfigErrors())
+            {
+                yield return str;
+            }
         }
-
-
-
     }
 }

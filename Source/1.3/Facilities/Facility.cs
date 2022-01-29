@@ -87,20 +87,24 @@ namespace Empire_Rewritten
             {
                 if(ShouldRecalculateModifiers)
                 {
-                    modifiers= new List<ResourceModifier>();
-                    foreach (ResourceDef resourceDef in def.resourceMultipliers.Keys)
-                    {
-                        Tile tile = Find.WorldGrid.tiles[settlement.Tile];
-                        ResourceModifier modifier = resourceDef.GetTileModifier(tile);
-                        modifier.multiplier *= (amount * def.resourceMultipliers[resourceDef]);
-
-                        modifiers.Add(modifier);
-                        
-                    }
-                    ShouldRecalculateModifiers=false;
-                    
+                    Recalculate();
+                    ShouldRecalculateModifiers = false;
                 }
                 return modifiers;
+            }
+        }
+
+        private void Recalculate()
+        {
+
+            modifiers = new List<ResourceModifier>();
+            foreach (ResourceDef resourceDef in def.resourceMultipliers.Keys)
+            {
+                Tile tile = Find.WorldGrid.tiles[settlement.Tile];
+                ResourceModifier modifier = resourceDef.GetTileModifier(tile);
+                modifier.multiplier *= (amount * def.resourceMultipliers[resourceDef]);
+                modifiers.Add(modifier);
+
             }
         }
 

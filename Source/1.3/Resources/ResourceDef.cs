@@ -19,7 +19,7 @@ namespace Empire_Rewritten
             }
         }
 
-        public Dictionary<ThingDef, int> providedResources = new Dictionary<ThingDef, int>();
+        public ThingFilter resourcesCreated;
 
         public SimpleCurve temperatureCurve;
         public SimpleCurve heightCurve;

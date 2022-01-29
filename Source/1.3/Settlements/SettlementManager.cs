@@ -9,7 +9,7 @@ using Verse;
 namespace Empire_Rewritten
 {
     /// <summary>
-    /// Manages settlements.
+    /// Manages settlements and their FacilitiyManager
     /// </summary>
     public class SettlementManager : IExposable, ILoadReferenceable
     {
