@@ -45,6 +45,7 @@ namespace Empire_Rewritten
         /// </summary>
         public SettlementManager SettlementManager => settlementManager;
 
+
         /// <summary>
         /// Creates all required FactionSettlementDatas
         /// </summary>

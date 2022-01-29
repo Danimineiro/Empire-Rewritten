@@ -28,6 +28,10 @@ namespace Empire_Rewritten
             get { return settlements; }
         }
 
+        /// <summary>
+        /// Add a settlement to the tracker.
+        /// </summary>
+        /// <param name="settlement"></param>
         public void AddSettlement(Settlement settlement)
         {
             FacilityManager tracker = new FacilityManager(settlement);

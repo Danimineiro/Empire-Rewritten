@@ -19,6 +19,7 @@ namespace Empire_Rewritten
         /// </summary>
         static Startup()
         {
+            HarmonyPatcher.DoPatches();
             AppendCreateFactionDatasFunction();
         }
 

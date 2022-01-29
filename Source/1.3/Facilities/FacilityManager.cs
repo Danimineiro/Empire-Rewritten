@@ -17,6 +17,9 @@ namespace Empire_Rewritten
         private Dictionary<FacilityDef,Facility> installedFacilities = new Dictionary<FacilityDef, Facility>();
         private Settlement settlement;
 
+        bool RefreshGizmos = true;
+
+        List<Gizmo> gizmos = new List<Gizmo>();
 
         public FacilityManager(Settlement settlement)
         {
@@ -25,8 +28,33 @@ namespace Empire_Rewritten
 
         public FacilityManager()
         {
-
+          
         }
+
+        /// <summary>
+        /// Get gizmos from all facilities in the settlement.
+        /// </summary>
+        public IEnumerable<Gizmo> GetGizmos()
+        {
+            if (RefreshGizmos)
+            {
+                RefreshGizmos = false;
+                foreach(FacilityDef facilityDef in installedFacilities.Keys.ToList())
+                {
+                    if(facilityDef.facilityWorker!= null )
+                    {
+                        FacilityWorker worker = (FacilityWorker)Activator.CreateInstance(facilityDef.facilityWorker);
+                        List<Gizmo> newGizmos = (List<Gizmo>)worker.GetGizmos();
+                        foreach(Gizmo gizmo in newGizmos)
+                        {
+                            gizmos.Add(gizmo);
+                        }
+                    }
+                }
+            }
+            return gizmos;
+        }
+
 
         /// <summary>
         /// Get all ResourceModifiers from installed facilities.
@@ -74,6 +102,7 @@ namespace Empire_Rewritten
             }
             else
             {
+                RefreshGizmos = true;
                 installedFacilities.Add(facilityDef, new Facility(facilityDef, settlement));
             }
           
@@ -86,6 +115,7 @@ namespace Empire_Rewritten
                 installedFacilities[facilityDef].RemoveFacility();
                 if (installedFacilities[facilityDef].FacilitiesInstalled <= 0)
                 {
+                    RefreshGizmos = true;
                     installedFacilities.Remove(facilityDef);
                 }
             }
