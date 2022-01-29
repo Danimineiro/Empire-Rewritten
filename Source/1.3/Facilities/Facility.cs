@@ -43,6 +43,11 @@ namespace Empire_Rewritten
             this.settlement = settlement;
             amount=1;
         }
+
+        public Facility()
+        {
+
+        }
         
         /// <summary>
         /// Add X facilities to a settlement.

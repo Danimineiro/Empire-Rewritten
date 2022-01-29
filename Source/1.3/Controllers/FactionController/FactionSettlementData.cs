@@ -9,10 +9,14 @@ using Verse;
 namespace Empire_Rewritten
 {
     /// <summary>
-    /// This struct links a Faction and it's settlements through a SettlementManager 
+    /// This class links a Faction and it's settlements through a SettlementManager 
     /// </summary>
-    public struct FactionSettlementData : IExposable
+    public class FactionSettlementData : IExposable
     {
+        public FactionSettlementData()
+        {
+
+        }
         /// <summary>
         /// Creates a new <c>FactionSettlementData</c> struct.
         /// Saves <paramref name="owner"/> into the <code>owner</code> and <code>originalOwner</code> field; saves <paramref name="settlementManager"/> into the <code>settlementManager field</code>

@@ -23,6 +23,11 @@ namespace Empire_Rewritten
             this.settlement = settlement;
         }
 
+        public FacilityManager()
+        {
+
+        }
+
         /// <summary>
         /// Get all ResourceModifiers from installed facilities.
         /// </summary>

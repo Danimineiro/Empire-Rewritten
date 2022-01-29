@@ -15,7 +15,12 @@ namespace Empire_Rewritten
     {
 
         private Dictionary<Settlement, FacilityManager> settlements = new Dictionary<Settlement, FacilityManager>();
-        private StorageTracker storageTracker;
+        private StorageTracker storageTracker = new StorageTracker();
+
+        public SettlementManager()
+        {
+
+        }
 
         public Dictionary<Settlement,FacilityManager> Settlements
         {
@@ -30,12 +35,12 @@ namespace Empire_Rewritten
 
         public void ExposeData()
         {
-            Scribe_Collections.Look(ref settlements, "settlements", LookMode.Undefined, LookMode.Deep);
+            Scribe_Collections.Look(ref settlements, "settlements", LookMode.Reference, LookMode.Deep);
             Scribe_Deep.Look(ref storageTracker, "storageTracker");
 
         }
 
-        public FacilityManager GetFacilityTracker(Settlement settlement)
+        public FacilityManager GetFacilityManager(Settlement settlement)
         {
             if (settlements.ContainsKey(settlement))
             {

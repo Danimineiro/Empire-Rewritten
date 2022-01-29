@@ -29,16 +29,23 @@ namespace Empire_Rewritten {
             }
         }
 
-        public void RemoveThingsFromStorage(ThingDef def, int count)
+        public bool RemoveThingsFromStorage(ThingDef def, int count)
         {
-            if (storedThings.ContainsKey(def))
+            if (CanRemoveThingsFromStorage(def, count))
             {
                 storedThings[def] -= count;
                 if (storedThings[def] <= 0)
                 {
                     storedThings.Remove(def);
                 }
+                return true;
             }
+            return false;
+        }
+
+        public bool CanRemoveThingsFromStorage(ThingDef def, int count)
+        {
+            return storedThings.ContainsKey(def) && storedThings[def] >=count;
         }
 
         public int GetCountOfThing(ThingDef def)
