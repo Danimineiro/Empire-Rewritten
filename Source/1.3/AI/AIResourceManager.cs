@@ -7,13 +7,16 @@ using Verse;
 
 namespace Empire_Rewritten.AI
 {
-    public class AIResourceManager
+    public class AIResourceManager : AIModule
     {
         private static List<ResourceDef> cachedDefs = new List<ResourceDef>();
         private AIPlayer parentPlayer;
-        private SettlementManager cachedManager;
-        private bool ManagerIsDirty = true;
+        
         private int LowResourceDecider=30;
+
+        public AIResourceManager(AIPlayer player) : base(player)
+        {
+        }
 
         private List<ResourceDef> FindAllResourceDefs
         {
@@ -27,23 +30,8 @@ namespace Empire_Rewritten.AI
             }
         }
 
-        public SettlementManager Manager
-        {
-            get {
-                if (cachedManager==null || ManagerIsDirty) {
-                    ManagerIsDirty = true;
-                    UpdateController updateController = UpdateController.GetUpdateController;
-                    FactionController factionController = updateController.FactionController;
+        
 
-                    cachedManager = factionController.GetOwnedSettlementManager(parentPlayer.Faction);
-                }
-                return cachedManager;
-            }
-        }
-        public AIResourceManager(AIPlayer aIPlayer)
-        {
-            this.parentPlayer = aIPlayer;
-        }
 
         /// <summary>
         /// Figure out what resources are "low" in production based on the amount being produced.
@@ -77,10 +65,11 @@ namespace Empire_Rewritten.AI
             }
             if (resourceBelowDecider)
             {
-                //This could probably be cleaned up a bit;
-                //With more resourcedefs this would slow down.
+                /*
+                 Find the lowest defs produced, and adds them to a list.
+                This isn't perfect, however it should catch most things.
+                 */
                 float lowest=0;
-                ResourceDef lowestDef = null;
                 bool first = true;
                 foreach(ResourceDef def in producedknown.Keys)
                 {
@@ -88,10 +77,9 @@ namespace Empire_Rewritten.AI
                     {
                         first = false;
                         lowest = producedknown[def];
-                        lowestDef=def;
+                        result.Add(def);
                     }
                 }
-                result.Add(lowestDef);
             }
             return result;
         }
@@ -102,7 +90,7 @@ namespace Empire_Rewritten.AI
         /// <returns></returns>
         public Dictionary<ResourceDef,float> AllResourcesProduced()
         {
-           Dictionary<ResourceDef, ResourceModifier> modifiers=  Manager.ResourceModifiersFromAllFacilities();
+           Dictionary<ResourceDef, ResourceModifier> modifiers=  parentPlayer.Manager.ResourceModifiersFromAllFacilities();
             Dictionary<ResourceDef, float> result = new Dictionary<ResourceDef, float>();
             foreach (ResourceDef def in modifiers.Keys)
             {

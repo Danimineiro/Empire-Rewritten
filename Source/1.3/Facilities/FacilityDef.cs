@@ -15,6 +15,8 @@ namespace Empire_Rewritten
 
         public Type facilityWorker;
 
+        public List<ThingDefCountClass> costList;
+
         public override IEnumerable<string> ConfigErrors()
         {
             if (facilityWorker!=null && !facilityWorker.IsSubclassOf(typeof(FacilityWorker)))

@@ -103,11 +103,15 @@ namespace Empire_Rewritten
         {
 
             modifiers = new List<ResourceModifier>();
-            foreach (ResourceDef resourceDef in def.resourceMultipliers.Keys)
+            List<ResourceDef> defs = new List<ResourceDef>();
+            defs.AddRange(def.resourceMultipliers.Keys);
+            defs.AddRange(def.resourceOffsets.Keys);
+            foreach (ResourceDef resourceDef in defs)
             {
                 Tile tile = Find.WorldGrid.tiles[settlement.Tile];
                 ResourceModifier modifier = resourceDef.GetTileModifier(tile);
-                modifier.multiplier *= (amount * def.resourceMultipliers[resourceDef]);
+                modifier.multiplier *= (amount *(def.resourceMultipliers.ContainsKey(resourceDef) ? def.resourceMultipliers[resourceDef] : 1));
+                modifier.offset += (amount * (def.resourceOffsets.ContainsKey(resourceDef) ? def.resourceOffsets[resourceDef] : 0));
                 modifiers.Add(modifier);
 
             }

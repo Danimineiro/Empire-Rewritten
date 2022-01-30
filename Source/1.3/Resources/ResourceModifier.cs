@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RimWorld;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -58,7 +59,7 @@ namespace Empire_Rewritten
         /// <returns></returns>
         public float TotalProduced()
         {
-            return (float)(this.multiplier+ this.offset);
+            return (float)(this.multiplier* this.offset);
         }
     }
 }

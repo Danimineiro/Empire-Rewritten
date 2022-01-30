@@ -150,5 +150,14 @@ namespace Empire_Rewritten
                 SetDataDirty(facilityChange);
             }
         }
+       
+        /// <summary>
+        /// Can this be built here?
+        /// </summary>
+        /// <returns></returns>
+        public bool CanBuildAt(FacilityDef facilityDef)
+        {
+            return true;
+        }
     }
 }
