@@ -14,7 +14,7 @@ namespace Empire_Rewritten
         public readonly List<string> requiredModIDs = new List<string>();
 
         [NoTranslate]
-        private readonly List<string> requiredEthicDefNames;
+        public readonly List<string> requiredEthicDefNames = new List<string>();
 
         /// <summary>
         /// Returns if all required Ethics are present
