@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Verse;
 
 namespace Empire_Rewritten
 {
@@ -30,6 +31,34 @@ namespace Empire_Rewritten
             def = resourceDef;
             offset = offsetValue;
             multiplier = multiplierValue;
+        }
+
+        /// <summary>
+        /// Merge two ResourceModifiers.
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public ResourceModifier MergeWithModifier(ResourceModifier other)
+        {
+            if (other.def == this.def)
+            {
+                return new ResourceModifier(this.def, other.offset + this.offset,other.multiplier*this.multiplier);
+            }
+            else
+            {
+                Log.Error("[Empire]: Trying to merge two modifiers of seperate resource def types!");
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// NEEDS math changes.
+        /// I know this is incorrect, but for some reason I cannot think of a correct way.
+        /// </summary>
+        /// <returns></returns>
+        public float TotalProduced()
+        {
+            return (float)(this.multiplier+ this.offset);
         }
     }
 }

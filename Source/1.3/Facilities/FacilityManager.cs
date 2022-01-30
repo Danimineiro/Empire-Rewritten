@@ -16,9 +16,9 @@ namespace Empire_Rewritten
     {
         private Dictionary<FacilityDef,Facility> installedFacilities = new Dictionary<FacilityDef, Facility>();
         private Settlement settlement;
-
+        private List<ResourceModifier> cachedModifiers = new List<ResourceModifier>();
+        bool RefreshModifiers = true;
         bool RefreshGizmos = true;
-
         List<Gizmo> gizmos = new List<Gizmo>();
 
         public FacilityManager(Settlement settlement)
@@ -36,9 +36,9 @@ namespace Empire_Rewritten
         /// </summary>
         public IEnumerable<Gizmo> GetGizmos()
         {
-            if (RefreshGizmos)
+            if (RefreshModifiers)
             {
-                RefreshGizmos = false;
+                RefreshModifiers = false;
                 foreach(FacilityDef facilityDef in installedFacilities.Keys.ToList())
                 {
                     if(facilityDef.facilityWorker!= null )
@@ -55,6 +55,30 @@ namespace Empire_Rewritten
             return gizmos;
         }
 
+        /// <summary>
+        /// Update the ResourceModifierCache when called.
+        /// </summary>
+        private void UpdateModiferCache()
+        {
+            Dictionary<ResourceDef, ResourceModifier> calculatedModifers = new Dictionary<ResourceDef, ResourceModifier>();
+            foreach (Facility facility in installedFacilities.Values.ToList())
+            {
+                foreach (ResourceModifier modifier in facility.ResourceModifiers)
+                {
+                    if (calculatedModifers.ContainsKey(modifier.def))
+                    {
+                        ResourceModifier newModifier = calculatedModifers[modifier.def].MergeWithModifier(modifier);
+                        calculatedModifers[modifier.def] = newModifier;
+                    }
+                    else
+                    {
+                        calculatedModifers.Add(modifier.def, modifier);
+                    }
+                }
+            }
+            cachedModifiers = calculatedModifers.Values.ToList();
+        }
+
 
         /// <summary>
         /// Get all ResourceModifiers from installed facilities.
@@ -63,27 +87,12 @@ namespace Empire_Rewritten
         {
             get
             {
-                Dictionary<ResourceDef, ResourceModifier> calculatedModifers = new Dictionary<ResourceDef, ResourceModifier>();
-                foreach (Facility facility in installedFacilities.Values.ToList())
+                if (RefreshModifiers)
                 {
-                    foreach (ResourceModifier modifier in facility.ResourceModifiers)
-                    {
-                        if (calculatedModifers.ContainsKey(modifier.def))
-                        {
-                            ResourceModifier resourceModifier = calculatedModifers[modifier.def];
-                            resourceModifier.offset += modifier.offset;
-                            resourceModifier.multiplier *= modifier.multiplier;
-
-                            calculatedModifers[modifier.def] = resourceModifier;
-                        }
-                        else
-                        {
-                            calculatedModifers.Add(modifier.def, modifier);
-                        }
-                    }
+                    UpdateModiferCache();
+                    RefreshModifiers = false;
                 }
-
-                return calculatedModifers.Values.ToList();
+                return cachedModifiers;
             }
         }
 
@@ -94,30 +103,51 @@ namespace Empire_Rewritten
             Scribe_Values.Look(ref settlement, "settlement");
         }
 
+        /// <summary>
+        /// Set gizmos and resourcemodifiers to be refreshed when called for.
+        /// </summary>
+        /// <param name="refreshGizmos">Refresh gizmos alongside resourcemodifiers</param>
+        public void SetDataDirty(bool refreshGizmos = false)
+        {
+            RefreshGizmos = refreshGizmos;
+            RefreshModifiers = true;
+        }
+        
+        
+        
+        
+        /// <summary>
+        /// Used for building a new facility on the settlement.
+        /// </summary>
+        /// <param name="facilityDef"></param>
         public void AddFacility(FacilityDef facilityDef)
         {
+            bool facilityChange = false;
             if (installedFacilities.ContainsKey(facilityDef))
             {
                 installedFacilities[facilityDef].AddFacility();
             }
             else
             {
-                RefreshGizmos = true;
+                facilityChange = true;
                 installedFacilities.Add(facilityDef, new Facility(facilityDef, settlement));
             }
+            SetDataDirty(facilityChange);
           
         }
 
         public void RemoveFacility(FacilityDef facilityDef)
         {
+            bool facilityChange = false;
             if (installedFacilities.ContainsKey(facilityDef))
             {
                 installedFacilities[facilityDef].RemoveFacility();
                 if (installedFacilities[facilityDef].FacilitiesInstalled <= 0)
                 {
-                    RefreshGizmos = true;
+                    facilityChange=true;
                     installedFacilities.Remove(facilityDef);
                 }
+                SetDataDirty(facilityChange);
             }
         }
     }

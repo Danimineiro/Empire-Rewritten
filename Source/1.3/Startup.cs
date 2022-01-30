@@ -21,6 +21,7 @@ namespace Empire_Rewritten
         {
             HarmonyPatcher.DoPatches();
             AppendCreateFactionDatasFunction();
+            new ResourceManager();
         }
 
         /// <summary>
