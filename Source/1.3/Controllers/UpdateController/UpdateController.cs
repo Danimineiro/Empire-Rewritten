@@ -11,7 +11,7 @@ namespace Empire_Rewritten
     public class UpdateController : WorldComponent
     {
         private FactionController factionController;
-        private static readonly Dictionary<Action<FactionController>, int> updateFunctionDic = new Dictionary<Action<FactionController>,int>();
+        private static readonly List<UpdateControllerAction> actions = new List<UpdateControllerAction>();
         private static readonly List<Action<FactionController>> finalizeInitHooks = new List<Action<FactionController>>();
         private static UpdateController updateControllerCached;
 
@@ -53,9 +53,9 @@ namespace Empire_Rewritten
         /// </summary>
         /// <param name="updateCall"></param>
         /// <param name="intervall"></param>
-        public static void AddUpdateCall(Action<FactionController> updateCall, int intervall)
+        public static void AddUpdateCall(Action<FactionController> updateCall, Func<bool> shouldExecute)
         {
-            updateFunctionDic.Add(updateCall, intervall);
+            actions.Add(new UpdateControllerAction(shouldExecute, updateCall));
         }
 
         /// <summary>
@@ -72,11 +72,11 @@ namespace Empire_Rewritten
         /// </summary>
         public override void WorldComponentTick()
         {
-            foreach (KeyValuePair<Action<FactionController>, int> keyValuePair in updateFunctionDic)
+            foreach (UpdateControllerAction action in actions)
             {
-                if (Find.TickManager.TicksGame % keyValuePair.Value == 0)
+                if (action.ShouldExecute.Invoke())
                 {
-                    keyValuePair.Key.Invoke(factionController);
+                    action.Action.Invoke(factionController);
                 }
             }
         }
