@@ -14,7 +14,7 @@ namespace Empire_Rewritten
         public static SettlementManager GetManager(this Settlement settlement)
         {
             UpdateController updateController = UpdateController.GetUpdateController;
-            return updateController.FactionController.GetOwnedSettlementManagers(settlement.Faction);
+            return updateController.FactionController.GetOwnedSettlementManager(settlement.Faction);
         }
         public static IEnumerable<Gizmo> GetExtendedGizmos(this Settlement settlement)
         {

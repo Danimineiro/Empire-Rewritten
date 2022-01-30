@@ -29,7 +29,7 @@ namespace Empire_Rewritten
 
         /// <param name="faction"></param>
         /// <returns>The <c>SettlementManager</c>s owned by a given <paramref name="faction"/></returns>
-        public SettlementManager GetOwnedSettlementManagers(Faction faction)
+        public SettlementManager GetOwnedSettlementManager(Faction faction)
         {
             foreach (FactionSettlementData factionSettlementData in factionSettlementDataList)
             {
