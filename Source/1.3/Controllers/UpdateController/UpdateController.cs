@@ -49,13 +49,22 @@ namespace Empire_Rewritten
         public static UpdateController GetUpdateController => updateControllerCached;
 
         /// <summary>
-        /// Registers an <paramref name="updateCall"/> to be called every <paramref name="intervall"/>
+        /// Registers an <paramref name="updateCall"/> to be called whenever <paramref name="shouldExecute"/> is true
         /// </summary>
         /// <param name="updateCall"></param>
-        /// <param name="intervall"></param>
+        /// <param name="shouldExecute"></param>
         public static void AddUpdateCall(Action<FactionController> updateCall, Func<bool> shouldExecute)
         {
-            actions.Add(new UpdateControllerAction(shouldExecute, updateCall));
+            actions.Add(new UpdateControllerAction(updateCall, shouldExecute));
+        }
+
+        /// <summary>
+        /// Registers an <paramref name="action"/> to be called as determined by its internal functions
+        /// </summary>
+        /// <param name="action"></param>
+        public static void AddUpdateCall(UpdateControllerAction action)
+        {
+            actions.Add(action);
         }
 
         /// <summary>
@@ -68,15 +77,26 @@ namespace Empire_Rewritten
         }
 
         /// <summary>
+        /// Registers <paramref name="actions"/> to be called after world generation
+        /// </summary>
+        /// <param name="actions"></param>
+        public static void AddFinalizeInitHooks(IEnumerable<Action<FactionController>> actions)
+        {
+            foreach (var action in actions) AddFinalizeInitHook(action);
+        }
+
+        /// <summary>
         /// Calls each registered Action when the current game tick is devisible by the int it was saved with
         /// </summary>
         public override void WorldComponentTick()
         {
-            foreach (UpdateControllerAction action in actions)
+            for (int i = 0; i < actions.Count; i++)
             {
+                UpdateControllerAction action = actions[i];
                 if (action.ShouldExecute.Invoke())
                 {
                     action.Action.Invoke(factionController);
+                    Log.Message(action.ToString());
                 }
             }
 

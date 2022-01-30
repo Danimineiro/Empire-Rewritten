@@ -11,7 +11,7 @@ namespace Empire_Rewritten
     public class FactionController : IExposable
     {
         private List<FactionSettlementData> factionSettlementDataList = new List<FactionSettlementData>();
-        private List<FactionCivicAndEthicData> factionCivicAndEthicDataList = new List<FactionCivicAndEthicData>();   
+        private readonly List<FactionCivicAndEthicData> factionCivicAndEthicDataList = new List<FactionCivicAndEthicData>();
 
         /// <summary>
         /// Needed for loading
