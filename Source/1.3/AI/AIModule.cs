@@ -13,5 +13,7 @@ namespace Empire_Rewritten.AI
         {
             this.player = player;
         }
+
+        public abstract void DoModuleAction();
     }
 }

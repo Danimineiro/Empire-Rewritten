@@ -88,6 +88,10 @@ namespace Empire_Rewritten
             return null;
         }
 
+        public IEnumerable<FacilityManager> GetAllFacilityManagers()
+        {
+            return settlements.Values;
+        }
         public string GetUniqueLoadID()
         {
             return $"SettlementTracker_{GetHashCode()}";

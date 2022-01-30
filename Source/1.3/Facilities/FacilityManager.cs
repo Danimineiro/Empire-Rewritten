@@ -159,5 +159,26 @@ namespace Empire_Rewritten
         {
             return true;
         }
+
+        /// <summary>
+        /// Has a facility of facilityDef
+        /// </summary>
+        /// <param name="facilityDef"></param>
+        /// <returns></returns>
+        public bool HasFacility(FacilityDef facilityDef)
+        {
+            return installedFacilities.ContainsKey(facilityDef);
+        }
+
+        /// <summary>
+        /// Installed facilitydefs
+        /// </summary>
+        public IEnumerable<FacilityDef> FacilityDefsInsalled
+        {
+            get
+            {
+                return installedFacilities.Keys;
+            }
+        }
     }
 }

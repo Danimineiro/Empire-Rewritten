@@ -10,6 +10,17 @@ namespace Empire_Rewritten {
     {
         private Dictionary<ThingDef, int> storedThings = new Dictionary<ThingDef, int>();
 
+        //For AI use
+        private Dictionary<ResourceDef, int> approxResources = new Dictionary<ResourceDef, int>();
+
+        public Dictionary<ResourceDef, int> GetApproxResources
+        {
+            get
+            {
+                return approxResources;
+            }
+        }
+
         public Dictionary<ThingDef,int> StoredThings { 
             get 
             { 

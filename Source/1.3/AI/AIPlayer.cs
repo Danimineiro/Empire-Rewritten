@@ -7,12 +7,11 @@ using System.Threading.Tasks;
 
 namespace Empire_Rewritten.AI
 {
-    public class AIPlayer
+    public class AIPlayer : BasePlayer
     {
         private AIFacilityManager facilityManager;
         private AISettlementManager settlementManager;
         private AIResourceManager resourceManager;
-        private Faction faction;
         private SettlementManager cachedManager;
         private bool ManagerIsDirty = true;
 
@@ -32,6 +31,13 @@ namespace Empire_Rewritten.AI
             }
         }
 
+        public AIFacilityManager FacilityManager
+        {
+            get
+            {
+                return facilityManager;
+            }
+        }
 
         public Faction Faction
         {
@@ -41,9 +47,8 @@ namespace Empire_Rewritten.AI
             }
         }
 
-        public AIPlayer(Faction faction)
+        public AIPlayer(Faction faction) : base(faction)
         {
-            this.faction = faction;
             this.resourceManager = new AIResourceManager(this);
             this.settlementManager = new AISettlementManager(this);
             this.facilityManager = new AIFacilityManager(this);
@@ -55,6 +60,11 @@ namespace Empire_Rewritten.AI
             {
                 return resourceManager;
             }
+        }
+
+        public override void MakeMove()
+        {
+            throw new NotImplementedException();
         }
     }
 }
