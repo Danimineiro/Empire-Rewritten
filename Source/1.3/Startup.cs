@@ -19,6 +19,7 @@ namespace Empire_Rewritten
         /// </summary>
         static Startup()
         {
+            Log.Message("<color=orange>[Empire]</color> just here to say hello! ^-^ Have a nice day and great fun with Empire!");
             AppendActionsToWorldStart();
         }
 
