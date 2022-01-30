@@ -79,6 +79,8 @@ namespace Empire_Rewritten
                     action.Action.Invoke(factionController);
                 }
             }
+
+            actions.RemoveAll(action => action.ShouldDiscard);
         }
 
         public override void FinalizeInit()

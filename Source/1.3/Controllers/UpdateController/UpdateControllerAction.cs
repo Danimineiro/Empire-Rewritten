@@ -14,6 +14,14 @@ namespace Empire_Rewritten
         /// </summary>
         private readonly Action<FactionController> action;
 
+        private readonly int useCounter;
+        private readonly int maxExecutions;
+
+        /// <summary>
+        /// Decides if the Action can be discarded
+        /// </summary>
+        public bool ShouldDiscard => maxExecutions > 0 && useCounter >= maxExecutions;
+
         /// <summary>
         /// Returns if the action should be executed
         /// </summary>
@@ -24,15 +32,20 @@ namespace Empire_Rewritten
         /// </summary>
         public Action<FactionController> Action => action;
 
+
         /// <summary>
-        /// Constructs a new <c>UpdateControllerAction</c> that controls when a given <paramref name="action"/> should execute using the func <paramref name="shouldExecute"/>
+        /// Constructs a new <c>UpdateControllerAction</c> that controls when a given <paramref name="action"/> should execute using the func <paramref name="shouldExecute"/>.
+        /// Will only execute a limited amount of times if <paramref name="maxExecutions"/> is set higher than 0
         /// </summary>
         /// <param name="shouldExecute"></param>
         /// <param name="action"></param>
-        public UpdateControllerAction(Func<bool> shouldExecute, Action<FactionController> action)
+        /// <param name="maxExecutions"></param>
+        public UpdateControllerAction(Func<bool> shouldExecute, Action<FactionController> action, int maxExecutions = 0)
         {
             this.shouldExecute = shouldExecute;
             this.action = action;
+            useCounter = 0;
+            this.maxExecutions = maxExecutions;
         }
     }
 }
