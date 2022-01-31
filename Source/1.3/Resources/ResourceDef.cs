@@ -41,7 +41,6 @@ namespace Empire_Rewritten
         /// <returns></returns>
         public ResourceModifier GetTileModifier(Tile tile)
         {
-
             float result = 1;
 
 
