@@ -70,10 +70,13 @@ namespace Empire_Rewritten.AI
 
        
         /// <summary>
-        /// Search for tiles based on weights;
+        /// Search for tiles to build settlements on based off weights;
         /// Weights:
         /// - Resources
         /// - Border distance
+        /// 
+        /// Resources AI wants = higher weight
+        /// Resources AI has excess of = lower weight
         /// </summary>
         /// <returns></returns>
         public Tile SearchForTile()

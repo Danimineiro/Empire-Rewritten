@@ -22,8 +22,8 @@ namespace Empire_Rewritten
         {
             get { 
                 return iconData.Graphic;
-            }
-        }
+        }            }
+
 
         public ThingFilter resourcesCreated;
 
