@@ -18,20 +18,37 @@ namespace Empire_Rewritten
     {
         public GraphicData iconData;
 
-        public Graphic Graphic
-        {
-            get { 
-                return iconData.Graphic;
-        }            }
+        public ThingFilter resourcesCreated = new ThingFilter();
 
-
-        public ThingFilter resourcesCreated;
-
-        
         public SimpleCurve temperatureCurve;
         public SimpleCurve heightCurve;
 
         public List<BiomeModifier> biomeModifiers;
+        public List<StuffCategoryDef> stuffCategories;
+        public List<ThingDef> allowedThingDefs;
+        public List<ThingDef> postRemoveThingDefs;
+        private bool hasCachedThings = false;
+
+        public Graphic Graphic => iconData.Graphic;
+
+        /// <summary>
+        /// Caches the resources created from this Resource Def inside a ThingFilter and returns it
+        /// </summary>
+        public ThingFilter ResourcesCreated
+        {
+            get
+            {
+                if (!hasCachedThings)
+                {
+                    stuffCategories?.ForEach(category => resourcesCreated.SetAllow(category, true));
+                    allowedThingDefs?.ForEach(thingDef => resourcesCreated.SetAllow(thingDef, true));
+                    postRemoveThingDefs?.ForEach(thingDef => resourcesCreated.SetAllow(thingDef, false));
+                    hasCachedThings = true;
+                }
+
+                return resourcesCreated;
+            }
+        }
 
         private Dictionary<BiomeDef, ResourceModifier> cachedBiomeModifiers = new Dictionary<BiomeDef, ResourceModifier> ();
         /// <summary>
@@ -42,7 +59,6 @@ namespace Empire_Rewritten
         public ResourceModifier GetTileModifier(Tile tile)
         {
             float result = 1;
-
 
             float tempVal = temperatureCurve.Evaluate(tile.temperature);
             float heightVal = heightCurve.Evaluate(tile.elevation);
