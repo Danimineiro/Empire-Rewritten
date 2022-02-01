@@ -142,7 +142,7 @@ namespace Empire_Rewritten
                     else
                         Widgets.DrawLightHighlight(rect_ThingDefsHighlight);
 
-                    GUI.DrawTexture(rect_ThingDefIcons, Widgets.GetIconFor(current));
+                    Widgets.ThingIcon(rect_ThingDefIcons, current);
                     Widgets.Label(rect_ThingDefs, current.label);
 
                     GUI.EndGroup();
