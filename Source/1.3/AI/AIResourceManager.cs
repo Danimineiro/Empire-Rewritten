@@ -132,6 +132,18 @@ namespace Empire_Rewritten.AI
         }
 
         /// <summary>
+        /// Get amount of a resource produced
+        /// </summary>
+        /// <param name="def"></param>
+        /// <returns></returns>
+        public float GetAmountProduced(ResourceDef def)
+        {
+            Dictionary<ResourceDef, float> knownResources = AllResourcesProduced();
+            float result = knownResources.ContainsKey(def) ? knownResources[def]: 0;
+            return result;
+        }
+
+        /// <summary>
         /// Find all resources produced.
         /// </summary>
         /// <returns></returns>
