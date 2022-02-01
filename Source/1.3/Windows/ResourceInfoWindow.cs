@@ -108,24 +108,30 @@ namespace Empire_Rewritten
         {
             Widgets.Label(rect_DefSelector, defSelected?.label ?? "Empire_ResourceInfoWindowSelector".Translate());
             {
-                Find.WindowStack.Add(new FloatMenu(DefOptions()));
+                Find.WindowStack.Add(new FloatMenu(DefOptions));
             }
         }
+
+        /// <summary>
+        /// A list of defs to choose from
+        /// </summary>
+        private List<FloatMenuOption> DefOptions => cachedOptions ?? (cachedOptions = CreateFloatMenuOptions());
 
         /// <summary>
         /// Makes a list out of all ResourceDefs to select from
         /// </summary>
         /// <returns>the list</returns>
-        private List<FloatMenuOption> DefOptions()
+        private List<FloatMenuOption> CreateFloatMenuOptions()
         {
             resources = resources ?? (resources = DefDatabase<ResourceDef>.AllDefsListForReading);
+
             List<FloatMenuOption> floatMenuOptions = new List<FloatMenuOption>();
 
             foreach (ResourceDef def in resources)
             {
                 floatMenuOptions.Add(new FloatMenuOption(def.label, delegate
                 {
-                    this.defSelected = def;
+                    defSelected = def;
                 }));
             }
 
