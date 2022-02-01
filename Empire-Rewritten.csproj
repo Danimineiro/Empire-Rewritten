@@ -22,7 +22,6 @@
 
   <ItemGroup>
     <Folder Include="1.3\Patches\" />
-    <Folder Include="1.3\Textures\Resources\" />
     <Folder Include="About\" />
   </ItemGroup>
 
