@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+	<Empire_ResourceInfoWindowSelector>Select a resource to look at</Empire_ResourceInfoWindowSelector>
+	<Empire_ResourceInfoWindowHeightCurve>Height Curve</Empire_ResourceInfoWindowHeightCurve>
+	<Empire_ResourceInfoWindowTempCurve>Temperature Curve</Empire_ResourceInfoWindowTempCurve>
+	<Empire_ResourceInfoWindowCurveMissing>This resource doesn't have a curve</Empire_ResourceInfoWindowCurveMissing>
+</LanguageData>

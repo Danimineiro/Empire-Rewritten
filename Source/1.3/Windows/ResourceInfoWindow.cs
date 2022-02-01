@@ -54,6 +54,9 @@ namespace Empire_Rewritten
         private void DrawCurves()
         {
             SimpleCurveDrawer.DrawCurve(rect_HeightCurve, defSelected.heightCurve);
+            DrawLabeledCurve(rect_HeightCurve, defSelected.heightCurve, "Empire_ResourceInfoWindowHeightCurve".Translate());
+            DrawLabeledCurve(rect_TempCurve, defSelected.temperatureCurve, "Empire_ResourceInfoWindowTempCurve".Translate());
+                Widgets.Label(rect, "Empire_ResourceInfoWindowCurveMissing".Translate());
 
             SimpleCurveDrawer.DrawCurve(rect_TempCurve, defSelected.temperatureCurve);
         }
@@ -103,7 +106,7 @@ namespace Empire_Rewritten
         /// </summary>
         private void DrawDefSelectorButton()
         {
-            if (Widgets.ButtonText(rect_DefName, defSelected?.label ?? "Select a resource def to look at"))
+            Widgets.Label(rect_DefSelector, defSelected?.label ?? "Empire_ResourceInfoWindowSelector".Translate());
             {
                 Find.WindowStack.Add(new FloatMenu(DefOptions()));
             }
