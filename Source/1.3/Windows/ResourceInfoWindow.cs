@@ -82,17 +82,17 @@ namespace Empire_Rewritten
         /// </summary>
         private void DrawCurves()
         {
-            DrawLabeledCurve(rect_HeightCurve, defSelected.heightCurve, "Empire_ResourceInfoWindowHeightCurve".Translate());
-            DrawLabeledCurve(rect_TempCurve, defSelected.temperatureCurve, "Empire_ResourceInfoWindowTempCurve".Translate());
+            DrawLabeledCurve(rect_HeightCurve, defSelected.heightCurve, "Empire_ResourceInfoWindowHeightCurve".Translate(), "Empire_ResourceInfoWindowHeightCurveLabelX".Translate(), new FloatRange(0f, 2500f));
+            DrawLabeledCurve(rect_TempCurve, defSelected.temperatureCurve, "Empire_ResourceInfoWindowTempCurve".Translate(), "Empire_ResourceInfoWindowTempCurveLabelX".Translate(), new FloatRange(-50f, 50f));
         }
 
         /// <summary>
-        /// Draws a <paramref name="curve"/> with a <paramref name="label"/> into a <paramref name="rect"/>
+        /// Draws a <paramref name="curve"/> with a <paramref name="labelRight"/> into a <paramref name="rect"/>
         /// </summary>
         /// <param name="rect"></param>
         /// <param name="curve"></param>
-        /// <param name="label"></param>
-        private void DrawLabeledCurve(Rect rect, SimpleCurve curve, string label)
+        /// <param name="labelRight"></param>
+        private void DrawLabeledCurve(Rect rect, SimpleCurve curve, string labelRight, string labelX, FloatRange range)
         {
             if (curve == null)
             {
@@ -108,12 +108,35 @@ namespace Empire_Rewritten
 
             Rect tempLabelRect = rect.BottomPartPixels(rect.height / 12f);
 
-            SimpleCurveDrawer.DrawCurve(rect, curve);
+            SimpleCurveDrawerStyle style = new SimpleCurveDrawerStyle()
+            {
+                DrawBackground = false,
+                DrawBackgroundLines = true,
+                DrawCurveMousePoint = true,
+                DrawLegend = false,
+                DrawMeasures = false,
+                DrawPoints = true,
+                LabelX = $"<color=orange>{labelX}</color>",
+                OnlyPositiveValues = false,
+                PointsRemoveOptimization = true,
+                UseAntiAliasedLines = true,
+                XIntegersOnly = false,
+                YIntegersOnly = false,
+                FixedSection = range,
+                FixedScale = new Vector2(-0.135f, 1.5f),
+                UseFixedSection = true,
+                UseFixedScale = true
+            };
+
+            SimpleCurveDrawer.DrawCurve(rect, curve, style);
             Widgets.DrawBoxSolid(tempLabelRect, transGray);
             rect.DrawBorderAroundRect(borderSize);
 
             Text.Anchor = TextAnchor.LowerRight;
-            Widgets.Label(tempLabelRect, $"{label} ");
+            Widgets.Label(tempLabelRect, $"{labelRight} ");
+
+            Text.Anchor = TextAnchor.LowerLeft;
+            Widgets.Label(tempLabelRect, $" {"Empire_ResourceInfoWindowEfficiency".Translate()} ");
             ResetTextAndColor();
         }
 
