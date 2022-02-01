@@ -108,7 +108,7 @@ namespace Empire_Rewritten.AI
         }
      
         /// <summary>
-        /// Builds a facility in a 
+        /// Builds a facility in a settlement.
         /// </summary>
         /// <returns></returns>
         public bool BuildFacility(FacilityManager manager)
