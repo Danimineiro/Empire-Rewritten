@@ -21,7 +21,11 @@ namespace Empire_Rewritten
         public ThingFilter resourcesCreated = new ThingFilter();
 
         public SimpleCurve temperatureCurve;
+        public SimpleCurve elevationAboveSeaLevelCurve;
+        public SimpleCurve rainfallCurve;
         public SimpleCurve heightCurve;
+        public SimpleCurve swampinessCurve;
+
 
         public List<BiomeModifier> biomeModifiers;
         public List<StuffCategoryDef> stuffCategories;
@@ -61,9 +65,12 @@ namespace Empire_Rewritten
             float result = 1;
 
             float tempVal = temperatureCurve.Evaluate(tile.temperature);
-            float heightVal = heightCurve.Evaluate(tile.elevation);
+            float heightVal = heightCurve.Evaluate((float)tile.hilliness);
+            float elevationVal = elevationAboveSeaLevelCurve.Evaluate(tile.elevation);
+            float swampinessVal = swampinessCurve.Evaluate(tile.swampiness);
+            float rainfallVal = rainfallCurve.Evaluate(tile.rainfall);
             ResourceModifier biomeModifier = GetBiomeModifier(tile);
-            result *= (tempVal * heightVal*biomeModifier.multiplier);
+            result *= (tempVal * heightVal*biomeModifier.multiplier * swampinessVal * rainfallVal * elevationVal);
 
             ResourceModifier modifer = new ResourceModifier(this, biomeModifier.offset, result);
             
