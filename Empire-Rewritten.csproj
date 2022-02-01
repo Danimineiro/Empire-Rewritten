@@ -21,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="1.3\Languages\English\" />
     <Folder Include="1.3\Patches\" />
     <Folder Include="1.3\Textures\Resources\" />
     <Folder Include="About\" />
