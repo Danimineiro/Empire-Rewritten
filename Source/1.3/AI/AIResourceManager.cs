@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RimWorld.Planet;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -151,10 +152,16 @@ namespace Empire_Rewritten.AI
         {
             Dictionary<ResourceDef, ResourceModifier> modifiers = parentPlayer.Manager.ResourceModifiersFromAllFacilities();
             Dictionary<ResourceDef, float> result = new Dictionary<ResourceDef, float>();
-            foreach (ResourceDef def in modifiers.Keys)
+            foreach (ResourceDef def in this.FindAllResourceDefs)
             {
-                ResourceModifier resourceModifier = modifiers[def];
-                result.Add(def, resourceModifier.TotalProduced());
+                if (modifiers.ContainsKey(def)) {
+                    ResourceModifier resourceModifier = modifiers[def];
+                    result.Add(def, resourceModifier.TotalProduced());
+                }
+                else
+                {
+                    result.Add(def, 0);
+                }
             }
             return result;
         }
@@ -166,6 +173,36 @@ namespace Empire_Rewritten.AI
                 Dictionary<ResourceDef, float> resourcesProduced = AllResourcesProduced();
                 criticalResources.RemoveAll(x => resourcesProduced.ContainsKey(x) && resourcesProduced[x] > LowResourceDecider / 2);
             }
+        }
+
+        /// <summary>
+        /// Search for tiles to build settlements on based off weights;
+        /// Weights:
+        /// - Resources
+        /// - Border distance
+        /// 
+        /// Resources AI wants = higher weight
+        /// Resources AI has excess of = lower weight
+        /// </summary>
+        /// <returns></returns>
+        public float GetTileResourceWeight(Tile tile)
+        {
+            //temp test
+            //todo when bordermanager is implimented:
+            //only pull from owned tiles.
+            List<ResourceDef> lowResources = FindLowResources();
+            List<ResourceDef> highResources = FindExcessResources();
+
+            float weight = 0;
+            foreach (ResourceDef resourceDef in lowResources)
+            {
+                weight += GetAmountProduced(resourceDef);
+            }
+            foreach (ResourceDef resourceDef in highResources)
+            {
+                weight -= GetAmountProduced(resourceDef);
+            }
+            return weight;
         }
     }
 }

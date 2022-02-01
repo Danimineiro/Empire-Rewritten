@@ -78,6 +78,18 @@ namespace Empire_Rewritten
 
         }
 
+        public Settlement GetSettlement(FacilityManager manager)
+        {
+            foreach(Settlement settlement in settlements.Keys)
+            {
+                if (settlements[settlement] == manager)
+                {
+                    return settlement;
+                }
+            }
+            return null;
+        }
+
         public FacilityManager GetFacilityManager(Settlement settlement)
         {
             if (settlements.ContainsKey(settlement))

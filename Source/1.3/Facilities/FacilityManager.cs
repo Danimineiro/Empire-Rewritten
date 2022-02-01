@@ -115,7 +115,6 @@ namespace Empire_Rewritten
         
         
         
-        
         /// <summary>
         /// Used for building a new facility on the settlement.
         /// </summary>
