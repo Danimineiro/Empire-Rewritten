@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using Empire_Rewritten.Util;
 using Verse;
-using HarmonyLib;
 
 namespace Empire_Rewritten
 {
@@ -17,54 +17,117 @@ namespace Empire_Rewritten
 
     public class ResourceInfoWindow : Window
     {
-        private readonly static Rect rect_DefName = new Rect(90f, 20f, 500f, 64f);
-        private readonly static Rect rect_DefIcon = new Rect(10f, 20f, 64f, 64f);
-        private readonly static Rect rect_ThingDefContainer = new Rect(610f, 20f, 569f, 40f);
-        private readonly static Rect rect_ThingDefIcons = new Rect(0f, 0f, 25f, 25f);
-        private readonly static Rect rect_ThingDefs = new Rect(45f, 0f, 515f, 25f);
-        private readonly static Rect rect_ThingDefsHighlight = new Rect(0f, 0f, 515f, 25f);
-        private readonly static Rect rect_TempCurve = new Rect(10f, 400f, 580f, 190f);
-        private readonly static Rect rect_HeightCurve = new Rect(610f, 400f, 580f, 190f);
-        private readonly static Rect rect_DefDesc = new Rect(10f, 145f, 580f, 240f);
+        //GUI.Group that can move everything
+        private readonly static Rect rect_fullRect = new Rect(22f, 22f, 1202f, 592f);
 
-        private readonly static Rect rect_ScrollRect = new Rect(new Vector2(610f, 20f), new Vector2(580f, 320f));
-        private readonly static Rect rect_ScrollViewRect = new Rect(new Vector2(610f, 20f), new Vector2(563f, 320f));
+        private readonly static Rect rect_DefIcon = new Rect(2f, 2f, 64f, 64f);
+        private readonly static Rect rect_DefSelector = new Rect(68f, 2f, 514f, 64f);
+        private readonly static Rect rect_DefDesc = new Rect(2f, 86f, 580f, 240f);
 
-        private readonly static Color gray = new Color(0f, 0f, 0f, 0.5f);
+        //In GUI.Group managed by container
+        private readonly static Rect rect_ThingDefContainer = new Rect(602f, 2f, 580f, 29f);
+        private readonly static Rect rect_ThingDefIcons = new Rect(2f, 2f, 25f, 25f);
+        private readonly static Rect rect_ThingDefs = new Rect(47f, 2f, 513f, 25f);
+        private readonly static Rect rect_ThingDefsHighlight = new Rect(0f, 0f, 569f, 29f);
+
+        private readonly static Rect rect_TempCurve = new Rect(2f, 348f, 580f, 224f);
+        private readonly static Rect rect_HeightCurve = new Rect(602f, 348f, 580f, 224f);
+
+        private readonly static Rect rect_ScrollRect = new Rect(602f, 2f, 580f, 324f);
+
+        private readonly static Color transGray = new Color(0f, 0f, 0f, 0.5f);
+
+        private readonly static int borderSize = 2;
+
+        private static readonly GameFont prevFont = Text.Font;
+        private static readonly TextAnchor prevAnchor = Text.Anchor;
+        private static readonly Color prevColor = GUI.color;
 
         private List<ResourceDef> resources = null;
+        private List<FloatMenuOption> cachedOptions = null;
         private Vector2 defDescScrollVector = new Vector2();
         private Vector2 scrollRectVector = new Vector2();
-
+        private Rect rect_ScrollViewRect = new Rect(602f, 2f, 563f, 324f);
+        
         private ResourceDef defSelected;
 
-        public override Vector2 InitialSize => new Vector2(1240, 640);
+        public override Vector2 InitialSize => new Vector2(1229f, 619f);
+        protected override float Margin => 0f;
 
         public override void DoWindowContents(Rect inRect)
         {
-            DrawDefSelectorButton();
-            if (defSelected == null) return;
+            if (Widgets.CloseButtonFor(inRect)) Close();
 
-            DrawDefInfo();
-            DrawItems();
-            DrawCurves();
-            DrawBoxes();
+            GUI.BeginGroup(rect_fullRect);
+            DrawDefSelectorButton();
+            DrawDefContent();
+            GUI.EndGroup();
         }
 
+        /// <summary>
+        /// Draws the contents of the selected def if available
+        /// </summary>
+        private void DrawDefContent()
+        {
+            if (defSelected != null)
+            {
+                DrawDescriptionAndIcon();
+                DrawItems();
+                DrawCurves();
+            }
+        }
+
+        /// <summary>
+        /// Draws the defs curves
+        /// </summary>
         private void DrawCurves()
         {
-            SimpleCurveDrawer.DrawCurve(rect_HeightCurve, defSelected.heightCurve);
             DrawLabeledCurve(rect_HeightCurve, defSelected.heightCurve, "Empire_ResourceInfoWindowHeightCurve".Translate());
             DrawLabeledCurve(rect_TempCurve, defSelected.temperatureCurve, "Empire_ResourceInfoWindowTempCurve".Translate());
-                Widgets.Label(rect, "Empire_ResourceInfoWindowCurveMissing".Translate());
-
-            SimpleCurveDrawer.DrawCurve(rect_TempCurve, defSelected.temperatureCurve);
         }
 
+        /// <summary>
+        /// Draws a <paramref name="curve"/> with a <paramref name="label"/> into a <paramref name="rect"/>
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="curve"></param>
+        /// <param name="label"></param>
+        private void DrawLabeledCurve(Rect rect, SimpleCurve curve, string label)
+        {
+            if (curve == null)
+            {
+                GUI.color = Color.red + Color.yellow;
+                Widgets.Label(rect, "Empire_ResourceInfoWindowCurveMissing".Translate());
+                ResetTextAndColor();
+
+                Widgets.DrawBoxSolid(rect, Color.black);
+                rect.DrawBorderAroundRect(borderSize);
+                return;
+            }
+
+
+            Rect tempLabelRect = rect.BottomPartPixels(rect.height / 12f);
+
+            SimpleCurveDrawer.DrawCurve(rect, curve);
+            Widgets.DrawBoxSolid(tempLabelRect, transGray);
+            rect.DrawBorderAroundRect(borderSize);
+
+            Text.Anchor = TextAnchor.LowerRight;
+            Widgets.Label(tempLabelRect, $"{label} ");
+            ResetTextAndColor();
+        }
+
+        /// <summary>
+        /// Draws all the items allowed in the ResourceDef
+        /// </summary>
         private void DrawItems()
         {
+            Text.Anchor = TextAnchor.MiddleLeft;
+
             if (defSelected.ResourcesCreated.AllowedThingDefs.ToList() is List<ThingDef> thingDefs)
             {
+                rect_ScrollRect.DrawBorderAroundRect(borderSize);
+                rect_ScrollViewRect.height = thingDefs.Count * rect_ThingDefContainer.height;
                 Widgets.BeginScrollView(rect_ScrollRect, ref scrollRectVector, rect_ScrollViewRect);
                 for (int i = 0; i < thingDefs.Count; i++)
                 {
@@ -73,7 +136,12 @@ namespace Empire_Rewritten
                     ThingDef current = thingDefs[i];
 
                     GUI.BeginGroup(temp);
-                    Widgets.DrawHighlight(rect_ThingDefsHighlight);
+
+                    if (i % 2 != 0)
+                        Widgets.DrawHighlight(rect_ThingDefsHighlight);
+                    else
+                        Widgets.DrawLightHighlight(rect_ThingDefsHighlight);
+
                     GUI.DrawTexture(rect_ThingDefIcons, Widgets.GetIconFor(current));
                     Widgets.Label(rect_ThingDefs, current.label);
 
@@ -82,23 +150,24 @@ namespace Empire_Rewritten
 
                 Widgets.EndScrollView();
             }
+
+            ResetTextAndColor();
         }
 
-        private void DrawBoxes()
+        /// <summary>
+        /// Draws the ResourceIcon and it's description
+        /// </summary>
+        private void DrawDescriptionAndIcon()
         {
-            Widgets.DrawHighlight(rect_DefDesc);
-            Widgets.DrawHighlight(rect_TempCurve);
-            Widgets.DrawHighlight(rect_HeightCurve);
-
-            Widgets.DrawBox(rect_DefDesc, 2);
-            Widgets.DrawBox(rect_TempCurve, 2);
-            Widgets.DrawBox(rect_HeightCurve, 2);
-        }
-
-        private void DrawDefInfo()
-        {
+            //Def Icon
             GUI.DrawTexture(rect_DefIcon, ContentFinder<Texture2D>.Get(defSelected.iconData.texPath));
+            Widgets.DrawLightHighlight(rect_DefIcon);
+            rect_DefIcon.DrawBorderAroundRect(borderSize);
+
+            //Def Description
             Widgets.TextAreaScrollable(rect_DefDesc, defSelected.description, ref defDescScrollVector, true);
+            Widgets.DrawLightHighlight(rect_DefDesc.ExpandedBy(borderSize));
+            rect_DefDesc.DrawBorderAroundRect(borderSize);
         }
 
         /// <summary>
@@ -106,7 +175,17 @@ namespace Empire_Rewritten
         /// </summary>
         private void DrawDefSelectorButton()
         {
+            Text.Anchor = TextAnchor.MiddleCenter;
+            Text.Font = GameFont.Medium;
+
+            Widgets.DrawLightHighlight(rect_DefSelector);
+            Widgets.DrawHighlightIfMouseover(rect_DefSelector);
             Widgets.Label(rect_DefSelector, defSelected?.label ?? "Empire_ResourceInfoWindowSelector".Translate());
+            rect_DefSelector.DrawBorderAroundRect(borderSize);
+
+            ResetTextAndColor();
+
+            if (Widgets.ButtonInvisible(rect_DefSelector))
             {
                 Find.WindowStack.Add(new FloatMenu(DefOptions));
             }
@@ -136,6 +215,16 @@ namespace Empire_Rewritten
             }
 
             return floatMenuOptions;
+        }
+
+        /// <summary>
+        /// Resets the Text.Font, Text.Anchor and GUI.color setting
+        /// </summary>
+        private static void ResetTextAndColor()
+        {
+            Text.Font = prevFont;
+            Text.Anchor = prevAnchor;
+            GUI.color = prevColor;
         }
     }
 }
