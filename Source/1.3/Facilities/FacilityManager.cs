@@ -38,18 +38,11 @@ namespace Empire_Rewritten
         {
             if (RefreshModifiers)
             {
+                gizmos.Clear();
                 RefreshModifiers = false;
-                foreach(FacilityDef facilityDef in installedFacilities.Keys.ToList())
+                foreach(Facility facility in installedFacilities.Values)
                 {
-                    if(facilityDef.facilityWorker!= null )
-                    {
-                        FacilityWorker worker = (FacilityWorker)Activator.CreateInstance(facilityDef.facilityWorker);
-                        List<Gizmo> newGizmos = (List<Gizmo>)worker.GetGizmos();
-                        foreach(Gizmo gizmo in newGizmos)
-                        {
-                            gizmos.Add(gizmo);
-                        }
-                    }
+                    gizmos.AddRange(facility.FacilityWorker.GetGizmos());
                 }
             }
             return gizmos;
@@ -150,14 +143,6 @@ namespace Empire_Rewritten
             }
         }
        
-        /// <summary>
-        /// Can this be built here?
-        /// </summary>
-        /// <returns></returns>
-        public bool CanBuildAt(FacilityDef facilityDef)
-        {
-            return true;
-        }
 
         /// <summary>
         /// Has a facility of facilityDef

@@ -13,6 +13,16 @@ namespace Empire_Rewritten
         int amount;
         public FacilityDef def;
 
+        private FacilityWorker worker;
+
+        public FacilityWorker FacilityWorker
+        {
+            get
+            {
+                return worker;
+            }
+        }
+
         private bool ShouldRecalculateModifiers = true;
         private List<ResourceModifier> modifiers = new List<ResourceModifier>();
         private Settlement settlement;
@@ -42,6 +52,12 @@ namespace Empire_Rewritten
             this.def = def;
             this.settlement = settlement;
             amount=1;
+
+            if (def.facilityWorker != null)
+            {
+                worker = (FacilityWorker)Activator.CreateInstance(def.facilityWorker);
+                worker.facilityDef = def;
+            }
         }
 
         public Facility()

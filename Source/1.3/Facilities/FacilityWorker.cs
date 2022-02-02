@@ -12,9 +12,15 @@ namespace Empire_Rewritten
     /// </summary>
     public class FacilityWorker
     {
+        public FacilityDef facilityDef;
         public virtual IEnumerable<Gizmo> GetGizmos()
         {
             yield return null;
+        }
+
+        public virtual bool CanBuildAt(FacilityManager manager)
+        {
+            return true;
         }
     }
 }

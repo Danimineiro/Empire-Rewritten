@@ -12,6 +12,21 @@ namespace Empire_Rewritten
         public Dictionary<ResourceDef, float> resourceMultipliers = new Dictionary<ResourceDef, float>();
         public Dictionary<ResourceDef,int> resourceOffsets = new Dictionary<ResourceDef, int>();
 
+        private FacilityWorker worker;
+
+        public FacilityWorker FacilityWorker
+        {
+            get
+            {
+                if(worker == null)
+                {
+                    worker = (FacilityWorker)Activator.CreateInstance(this.facilityWorker);
+                    worker.facilityDef = this;
+                }
+                return worker;
+            }
+        }
+
         private List<ResourceDef> producedResources = new List<ResourceDef>();
         public List<ResourceDef> ProducedResources
         {
