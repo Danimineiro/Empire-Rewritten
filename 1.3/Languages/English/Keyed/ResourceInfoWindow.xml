@@ -15,4 +15,12 @@
 
 	<Empire_ResourceInfoWindowCurveMissing>This resource doesn't have a curve</Empire_ResourceInfoWindowCurveMissing>
 	<Empire_ResourceInfoWindowEfficiency>Y = Efficiency</Empire_ResourceInfoWindowEfficiency>
+
+	<Empire_ResourceInfoWindowLakeBonus>This resource benefits from neighboring lake tiles by {0}.</Empire_ResourceInfoWindowLakeBonus>
+	<Empire_ResourceInfoWindowOceanBonus>This resource benefits from neighboring ocean tiles by {0}.</Empire_ResourceInfoWindowOceanBonus>
+	<Empire_ResourceInfoWindowRiverBonus>This resource benefits from being on a river tile by {0}.</Empire_ResourceInfoWindowRiverBonus>
+
+	<Empire_ResourceInfoWindowLakeNoBonus>This resource doesn't benefit from neighboring lake tiles.</Empire_ResourceInfoWindowLakeNoBonus>
+	<Empire_ResourceInfoWindowOceanNoBonus>This resource doesn't benefit from neighboring ocean tiles.</Empire_ResourceInfoWindowOceanNoBonus>
+	<Empire_ResourceInfoWindowRiverNoBonus>This resource doesn't benefit from being on a river tile.</Empire_ResourceInfoWindowRiverNoBonus>
 </LanguageData>

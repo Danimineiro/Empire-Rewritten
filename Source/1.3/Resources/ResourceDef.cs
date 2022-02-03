@@ -33,9 +33,9 @@ namespace Empire_Rewritten
         public List<ThingDef> allowedThingDefs;
         public List<ThingDef> postRemoveThingDefs;
 
-        public bool getsLakeBonus;
-        public bool getsOceanBonus;
-        public bool getsRiverBonus;
+        public float lakeBonus = 0f;
+        public float oceanBonus = 0f;
+        public float riverBonus = 0f;
         private bool hasCachedThingDefs = false;
 
         public Graphic Graphic => iconData.Graphic;

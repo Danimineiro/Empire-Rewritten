@@ -155,6 +155,7 @@ namespace Empire_Rewritten
         private void DrawItems()
         {
             Text.Anchor = TextAnchor.MiddleLeft;
+            Text.Font = GameFont.Small;
 
             if (defSelected.ResourcesCreated.AllowedThingDefs.ToList() is List<ThingDef> thingDefs)
             {
@@ -191,15 +192,44 @@ namespace Empire_Rewritten
         /// </summary>
         private void DrawDescriptionAndIcon()
         {
+            Text.Font = GameFont.Small;
+
             //Def Icon
             GUI.DrawTexture(rect_DefIcon, ContentFinder<Texture2D>.Get(defSelected.iconData.texPath));
             Widgets.DrawLightHighlight(rect_DefIcon);
             rect_DefIcon.DrawBorderAroundRect(borderSize);
 
             //Def Description
-            Widgets.TextAreaScrollable(rect_DefDesc, defSelected.description, ref defDescScrollVector, true);
+            Widgets.LabelScrollable(rect_DefDesc.ContractedBy(5f), MakeDefDescriptionString(), ref defDescScrollVector, true);
             Widgets.DrawLightHighlight(rect_DefDesc.ExpandedBy(borderSize));
             rect_DefDesc.DrawBorderAroundRect(borderSize);
+
+            ResetTextAndColor();
+        }
+
+
+        /// <returns>The def description string</returns>
+        private string MakeDefDescriptionString()
+        {
+            string desc = defSelected.description;
+            string lakeBonus = GetBonusStringWithColor("Empire_ResourceInfoWindowLake", defSelected.lakeBonus);
+            string oceanBonus = GetBonusStringWithColor("Empire_ResourceInfoWindowOcean", defSelected.oceanBonus);
+            string riverBonus = GetBonusStringWithColor("Empire_ResourceInfoWindowRiver", defSelected.riverBonus);
+
+            return $"{desc}\n\n{lakeBonus}\n{oceanBonus}\n{riverBonus}";
+        }
+
+        /// <summary>
+        /// Colors a resource info string <paramref name="translationKey"/> based on <paramref name="bonus"/>
+        /// </summary>
+        /// <param name="translationKey"></param>
+        /// <param name="bonus"></param>
+        /// <returns></returns>
+        private string GetBonusStringWithColor(string translationKey, float bonus)
+        {
+            string fullString = bonus > 0f ? $"{translationKey}Bonus".Translate(bonus.ToStringPercent()) : $"{translationKey}NoBonus".Translate();
+            string color = bonus > 0f ? "green" : "red";
+            return $"<color={color}>{fullString}</color>";
         }
 
         /// <summary>
