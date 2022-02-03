@@ -17,6 +17,10 @@
 		<allowedThingDefs>
 			<li>ComponentIndustrial</li>
 		</allowedThingDefs>
+
+		<getsLakeBonus>false</getsLakeBonus>
+		<getsOceanBonus>false</getsOceanBonus>
+		<getsRiverBonus>false</getsRiverBonus>
 		
 		<temperatureCurve>
 			<points>

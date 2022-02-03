@@ -33,6 +33,7 @@ namespace Empire_Rewritten
         public List<ThingDef> allowedThingDefs;
         public List<ThingDef> postRemoveThingDefs;
 
+        public bool getsLakeBonus;
         public bool getsOceanBonus;
         public bool getsRiverBonus;
         private bool hasCachedThingDefs = false;
