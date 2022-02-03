@@ -28,6 +28,7 @@ namespace Empire_Rewritten
         public SimpleCurve heightCurve;
         public SimpleCurve swampinessCurve;
 
+
         public List<BiomeModifier> biomeModifiers;
         public List<StuffCategoryDef> stuffCategories;
         public List<ThingCategoryDef> thingCategoryDefs;
