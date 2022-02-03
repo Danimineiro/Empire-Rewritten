@@ -30,6 +30,7 @@ namespace Empire_Rewritten
         private readonly static Rect rect_ThingDefs = new Rect(47f, 2f, 513f, 25f);
         private readonly static Rect rect_ThingDefsHighlight = new Rect(0f, 0f, 569f, 29f);
 
+        private readonly static Rect rect_CurveContainer = new Rect(2f, 348f, 1182f, 224f);
         private readonly static Rect rect_TempCurve = new Rect(2f, 348f, 580f, 224f);
         private readonly static Rect rect_HeightCurve = new Rect(602f, 348f, 580f, 224f);
 
@@ -82,8 +83,10 @@ namespace Empire_Rewritten
         /// </summary>
         private void DrawCurves()
         {
-            DrawLabeledCurve(rect_HeightCurve, defSelected.heightCurve, "Empire_ResourceInfoWindowHeightCurve".Translate(), "Empire_ResourceInfoWindowHeightCurveLabelX".Translate(), new FloatRange(0f, 2500f));
-            DrawLabeledCurve(rect_TempCurve, defSelected.temperatureCurve, "Empire_ResourceInfoWindowTempCurve".Translate(), "Empire_ResourceInfoWindowTempCurveLabelX".Translate(), new FloatRange(-50f, 50f));
+            GUI.BeginGroup(rect_CurveContainer);
+            //DrawLabeledCurve(rect_HeightCurve, defSelected.heightCurve, "Empire_ResourceInfoWindowHeightCurve".Translate(), "Empire_ResourceInfoWindowHeightCurveLabelX".Translate(), new FloatRange(0f, 2500f));
+            //DrawLabeledCurve(rect_TempCurve, defSelected.temperatureCurve, "Empire_ResourceInfoWindowTempCurve".Translate(), "Empire_ResourceInfoWindowTempCurveLabelX".Translate(), new FloatRange(-50f, 50f));
+            GUI.EndGroup();
         }
 
         /// <summary>
@@ -92,6 +95,8 @@ namespace Empire_Rewritten
         /// <param name="rect"></param>
         /// <param name="curve"></param>
         /// <param name="labelRight"></param>
+        /// <param name="labelX"></param>
+        /// <param name="range">
         private void DrawLabeledCurve(Rect rect, SimpleCurve curve, string labelRight, string labelX, FloatRange range)
         {
             if (curve == null)
