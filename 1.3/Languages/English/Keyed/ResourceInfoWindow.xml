@@ -3,8 +3,16 @@
 	<Empire_ResourceInfoWindowSelector>Select a resource to look at</Empire_ResourceInfoWindowSelector>
 	<Empire_ResourceInfoWindowHeightCurve>Height Curve</Empire_ResourceInfoWindowHeightCurve>
 	<Empire_ResourceInfoWindowHeightCurveLabelX>Height (in Meters):</Empire_ResourceInfoWindowHeightCurveLabelX>
+	
 	<Empire_ResourceInfoWindowTempCurve>Temperature Curve</Empire_ResourceInfoWindowTempCurve>
 	<Empire_ResourceInfoWindowTempCurveLabelX>Temperature (in Celsius):</Empire_ResourceInfoWindowTempCurveLabelX>
+	
+	<Empire_ResourceInfoWindowRainfallCurve>Rainfall Curve</Empire_ResourceInfoWindowRainfallCurve>
+	<Empire_ResourceInfoWindowRainfallCurveLabelX>Rainfall (in mm):</Empire_ResourceInfoWindowRainfallCurveLabelX>
+
+	<Empire_ResourceInfoWindowSwampinessCurve>Swampiness Curve</Empire_ResourceInfoWindowSwampinessCurve>
+	<Empire_ResourceInfoWindowSwampinessCurveLabelX>Swampiness:</Empire_ResourceInfoWindowSwampinessCurveLabelX>
+
 	<Empire_ResourceInfoWindowCurveMissing>This resource doesn't have a curve</Empire_ResourceInfoWindowCurveMissing>
 	<Empire_ResourceInfoWindowEfficiency>Y = Efficiency</Empire_ResourceInfoWindowEfficiency>
 </LanguageData>
