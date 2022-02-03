@@ -21,6 +21,7 @@ namespace Empire_Rewritten.AI
             {
                 if (cachedManager== null || ManagerIsDirty)
                 {
+                  
                     ManagerIsDirty = true;
                     UpdateController updateController = UpdateController.GetUpdateController;
                     FactionController factionController = updateController.FactionController;

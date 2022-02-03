@@ -71,9 +71,11 @@ namespace Empire_Rewritten
             settlements.Add(settlement, tracker);
         }
 
+        private List<Settlement> settlementsForLoading = new List<Settlement>();
+        private List<FacilityManager> facilityManagersForLoading = new List<FacilityManager>();
         public void ExposeData()
         {
-            Scribe_Collections.Look(ref settlements, "settlements", LookMode.Reference, LookMode.Deep);
+            Scribe_Collections.Look<Settlement,FacilityManager>(ref settlements, "settlements", LookMode.Reference, LookMode.Deep,keysWorkingList:ref settlementsForLoading,valuesWorkingList:ref facilityManagersForLoading);
             Scribe_Deep.Look(ref storageTracker, "storageTracker");
 
         }

@@ -14,9 +14,6 @@ namespace Empire_Rewritten.AI
         private AIPlayer parentPlayer;
 
         private List<ResourceDef> criticalResources = new List<ResourceDef>();
-        private int LowResourceDecider=30;
-        private int HighResourceDecider = 50;
-
         public bool HasCriticalResource
         {
             get
@@ -62,11 +59,11 @@ namespace Empire_Rewritten.AI
             {
                 if (producedknown.ContainsKey(def))
                 {
-                    if (producedknown[def] <= LowResourceDecider)
+                    if (producedknown[def] <= def.desiredAIMinimum)
                     {
                         result.Add(def);
                         resourceBelowDecider = true;
-                        if (producedknown[def] < LowResourceDecider / 2)
+                        if (producedknown[def] < def.desiredAIMinimum / 2)
                         {
                             criticalResources.Add(def);
                         }
@@ -117,7 +114,7 @@ namespace Empire_Rewritten.AI
             {
                 if (producedknown.ContainsKey(def))
                 {
-                    if (producedknown[def] >= HighResourceDecider)
+                    if (producedknown[def] >= def.desiredAIMaximum)
                     {
                         result.Add(def);
                     }
@@ -171,7 +168,7 @@ namespace Empire_Rewritten.AI
             if (!criticalResources.EnumerableNullOrEmpty())
             {
                 Dictionary<ResourceDef, float> resourcesProduced = AllResourcesProduced();
-                criticalResources.RemoveAll(x => resourcesProduced.ContainsKey(x) && resourcesProduced[x] > LowResourceDecider / 2);
+                criticalResources.RemoveAll(x => resourcesProduced.ContainsKey(x) && resourcesProduced[x] > x.desiredAIMinimum / 2);
             }
         }
 
@@ -196,11 +193,15 @@ namespace Empire_Rewritten.AI
             float weight = 0;
             foreach (ResourceDef resourceDef in lowResources)
             {
-                weight += GetAmountProduced(resourceDef);
+                weight += 1;
+            }
+            foreach (ResourceDef resourceDef in criticalResources)
+            {
+                weight += 5;
             }
             foreach (ResourceDef resourceDef in highResources)
             {
-                weight -= GetAmountProduced(resourceDef);
+                weight -= 1;
             }
             return weight;
         }

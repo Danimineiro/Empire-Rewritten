@@ -17,7 +17,7 @@ namespace Empire_Rewritten.AI
         }
 
         private List<FacilityManager> cachedFacilities;
-        HashSet<FacilityDef> cachedFacilitiesDef;
+        HashSet<FacilityDef> cachedFacilitiesDef = new HashSet<FacilityDef>();
         private bool updateCache = true;
         private bool updateDefCache = true;
 
