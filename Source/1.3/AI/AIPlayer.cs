@@ -12,6 +12,7 @@ namespace Empire_Rewritten.AI
         private AIFacilityManager facilityManager;
         private AISettlementManager settlementManager;
         private AIResourceManager resourceManager;
+
         private SettlementManager cachedManager;
         private bool ManagerIsDirty = true;
 
@@ -29,6 +30,14 @@ namespace Empire_Rewritten.AI
                     cachedManager = factionController.GetOwnedSettlementManager(Faction);
                 }
                 return cachedManager;
+            }
+        }
+
+        public AISettlementManager AISettlementManager
+        {
+            get
+            {
+                return settlementManager;
             }
         }
 
@@ -53,6 +62,8 @@ namespace Empire_Rewritten.AI
             this.resourceManager = new AIResourceManager(this);
             this.settlementManager = new AISettlementManager(this);
             this.facilityManager = new AIFacilityManager(this);
+
+            UpdateController.AddUpdateCall(MakeMove,ShouldExecute);
         }
 
         public AIResourceManager ResourceManager
@@ -63,9 +74,26 @@ namespace Empire_Rewritten.AI
             }
         }
 
-        public override void MakeMove()
+
+
+
+        public override void MakeMove(FactionController factionController)
         {
-            throw new NotImplementedException();
+            ResourceManager.DoModuleAction();
+            FacilityManager.DoModuleAction();
+            AISettlementManager.DoModuleAction();
+        }
+
+        int tick = 0;
+        public override bool ShouldExecute()
+        {
+            if (tick == 120)
+            {
+                tick = 0;
+                return true;
+            }
+            tick++;
+            return false;
         }
     }
 }

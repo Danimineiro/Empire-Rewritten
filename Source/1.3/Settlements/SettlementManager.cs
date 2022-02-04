@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using RimWorld;
 using RimWorld.Planet;
 using Verse;
 
@@ -16,19 +17,20 @@ namespace Empire_Rewritten
 
         private Dictionary<Settlement, FacilityManager> settlements = new Dictionary<Settlement, FacilityManager>();
         private StorageTracker storageTracker = new StorageTracker();
+        private Faction faction;
 
         /// <summary>
         /// Compiles a complete dictionary of all the resources a faction is producing and their modifiers.
         /// </summary>
         /// <returns></returns>
-        public Dictionary<ResourceDef,ResourceModifier> ResourceModifiersFromAllFacilities()
+        public Dictionary<ResourceDef, ResourceModifier> ResourceModifiersFromAllFacilities()
         {
-            Dictionary<ResourceDef,ResourceModifier> resourceModifiers = new Dictionary<ResourceDef, ResourceModifier>();
+            Dictionary<ResourceDef, ResourceModifier> resourceModifiers = new Dictionary<ResourceDef, ResourceModifier>();
             List<FacilityManager> facilities = settlements.Values.ToList();
-            foreach(FacilityManager facilityManager in facilities)
+            foreach (FacilityManager facilityManager in facilities)
             {
                 List<ResourceModifier> facilityMods = facilityManager.modifiers;
-                foreach(ResourceModifier resourceModifier in facilityMods)
+                foreach (ResourceModifier resourceModifier in facilityMods)
                 {
                     if (resourceModifiers.ContainsKey(resourceModifier.def))
                     {
@@ -56,10 +58,50 @@ namespace Empire_Rewritten
 
         }
 
-        public Dictionary<Settlement,FacilityManager> Settlements
+        public SettlementManager(Faction faction)
+        {
+            this.faction = faction;
+        }
+
+        public Dictionary<Settlement, FacilityManager> Settlements
         {
             get { return settlements; }
         }
+
+        /// <summary>
+        /// Place a settlement on a <paramref name="tile"/>.
+        /// </summary>
+        /// <param name="tile"></param>
+        /// <returns>If the settlement was built.</returns>
+        public bool BuildNewSettlementOnTile(Tile tile)
+        {
+            if (tile != null)
+            {
+                int tileID = Find.WorldGrid.tiles.IndexOf(tile);
+                if (TileFinder.IsValidTileForNewSettlement(tileID))
+                {
+                    Log.Message($"Tile is null: {tile == null}");
+                    Log.Message($"Faction is null: {faction == null}");
+                    Settlement settlement = (Settlement)WorldObjectMaker.MakeWorldObject(WorldObjectDefOf.Settlement);
+                    settlement.Tile = tileID;
+                    settlement.SetFaction(this.faction);
+
+                    List<string> used = new List<string>();
+                    List<Settlement> settlements = Find.WorldObjects.Settlements;
+                    foreach (Settlement found in settlements)
+                    {
+                        used.Add(found.Name);
+                    }
+
+                    settlement.Name = NameGenerator.GenerateName(faction.def.factionNameMaker, used, true);
+                    Find.WorldObjects.Add(settlement);
+                    AddSettlement(settlement);
+                    return true;
+                }
+            }
+            return false;
+        }
+        
 
         /// <summary>
         /// Add a settlement to the tracker.
@@ -76,6 +118,7 @@ namespace Empire_Rewritten
         public void ExposeData()
         {
             Scribe_Collections.Look<Settlement,FacilityManager>(ref settlements, "settlements", LookMode.Reference, LookMode.Deep,keysWorkingList:ref settlementsForLoading,valuesWorkingList:ref facilityManagersForLoading);
+            Scribe_References.Look(ref faction, "faction");
             Scribe_Deep.Look(ref storageTracker, "storageTracker");
 
         }

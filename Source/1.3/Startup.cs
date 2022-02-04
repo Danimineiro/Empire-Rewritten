@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using RimWorld;
 using Empire_Rewritten.Utils;
+using RimWorld.Planet;
 
 namespace Empire_Rewritten
 {
@@ -23,7 +24,6 @@ namespace Empire_Rewritten
             Log.Message("[Empire Rewritten] just here to say hello! ^-^ Have a nice day and great fun with Empire!".Rainbowify(" ", 35));
             AppendActionsToWorldStart();
             HarmonyPatcher.DoPatches();
-            AppendCreateFactionDatasFunction();
         }
 
         /// <summary>
@@ -33,6 +33,7 @@ namespace Empire_Rewritten
         {
             Log.Message($"<color=orange>[Empire]</color> Attaching actions to world start");
             UpdateController.AddFinalizeInitHook(AddFactionControllerIfMissing);
+            UpdateController.AddFinalizeInitHook(AddAIToNonPlayers);
         }
 
         /// <summary>
@@ -43,6 +44,21 @@ namespace Empire_Rewritten
         {
             if (UpdateController.GetUpdateController.HasFactionController) return;
             UpdateController.GetUpdateController.FactionController = new FactionController(FactionSettlementData.CreateFactionSettlementDatas());
+        }
+
+        /// <summary>
+        /// Add AI to non-player factions
+        /// </summary>
+        private static void AddAIToNonPlayers(FactionController factionController)
+        {
+            IEnumerable<Faction> factions = Find.World.factionManager.AllFactions;
+            foreach(Faction faction in factions)
+            {
+                if (!faction.IsPlayer && !faction.Hidden)
+                { 
+                    factionController.CreateNewAIPlayer(faction);
+                }
+            }
         }
     }
 }

@@ -93,7 +93,7 @@ namespace Empire_Rewritten.AI
         }
 
         /// <summary>
-        /// Checks that the AI has the resources to build the facility.
+        /// Checks that the AI has the resources to build the <paramref name="facilityDef"/>.
         /// </summary>
         /// <param name="facilityDef"></param>
         /// <returns></returns>
@@ -137,7 +137,7 @@ namespace Empire_Rewritten.AI
         public FacilityManager FindManagerToBuildOn()
         {
             List<ResourceDef> resourceDefs = player.ResourceManager.FindLowResources();
-            List<FacilityManager> managers = (List<FacilityManager>)player.Manager.GetAllFacilityManagers();
+            IEnumerable<FacilityManager> managers = player.Manager.GetAllFacilityManagers();
             List<FacilityManager> potentialResults = new List<FacilityManager>();
             foreach (ResourceDef resourceDef in resourceDefs)
             {
@@ -150,7 +150,12 @@ namespace Empire_Rewritten.AI
                     }
                 }
             }
-            return potentialResults.RandomElement();
+            if (potentialResults.Count() > 0)
+            {
+                return potentialResults.RandomElement();
+            }
+            canMakeFacilities = false;
+            return null;
         }
 
 
@@ -192,9 +197,13 @@ namespace Empire_Rewritten.AI
         public override void DoModuleAction()
         {
             //Some basic facility action
-            bool builtSomething = BuildFacility(FindManagerToBuildOn());
-            bool uninstalledFacility =  builtSomething ? false : UninstallResourceProducingFacility();
-            canMakeFacilities = !builtSomething && player.ResourceManager.HasCriticalResource && !uninstalledFacility; 
+            FacilityManager manager = FindManagerToBuildOn();
+            if (manager != null)
+            {
+                bool builtSomething = BuildFacility(manager);
+                bool uninstalledFacility = builtSomething ? false : UninstallResourceProducingFacility();
+                canMakeFacilities = !builtSomething && player.ResourceManager.HasCriticalResource && !uninstalledFacility;
+            }
         }
     }
 }

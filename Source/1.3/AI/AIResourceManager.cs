@@ -24,6 +24,7 @@ namespace Empire_Rewritten.AI
 
         public AIResourceManager(AIPlayer player) : base(player)
         {
+            parentPlayer = player;
         }
 
         private List<ResourceDef> FindAllResourceDefs

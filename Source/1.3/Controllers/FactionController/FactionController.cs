@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Verse;
+using Empire_Rewritten.AI;
+using RimWorld.Planet;
 
 namespace Empire_Rewritten
 {
@@ -12,7 +14,7 @@ namespace Empire_Rewritten
     {
         private List<FactionSettlementData> factionSettlementDataList = new List<FactionSettlementData>();
         private readonly List<FactionCivicAndEthicData> factionCivicAndEthicDataList = new List<FactionCivicAndEthicData>();
-
+        private Dictionary<Faction, AIPlayer> AIFactions = new Dictionary<Faction, AIPlayer>();
         /// <summary>
         /// Needed for loading
         /// </summary>
@@ -24,6 +26,7 @@ namespace Empire_Rewritten
         /// <param name="factionSettlementDataList"></param>
         public FactionController(List<FactionSettlementData> factionSettlementDataList)
         {
+
             this.factionSettlementDataList = factionSettlementDataList;
         }
 
@@ -37,6 +40,31 @@ namespace Empire_Rewritten
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Gets the AIPlayer of a faction.
+        /// </summary>
+        /// <param name="faction"></param>
+        /// <returns></returns>
+        public AIPlayer GetAIPlayer(Faction faction)
+        {
+            return AIFactions.ContainsKey(faction) ? AIFactions[faction] : null;
+        }
+
+        public void CreateNewAIPlayer(Faction faction)
+        {
+            AIPlayer aIPlayer = new AIPlayer(faction);
+            AIFactions.Add(faction,aIPlayer);
+
+            //Find preexisting settlements.
+            IEnumerable<WorldObject> settlements = Find.WorldObjects.AllWorldObjects.Where(x => x is Settlement s && s.Faction == faction);
+            foreach(WorldObject worldObject in settlements)
+            {
+                Settlement settlement = worldObject as Settlement;
+                aIPlayer.Manager.AddSettlement(settlement);
+            }
+            Log.Message($"Created AI for: {faction.Name}");
         }
 
         /// <summary>

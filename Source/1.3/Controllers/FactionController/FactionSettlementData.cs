@@ -56,7 +56,7 @@ namespace Empire_Rewritten
             List<FactionSettlementData> factionSettlementDatas = new List<FactionSettlementData>();
             foreach (Faction faction in Find.FactionManager.AllFactionsListForReading)
             {
-                factionSettlementDatas.Add(new FactionSettlementData(faction, new SettlementManager()));
+                factionSettlementDatas.Add(new FactionSettlementData(faction, new SettlementManager(faction)));
             }
 
             return factionSettlementDatas;

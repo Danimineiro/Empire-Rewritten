@@ -44,11 +44,17 @@ namespace Empire_Rewritten
 
         public Type facilityWorker;
 
+        public readonly bool requiresIdeology = false;
+        public readonly bool requiresRoyality = false;
+        public readonly List<string> requiredModIDs = new List<string>();
+
         /// <summary>
         /// Returns if all required Mods are loaded
         /// </summary>
         public bool RequiredModsLoaded => ModChecker.RequiredModsLoaded(requiredModIDs, requiresRoyality, requiresIdeology);
 
+
+        public List<ThingDefCountClass> costList = new List<ThingDefCountClass>();
         public override IEnumerable<string> ConfigErrors()
         {
             if (facilityWorker!=null && !facilityWorker.IsSubclassOf(typeof(FacilityWorker)))

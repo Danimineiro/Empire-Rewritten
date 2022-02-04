@@ -19,6 +19,8 @@ namespace Empire_Rewritten {
         /// <summary>
         /// Pass a move to be executed.
         /// </summary>
-        public abstract void MakeMove();
+        public abstract void MakeMove(FactionController factionController);
+
+        public abstract bool ShouldExecute();
     }
 }
