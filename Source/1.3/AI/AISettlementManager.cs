@@ -1,4 +1,6 @@
-﻿using RimWorld.Planet;
+﻿using Empire_Rewritten.Borders;
+using RimWorld;
+using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +14,26 @@ namespace Empire_Rewritten.AI
     {
         public AISettlementManager(AIPlayer player) : base(player)
         {
+            worldGrid = Find.WorldGrid;
         }
 
+        WorldGrid worldGrid;
         private bool canUpgradeOrBuild;
+        private TechLevel cachedTechLevel=TechLevel.Undefined;
 
+        private Dictionary<int, float> tileWeights = new Dictionary<int, float>();
+
+        public TechLevel TechLevel
+        {
+            get
+            {
+                if(cachedTechLevel == TechLevel.Undefined)
+                {
+                    cachedTechLevel = player.Faction.def.techLevel;
+                }
+                return cachedTechLevel;
+            }
+        }
         public bool CanUpgradeOrBuild
         {
             get
@@ -43,10 +61,7 @@ namespace Empire_Rewritten.AI
         }
 
 
-        public bool AttemptBuildNewSettlement()
-        {
-            return !player.FacilityManager.CanMakeFacilities && player.Manager.BuildNewSettlementOnTile(SearchForTile());
-        }
+
 
         public void BuildOrUpgradeNewSettlement()
         {
@@ -61,18 +76,48 @@ namespace Empire_Rewritten.AI
             bool BuiltSettlement = false;
             if (!UpgradedSettlement)
             {
-                Log.Message($"{player.faction.Name}: Couldn't upgrade a settlement, attempting to build a new one...");
-                BuiltSettlement = AttemptBuildNewSettlement();
-                if (BuiltSettlement)
-                {
-                    Log.Message($"{player.faction.Name}: Built a new one!");
-                }
+              SearchForTile();
             }
 
             canUpgradeOrBuild = UpgradedSettlement || BuiltSettlement;
         }
 
-        int tempOffset = 0;
+        public float GetTileWeight(int id)
+        {
+            if (!tileWeights.ContainsKey(id))
+            {
+                AIResourceManager aIResourceManager = player.ResourceManager;
+                Tile tile = Find.WorldGrid[id];
+                //The weight from a tile's resources.
+                float weight = aIResourceManager.GetTileResourceWeight(tile);
+
+                //Neolithic AI should not have pin point actions, while spacer AI should be better at understanding resources.
+                float techWeight = (float)(TechLevel - 4) * UnityEngine.Random.Range(1, 10);
+
+                //Make the AI more "Organic"
+                float randomOffsetWeight = UnityEngine.Random.Range(-5, 10);
+
+                //Hills are hard to build on.
+                float hillinessOffsetWeight = (float)tile.hilliness * UnityEngine.Random.Range(-10, -2);
+
+
+                /*
+                     * Todo: border weight
+                     * Requires:
+                     * - Distance from settlement calculations
+                    */
+
+
+
+                weight += techWeight + hillinessOffsetWeight + randomOffsetWeight;
+
+                tileWeights.Add(id, weight);
+            }
+            
+
+            return tileWeights[id];
+        }
+
         /// <summary>
         /// Search for tiles to build settlements on based off weights;
         /// Weights:
@@ -83,78 +128,48 @@ namespace Empire_Rewritten.AI
         /// Resources AI has excess of = lower weight
         /// </summary>
         /// <returns></returns>
-        public Tile SearchForTile()
+        public void SearchForTile()
         {
-            IEnumerable<Settlement> settlements = player.Manager.Settlements.Keys;
-            AIResourceManager aIResourceManager = player.ResourceManager;
-            List<int> tiles = new List<int>();
-            int tileID = UnityEngine.Random.Range(0, Find.WorldGrid.TilesCount - 1);
-            if (!settlements.EnumerableNullOrEmpty())
-            {
-                tileID = player.Manager.Settlements.RandomElement().Key.Tile;
-            }
-            Find.WorldGrid.GetTileNeighbors(tileID, tiles);
+
+            List<int> tileOptions = BorderManager.GetBorderManager.GetBorder(player.Faction).Tiles;
+
+            //Default largestweight to -1000 so it's almost always initally overridden.
             float largestWeight = -1000;
 
-            Tile result = null;
-            foreach (int t in tiles)
+            int result=0;
+            for (int a = 0; a < tileOptions.Count; a++)
             {
-                if (Find.WorldGrid[t].hilliness != Hilliness.Impassable)
-                {
-                    List<int> newTiles = new List<int>();
-                    Find.WorldGrid.GetTileNeighbors(t, newTiles);
-                    foreach (int i in newTiles)
-                    {
-                        if (TileFinder.IsValidTileForNewSettlement(i))
-                        {
-                            Tile tile = Find.WorldGrid[i];
-                            float weight = aIResourceManager.GetTileResourceWeight(tile);
-                            if (largestWeight < weight)
-                            {
-                                largestWeight = weight;
-                                result = tile;
-                            }
-                        }
-                    }
-                }
-            }
-            return result;
-            /*
-            Tile t = null;
+                int t = tileOptions[a];
 
-            //temp test
-            //todo when bordermanager is implimented:
-            //only pull from owned tiles.
-
-            List<Tile> tiles = Find.WorldGrid.tiles.Where(x => TileFinder.IsValidTileForNewSettlement(Find.WorldGrid.tiles.IndexOf(x))).ToList();
-            AIResourceManager aIResourceManager = player.ResourceManager;
-
-            float largestWeight = -1000;
-
-            int offsetter = 0;
-            //Temporary limiter
-            for (int a = tempOffset; a < 20 + tempOffset; a++)
-            {
-                Tile tile = tiles[a];
-                float weight = aIResourceManager.GetTileResourceWeight(tile);
-                if (largestWeight < weight)
+                float weight = GetTileWeight(t);
+                if (largestWeight < weight && TileFinder.IsValidTileForNewSettlement(t))
                 {
                     largestWeight = weight;
-                    t = tile;
+                    result = t;
                 }
             }
-            /*
-            todo: border weight
-   
-
-            return t;
-            */
+            tileToBuildOn = worldGrid[result];
         }
-       
+
+        private Tile tileToBuildOn = null;
+
+        public void BuildSettlement()
+        {
+            if (tileToBuildOn != null)
+            {
+                player.Manager.BuildNewSettlementOnTile(tileToBuildOn);
+                tileToBuildOn = null;
+            }
+        }
 
         public override void DoModuleAction()
         {
-            BuildOrUpgradeNewSettlement();
+            BuildSettlement();
+        }
+
+        public override void DoThreadableAction()
+        {
+           Task.Run(SearchForTile);
         }
     }
 }

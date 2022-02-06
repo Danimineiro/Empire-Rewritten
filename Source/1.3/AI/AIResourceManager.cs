@@ -206,5 +206,10 @@ namespace Empire_Rewritten.AI
             }
             return weight;
         }
+
+        public override void DoThreadableAction()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

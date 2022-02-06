@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using RimWorld;
 using RimWorld.Planet;
 using Verse;
-
+using Empire_Rewritten.Borders;
 namespace Empire_Rewritten
 {
     /// <summary>
@@ -111,6 +111,7 @@ namespace Empire_Rewritten
         {
             FacilityManager tracker = new FacilityManager(settlement);
             settlements.Add(settlement, tracker);
+            BorderManager.GetBorderManager.GetBorder(faction).SettlementClaimTiles(settlement);
         }
 
         private List<Settlement> settlementsForLoading = new List<Settlement>();

@@ -20,7 +20,7 @@ namespace Empire_Rewritten
 
         public virtual bool CanBuildAt(FacilityManager manager)
         {
-            return true;
+            return false;
         }
     }
 }

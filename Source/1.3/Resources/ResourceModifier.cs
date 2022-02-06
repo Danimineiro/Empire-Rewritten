@@ -24,10 +24,10 @@ namespace Empire_Rewritten
     public struct ResourceModifier
     {
         public ResourceDef def;
-        public int offset;
+        public float offset;
         public float multiplier;
 
-        public ResourceModifier(ResourceDef resourceDef, int offsetValue = 0, float multiplierValue = 1)
+        public ResourceModifier(ResourceDef resourceDef, float offsetValue = 0, float multiplierValue = 1)
         {
             def = resourceDef;
             offset = offsetValue;

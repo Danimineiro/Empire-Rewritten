@@ -64,6 +64,7 @@ namespace Empire_Rewritten.AI
             this.facilityManager = new AIFacilityManager(this);
 
             UpdateController.AddUpdateCall(MakeMove,ShouldExecute);
+            UpdateController.AddUpdateCall(MakeThreadedMove, ShouldExecuteThreaded);
         }
 
         public AIResourceManager ResourceManager
@@ -82,6 +83,7 @@ namespace Empire_Rewritten.AI
             ResourceManager.DoModuleAction();
             FacilityManager.DoModuleAction();
             AISettlementManager.DoModuleAction();
+
         }
 
         int tick = 0;
@@ -93,6 +95,23 @@ namespace Empire_Rewritten.AI
                 return true;
             }
             tick++;
+            return false;
+        }
+
+        public override void MakeThreadedMove(FactionController factionController)
+        {
+           Task.Run(AISettlementManager.DoThreadableAction);
+        }
+
+        int threadTick = 0;
+        public override bool ShouldExecuteThreaded()
+        {
+            if (threadTick == 2)
+            {
+                threadTick = 0;
+                return true;
+            }
+            threadTick++;
             return false;
         }
     }

@@ -22,5 +22,13 @@ namespace Empire_Rewritten {
         public abstract void MakeMove(FactionController factionController);
 
         public abstract bool ShouldExecute();
+
+        /// <summary>
+        /// Pass a move to be executed in a thread.
+        /// </summary>
+        /// <param name="factionController"></param>
+        public abstract void MakeThreadedMove(FactionController factionController);
+
+        public abstract bool ShouldExecuteThreaded();
     }
 }

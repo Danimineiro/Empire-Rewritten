@@ -205,5 +205,10 @@ namespace Empire_Rewritten.AI
                 canMakeFacilities = !builtSomething && player.ResourceManager.HasCriticalResource && !uninstalledFacility;
             }
         }
+
+        public override void DoThreadableAction()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

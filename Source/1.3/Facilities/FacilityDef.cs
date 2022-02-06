@@ -8,10 +8,15 @@ using Verse;
 
 namespace Empire_Rewritten
 {
+    public class ResourceChange
+    {
+        public ResourceDef def;
+        public float amount;
+    }
     public class FacilityDef : Def
     {
-        public Dictionary<ResourceDef, float> resourceMultipliers = new Dictionary<ResourceDef, float>();
-        public Dictionary<ResourceDef,int> resourceOffsets = new Dictionary<ResourceDef, int>();
+        public List<ResourceChange> resourceMultipliers = new List<ResourceChange>();
+        public List<ResourceChange> resourceOffsets = new List<ResourceChange>();
 
         private FacilityWorker worker;
 
@@ -35,8 +40,15 @@ namespace Empire_Rewritten
             {
                 if (producedResources.NullOrEmpty())
                 {
-                    producedResources.AddRange(this.resourceMultipliers.Keys);
-                    producedResources.AddRange(this.resourceOffsets.Keys);
+                    List<ResourceDef> resourceDefs = new List<ResourceDef>();
+                    foreach(ResourceChange change in this.resourceOffsets)
+                    {
+                        resourceDefs.Add(change.def);
+                    }
+                    foreach (ResourceChange change in this.resourceMultipliers)
+                    {
+                        resourceDefs.Add(change.def);
+                    }
                 }
                 return producedResources;
             }

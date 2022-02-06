@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Verse;
+using Empire_Rewritten.Borders;
 using Empire_Rewritten.AI;
 using RimWorld.Planet;
 
@@ -15,6 +16,26 @@ namespace Empire_Rewritten
         private List<FactionSettlementData> factionSettlementDataList = new List<FactionSettlementData>();
         private readonly List<FactionCivicAndEthicData> factionCivicAndEthicDataList = new List<FactionCivicAndEthicData>();
         private Dictionary<Faction, AIPlayer> AIFactions = new Dictionary<Faction, AIPlayer>();
+        private BorderManager borderManager = new BorderManager();
+        private bool shouldRefreshBorders = true;
+
+        public BorderManager BorderManager
+        {
+            get
+            {
+                return borderManager;
+            }
+        }
+        /// <summary>
+        /// Meant for things that cache the borders to check.
+        /// </summary>
+        public bool ShouldRefreshBorders
+        {
+            get
+            {
+                return shouldRefreshBorders;
+            }
+        }
         /// <summary>
         /// Needed for loading
         /// </summary>
@@ -26,7 +47,8 @@ namespace Empire_Rewritten
         /// <param name="factionSettlementDataList"></param>
         public FactionController(List<FactionSettlementData> factionSettlementDataList)
         {
-
+            shouldRefreshBorders = true;
+            borderManager= new BorderManager();
             this.factionSettlementDataList = factionSettlementDataList;
         }
 
@@ -59,10 +81,15 @@ namespace Empire_Rewritten
 
             //Find preexisting settlements.
             IEnumerable<WorldObject> settlements = Find.WorldObjects.AllWorldObjects.Where(x => x is Settlement s && s.Faction == faction);
-            foreach(WorldObject worldObject in settlements)
-            {
-                Settlement settlement = worldObject as Settlement;
-                aIPlayer.Manager.AddSettlement(settlement);
+            if (settlements.Count() > 0) {
+                List<WorldObject> list = settlements.ToList();
+                aIPlayer.Manager.AddSettlement(list[0] as Settlement);
+                list.RemoveAt(0);
+
+                foreach(WorldObject item in list)
+                {
+                    item.Destroy();
+                }
             }
             Log.Message($"Created AI for: {faction.Name}");
         }
@@ -139,6 +166,7 @@ namespace Empire_Rewritten
         public void ExposeData()
         {
             Scribe_Collections.Look(ref factionSettlementDataList, "FactionSettlementDataList");
+            Scribe_Deep.Look(ref borderManager, "borderManager");
         }
     }
 }
