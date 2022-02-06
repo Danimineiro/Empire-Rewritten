@@ -17,10 +17,32 @@
 		<allowedThingDefs>
 			<li>ComponentIndustrial</li>
 		</allowedThingDefs>
+		
+		<hillinessFactors>
+			<flat>0.8</flat>
+			<smallHills>0.9</smallHills>
+			<largeHills>1</largeHills>
+			<mountainous>1.1</mountainous>
+		</hillinessFactors>
+		
+		<hillinessOffsets>
+			<flat>-0.6</flat>
+			<smallHills>-0.4</smallHills>
+			<largeHills>0</largeHills>
+			<mountainous>0.1</mountainous>
+		</hillinessOffsets>
 
-		<lakeBonus>0</lakeBonus>
-		<oceanBonus>0</oceanBonus>
-		<riverBonus>0</riverBonus>
+		<waterBodyFactors>
+			<lake>1</lake>
+			<river>1</river>
+			<ocean>1</ocean>
+		</waterBodyFactors>
+
+		<waterBodyOffsets>
+			<lake>0</lake>
+			<river>0</river>
+			<ocean>0</ocean>
+		</waterBodyOffsets>
 		
 		<temperatureCurve>
 			<points>
@@ -65,5 +87,6 @@
 				<li> 1.0, 0.80</li>
 			</points>
 		</swampinessCurve>
-	</Empire_Rewritten.ResourceDef>
+	
+</Empire_Rewritten.ResourceDef>
 </Defs>
