@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Empire_Rewritten.Util;
 using Verse;
+using Verse.Sound;
 
 namespace Empire_Rewritten
 {
@@ -22,7 +23,8 @@ namespace Empire_Rewritten
 
         private readonly static Rect rect_DefIcon = new Rect(2f, 2f, 64f, 64f);
         private readonly static Rect rect_DefSelector = new Rect(68f, 2f, 514f, 64f);
-        private readonly static Rect rect_DefDesc = new Rect(2f, 86f, 580f, 240f);
+        private readonly static Rect rect_FullDefDesc = new Rect(2f, 86f, 580f, 240f);
+        private readonly static Rect rect_DefDescValue = new Rect(0f, 0f, 570f, 24f);
 
         //In GUI.Group managed by container
         private readonly static Rect rect_ThingDefContainer = new Rect(602f, 2f, 580f, 29f);
@@ -72,12 +74,11 @@ namespace Empire_Rewritten
         /// </summary>
         private void DrawDefContent()
         {
-            if (defSelected != null)
-            {
-                DrawDescriptionAndIcon();
-                DrawItems();
-                DrawCurves();
-            }
+            if (defSelected == null) return;
+
+            DrawDescriptionAndIcon();
+            DrawItems();
+            DrawCurves();
         }
 
         /// <summary>
@@ -154,36 +155,37 @@ namespace Empire_Rewritten
         /// </summary>
         private void DrawItems()
         {
+            if (!(defSelected.ResourcesCreated.AllowedThingDefs.ToList() is List<ThingDef> thingDefs)) return;
+
             Text.Anchor = TextAnchor.MiddleLeft;
             Text.Font = GameFont.Small;
+            rect_ScrollRect.DrawBorderAroundRect(borderSize);
+            rect_ScrollViewRect.height = thingDefs.Count * rect_ThingDefContainer.height;
+            Widgets.BeginScrollView(rect_ScrollRect, ref scrollRectVector, rect_ScrollViewRect);
 
-            if (defSelected.ResourcesCreated.AllowedThingDefs.ToList() is List<ThingDef> thingDefs)
+            for (int i = 0; i < thingDefs.Count; i++)
             {
-                rect_ScrollRect.DrawBorderAroundRect(borderSize);
-                rect_ScrollViewRect.height = thingDefs.Count * rect_ThingDefContainer.height;
-                Widgets.BeginScrollView(rect_ScrollRect, ref scrollRectVector, rect_ScrollViewRect);
-                for (int i = 0; i < thingDefs.Count; i++)
-                {
-                    Rect temp = new Rect(rect_ThingDefContainer);
-                    temp.y += temp.height * i;
-                    ThingDef current = thingDefs[i];
+                Rect temp = new Rect(rect_ThingDefContainer);
+                temp.y += temp.height * i;
+                ThingDef current = thingDefs[i];
 
-                    GUI.BeginGroup(temp);
+                GUI.BeginGroup(temp);
 
-                    if (i % 2 != 0)
-                        Widgets.DrawHighlight(rect_ThingDefsHighlight);
-                    else
-                        Widgets.DrawLightHighlight(rect_ThingDefsHighlight);
+                if (i % 2 != 0)
+                    Widgets.DrawHighlight(rect_ThingDefsHighlight);
+                else
+                    Widgets.DrawLightHighlight(rect_ThingDefsHighlight);
 
-                    Widgets.ThingIcon(rect_ThingDefIcons, current);
-                    Widgets.Label(rect_ThingDefs, current.label);
+                MouseoverSounds.DoRegion(rect_ThingDefsHighlight);
+                Widgets.DrawHighlightIfMouseover(rect_ThingDefsHighlight);
+                Widgets.ThingIcon(rect_ThingDefIcons, current);
+                Widgets.Label(rect_ThingDefs, current.LabelCap);
+                Widgets.InfoCardButton(rect_ThingDefs.RightPartPixels(rect_ThingDefs.height), current);
 
-                    GUI.EndGroup();
-                }
-
-                Widgets.EndScrollView();
+                GUI.EndGroup();
             }
 
+            Widgets.EndScrollView();
             ResetTextAndColor();
         }
 
@@ -200,36 +202,73 @@ namespace Empire_Rewritten
             rect_DefIcon.DrawBorderAroundRect(borderSize);
 
             //Def Description
-            Widgets.LabelScrollable(rect_DefDesc.ContractedBy(5f), MakeDefDescriptionString(), ref defDescScrollVector, true);
-            Widgets.DrawLightHighlight(rect_DefDesc.ExpandedBy(borderSize));
-            rect_DefDesc.DrawBorderAroundRect(borderSize);
+            Rect tempFullHeight = rect_FullDefDesc.ContractedBy(5f);
+
+            float descHeight = Text.CalcHeight(defSelected.description, tempFullHeight.width);
+
+            Rect tempDescRect = tempFullHeight.TopPartPixels(descHeight);
+            Rect tempValuesRect = tempFullHeight.BottomPartPixels(tempFullHeight.height - descHeight - 5f);
+
+            Rect tempTex = new Rect(tempValuesRect.x, tempValuesRect.y, tempValuesRect.width - 17f, 15f * rect_DefDescValue.height);
+
+            Widgets.Label(tempDescRect, $"{defSelected.description}");
+
+            GUI.color = Color.gray;
+            Widgets.DrawLineHorizontal(tempDescRect.x, tempDescRect.y + tempDescRect.height, tempDescRect.width);
+            GUI.color = Color.white;
+            DrawResourceValues(tempValuesRect, tempTex);
+            rect_FullDefDesc.DrawBorderAroundRect(borderSize);
 
             ResetTextAndColor();
         }
 
-
-        /// <returns>The def description string</returns>
-        private string MakeDefDescriptionString()
+        /// <summary>
+        /// Draws the resource values
+        /// </summary>
+        /// <param name="tempValuesRect"></param>
+        /// <param name="tempTex"></param>
+        private void DrawResourceValues(Rect tempValuesRect, Rect tempTex)
         {
-            string desc = defSelected.description;
-            string lakeBonus = GetBonusStringWithColor("Empire_ResourceInfoWindowLake", defSelected.lakeBonus);
-            string oceanBonus = GetBonusStringWithColor("Empire_ResourceInfoWindowOcean", defSelected.oceanBonus);
-            string riverBonus = GetBonusStringWithColor("Empire_ResourceInfoWindowRiver", defSelected.riverBonus);
+            Widgets.BeginScrollView(tempValuesRect, ref defDescScrollVector, tempTex);
+            GUI.BeginGroup(tempTex);
 
-            return $"{desc}\n\n{lakeBonus}\n{oceanBonus}\n{riverBonus}";
+            DrawResourceValueBlock(true);
+            Widgets.DrawLightHighlight(rect_DefDescValue.MoveRect(new Vector2(0f, rect_DefDescValue.height * 7)));
+            DrawResourceValueBlock(false, 8);
+
+            GUI.EndGroup();
+            Widgets.EndScrollView();
         }
 
         /// <summary>
-        /// Colors a resource info string <paramref name="translationKey"/> based on <paramref name="bonus"/>
+        /// Draws a resource value block <paramref name="isOffset"/> says if it is in percent or not, <paramref name="valueOffset"/> offsets the block
         /// </summary>
-        /// <param name="translationKey"></param>
-        /// <param name="bonus"></param>
-        /// <returns></returns>
-        private string GetBonusStringWithColor(string translationKey, float bonus)
+        /// <param name="isOffset"></param>
+        /// <param name="valueOffset"></param>
+        private void DrawResourceValueBlock(bool isOffset, int valueOffset = 0)
         {
-            string fullString = bonus > 0f ? $"{translationKey}Bonus".Translate(bonus.ToStringPercent()) : $"{translationKey}NoBonus".Translate();
-            string color = bonus > 0f ? "green" : "red";
-            return $"<color={color}>{fullString}</color>";
+            for (int i = 0; i < 7; i++)
+            {
+                string addOrMult = $"Empire_ResourceInfoWindow{(isOffset ? "Additively" : "Multiplicatively")}".Translate();
+
+                Rect tempRect = rect_DefDescValue.MoveRect(new Vector2(0f, rect_DefDescValue.height * (i + valueOffset)));
+
+                if (i % 2 == 0)
+                    Widgets.DrawHighlight(tempRect);
+                else
+                    Widgets.DrawLightHighlight(tempRect);
+
+                Widgets.Label(tempRect.ScaleXByPixel(-5f), ((ResourceStat)i).Translate(isOffset).CapitalizeFirst());
+
+                if (isOffset)
+                    Widgets.Label(tempRect.ScaleXByPixel(-5f).RightHalf(), defSelected.GetBonus((ResourceStat)i, isOffset).ToString());
+                else
+                    Widgets.Label(tempRect.ScaleXByPixel(-5f).RightHalf(), defSelected.GetBonus((ResourceStat)i, isOffset).ToStringPercent());
+
+                MouseoverSounds.DoRegion(tempRect);
+                Widgets.DrawHighlightIfMouseover(tempRect);
+                TooltipHandler.TipRegion(tempRect, $"Empire_ResourceInfoWindowTip{((ResourceStat)i).ToString().CapitalizeFirst()}".Translate(addOrMult.Translate()));
+            }
         }
 
         /// <summary>
