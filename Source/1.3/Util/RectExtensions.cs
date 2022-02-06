@@ -25,5 +25,13 @@ namespace Empire_Rewritten.Util
         /// <param name="y"></param>
         /// <returns>the moved <paramref name="rect"/></returns>
         public static Rect MoveRect(this Rect rect, int x, int y) => MoveRect(rect, new Vector2(x, y));
+
+        /// <summary>
+        /// Adds or subtracts <paramref name="scaleByPixel"/> from a <paramref name="rect"/>s sides
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="scaleByPixel"></param>
+        /// <returns></returns>
+        public static Rect ScaleXByPixel(this Rect rect, float scaleByPixel) => new Rect(rect.x - scaleByPixel, rect.y, rect.width + scaleByPixel, rect.height);
     }
 }
