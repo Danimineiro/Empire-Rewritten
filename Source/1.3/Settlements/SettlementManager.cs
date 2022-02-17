@@ -18,6 +18,24 @@ namespace Empire_Rewritten
         private Dictionary<Settlement, FacilityManager> settlements = new Dictionary<Settlement, FacilityManager>();
         private StorageTracker storageTracker = new StorageTracker();
         private Faction faction;
+        private Border cachedBorder;
+        private bool borderIsDirty= false;
+        
+        public void SetBorderDirty()
+        {
+            borderIsDirty = true;
+        }
+
+
+        private Border Border
+        {
+            get
+            {
+                if(cachedBorder == null)
+                    cachedBorder=BorderManager.GetBorderManager.GetBorder(faction);
+                return cachedBorder;
+            }
+        }
 
         /// <summary>
         /// Compiles a complete dictionary of all the resources a faction is producing and their modifiers.
@@ -44,6 +62,16 @@ namespace Empire_Rewritten
                 }
             }
             return resourceModifiers;
+        }
+
+        private List<int> settlementTiles = new List<int>();
+
+        public List<int> SettlementTiles
+        {
+            get
+            {
+                return settlementTiles;
+            }
         }
 
         public StorageTracker StorageTracker
@@ -111,7 +139,8 @@ namespace Empire_Rewritten
         {
             FacilityManager tracker = new FacilityManager(settlement);
             settlements.Add(settlement, tracker);
-            BorderManager.GetBorderManager.GetBorder(faction).SettlementClaimTiles(settlement);
+            Border.SettlementClaimTiles(settlement);
+            settlementTiles.Add(settlement.Tile);
         }
 
         private List<Settlement> settlementsForLoading = new List<Settlement>();

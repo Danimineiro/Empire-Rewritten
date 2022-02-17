@@ -12,6 +12,16 @@ namespace Empire_Rewritten.Borders
     public class Border : IExposable
     {
         private Faction faction;
+        private static WorldGrid worldGrid;
+        private static WorldGrid WorldGrid
+        {
+            get
+            {
+                if (worldGrid == null)
+                    worldGrid = Find.WorldGrid;
+                return worldGrid;
+            }
+        }
         public Faction Faction
         {
             get
@@ -67,51 +77,54 @@ namespace Empire_Rewritten.Borders
         public void SettlementClaimTiles(Settlement settlement)
         {
             int tileID = settlement.Tile;
-
-            List<int> tiles = new List<int>();
-
-            void GetTiles()
+            void TestTask()
             {
-                tiles = GetTilesRecursively(tileID, 5);
+                List<int> tiles = GetTilesRecursively(tileID, (int)(faction.def.techLevel+1));
                 ClaimTiles(tiles);
             }
-            Task task = new Task(GetTiles);
+            Task task = new Task(TestTask);
             task.Start();
+
         }
 
         /// <summary>
         /// Get neighbors recursively.
+        /// 
+        /// 
         /// </summary>
         /// <param name="neighbor"></param>
         /// <param name="times"></param>
         /// <returns></returns>
         public List<int> GetTilesRecursively(int tileID, int times)
         {
-            List<int> result = new List<int>();
+            List<int> result = TileAndNeighbors(tileID);
 
-            Find.WorldGrid.GetTileNeighbors(tileID, result);
-            int max = result.Count;
-            result.Add(tileID);
-            //Already did it once so times-1
-            for (int index = 0; index<times-1; index++)
+            if(times <= 0)
+                return result;
+
+            int count = 1;
+            List<int> resultCopy = new List<int>();
+            resultCopy.AddRange(result);
+           
+            foreach (int tile in resultCopy)
             {
-                int count = result.Count;
-               
-                for (int tile = 0; tile <count; tile++)
+                List<int> tiles = GetTilesRecursively(tile, times-count);
+                foreach (int nTile in tiles)
                 {
-                    List<int> addition = new List<int>();
-                    Find.WorldGrid.GetTileNeighbors(result[tile], addition);
-
-                    foreach (int newTile in addition)
-                    {
-                        if (!result.Contains(newTile))
-                        {
-                            result.Add(newTile);
-                        }
-                    }
+                    if (!result.Contains(nTile))
+                        result.Add(nTile);
                 }
+                count++;
             }
             return result;
+        }
+         
+        private List<int> TileAndNeighbors(int tile)
+        {
+            List<int> addition = new List<int>();
+            WorldGrid.GetTileNeighbors(tile, addition);
+            addition.Add(tile);
+            return addition;
         }
 
         public void ExposeData()
@@ -158,12 +171,6 @@ namespace Empire_Rewritten.Borders
         {
             Border border = GetBorder(faction);
             return border != null && border.Tiles.Contains(tile);
-        }
-
-        public HashSet<int> GetTiles(Faction faction)
-        {
-            Border border = GetBorder(faction);
-            return border != null ? border.Tiles: new HashSet<int>();
         }
 
         public bool HasFactionRegistered(Faction faction)

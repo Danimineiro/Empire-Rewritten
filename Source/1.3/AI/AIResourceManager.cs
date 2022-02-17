@@ -166,11 +166,7 @@ namespace Empire_Rewritten.AI
 
         public override void DoModuleAction()
         {
-            if (!criticalResources.EnumerableNullOrEmpty())
-            {
-                Dictionary<ResourceDef, float> resourcesProduced = AllResourcesProduced();
-                criticalResources.RemoveAll(x => resourcesProduced.ContainsKey(x) && resourcesProduced[x] > x.desiredAIMinimum / 2);
-            }
+            
         }
 
         /// <summary>
@@ -209,7 +205,11 @@ namespace Empire_Rewritten.AI
 
         public override void DoThreadableAction()
         {
-            throw new NotImplementedException();
+            if (!criticalResources.EnumerableNullOrEmpty())
+            {
+                Dictionary<ResourceDef, float> resourcesProduced = AllResourcesProduced();
+                criticalResources.RemoveAll(x => resourcesProduced.ContainsKey(x) && resourcesProduced[x] > x.desiredAIMinimum / 2);
+            }
         }
     }
 }
