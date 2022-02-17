@@ -16,6 +16,8 @@ namespace Empire_Rewritten
 
     public class ResourceDef : Def
     {
+        private Dictionary<BiomeDef, ResourceModifier> cachedBiomeModifiers = new Dictionary<BiomeDef, ResourceModifier>();
+
         public GraphicData iconData;
 
         public ThingFilter resourcesCreated = new ThingFilter();
@@ -29,9 +31,13 @@ namespace Empire_Rewritten
 
         public List<BiomeModifier> biomeModifiers;
         public List<StuffCategoryDef> stuffCategories;
+        public List<ThingCategoryDef> thingCategoryDefs;
         public List<ThingDef> allowedThingDefs;
         public List<ThingDef> postRemoveThingDefs;
-        private bool hasCachedThings = false;
+
+        public bool getsOceanBonus;
+        public bool getsRiverBonus;
+        private bool hasCachedThingDefs = false;
 
         /// <summary>
         /// The AI will focus more on this resource if it's income is below this amount.
@@ -52,19 +58,19 @@ namespace Empire_Rewritten
         {
             get
             {
-                if (!hasCachedThings)
+                if (!hasCachedThingDefs)
                 {
                     stuffCategories?.ForEach(category => resourcesCreated.SetAllow(category, true));
+                    thingCategoryDefs?.ForEach(category => resourcesCreated.SetAllow(category, true));
                     allowedThingDefs?.ForEach(thingDef => resourcesCreated.SetAllow(thingDef, true));
                     postRemoveThingDefs?.ForEach(thingDef => resourcesCreated.SetAllow(thingDef, false));
-                    hasCachedThings = true;
+                    hasCachedThingDefs = true;
                 }
 
                 return resourcesCreated;
             }
         }
 
-        private Dictionary<BiomeDef, ResourceModifier> cachedBiomeModifiers = new Dictionary<BiomeDef, ResourceModifier> ();
         /// <summary>
         /// Gets the modifier for the resource based on the tile
         /// </summary>
