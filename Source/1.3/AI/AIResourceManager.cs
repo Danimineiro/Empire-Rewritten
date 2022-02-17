@@ -14,6 +14,19 @@ namespace Empire_Rewritten.AI
         private AIPlayer parentPlayer;
 
         private List<ResourceDef> criticalResources = new List<ResourceDef>();
+        private List<ResourceDef> excessResoures = new List<ResourceDef>();
+        private List<ResourceDef> lowResources = new List<ResourceDef>();
+
+        public List<ResourceDef> ExcessResources
+        {
+            get { return cachedDefs; }
+        }
+
+        public List<ResourceDef> LowResources
+        {
+            get { return lowResources; }
+        }
+
         public bool HasCriticalResource
         {
             get
@@ -101,6 +114,7 @@ namespace Empire_Rewritten.AI
 
 
 
+
         /// <summary>
         /// Figure out what resources are "excess" in production based on the amount being produced.
         /// HighResourceDecider changes the excess value.
@@ -184,8 +198,8 @@ namespace Empire_Rewritten.AI
             //temp test
             //todo when bordermanager is implimented:
             //only pull from owned tiles.
-            List<ResourceDef> lowResources = FindLowResources();
-            List<ResourceDef> highResources = FindExcessResources();
+            List<ResourceDef> lowResources = LowResources;
+            List<ResourceDef> highResources = ExcessResources;
 
             float weight = 0;
             foreach (ResourceDef resourceDef in lowResources)
@@ -210,6 +224,10 @@ namespace Empire_Rewritten.AI
                 Dictionary<ResourceDef, float> resourcesProduced = AllResourcesProduced();
                 criticalResources.RemoveAll(x => resourcesProduced.ContainsKey(x) && resourcesProduced[x] > x.desiredAIMinimum / 2);
             }
+            lowResources.Clear();
+            lowResources=FindLowResources();
+            excessResoures.Clear();
+            FindExcessResources();
         }
     }
 }

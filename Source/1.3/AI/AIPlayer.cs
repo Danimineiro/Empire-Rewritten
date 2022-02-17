@@ -12,9 +12,21 @@ namespace Empire_Rewritten.AI
         private AIFacilityManager facilityManager;
         private AISettlementManager settlementManager;
         private AIResourceManager resourceManager;
-
+        private AITileManager tileManager;
         private SettlementManager cachedManager;
         private bool ManagerIsDirty = true;
+
+        public AITileManager TileManager
+        {
+            get
+            {
+                if(tileManager == null)
+                {
+                    tileManager = new AITileManager(this);
+                }
+                return tileManager;
+            }
+        }
 
         public SettlementManager Manager
         {
@@ -83,6 +95,7 @@ namespace Empire_Rewritten.AI
             ResourceManager.DoModuleAction();
             FacilityManager.DoModuleAction();
             AISettlementManager.DoModuleAction();
+            TileManager.DoModuleAction();
 
         }
 
@@ -100,7 +113,7 @@ namespace Empire_Rewritten.AI
 
         public override void MakeThreadedMove(FactionController factionController)
         {
-           Task.Run(AISettlementManager.DoThreadableAction);
+            Task.Run(AISettlementManager.DoThreadableAction);
         }
 
         int threadTick = 0;

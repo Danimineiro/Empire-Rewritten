@@ -136,8 +136,8 @@ namespace Empire_Rewritten.AI
         /// <returns></returns>
         public FacilityManager FindManagerToBuildOn()
         {
-            List<ResourceDef> resourceDefs = player.ResourceManager.FindLowResources();
-            IEnumerable<FacilityManager> managers = player.Manager.GetAllFacilityManagers();
+            List<ResourceDef> resourceDefs = player.ResourceManager.LowResources;
+            IEnumerable<FacilityManager> managers = player.Manager.GetAllFacilityManagers().Where(x=>x.CanBuildNewFacilities());
             List<FacilityManager> potentialResults = new List<FacilityManager>();
             foreach (ResourceDef resourceDef in resourceDefs)
             {
@@ -165,7 +165,7 @@ namespace Empire_Rewritten.AI
         /// <returns></returns>
         public bool UninstallResourceProducingFacility()
         {
-            List<ResourceDef> resourceDefs = player.ResourceManager.FindExcessResources();
+            List<ResourceDef> resourceDefs = player.ResourceManager.ExcessResources;
 
             if (!resourceDefs.NullOrEmpty())
             {

@@ -19,8 +19,10 @@ namespace Empire_Rewritten
         private List<ResourceModifier> cachedModifiers = new List<ResourceModifier>();
         bool RefreshModifiers = true;
         bool RefreshGizmos = true;
+        bool RefreshFacilityCount = true;
         List<Gizmo> gizmos = new List<Gizmo>();
-
+        int stage = 1;
+        int facilityCount = 0;
         public FacilityManager(Settlement settlement)
         {
             this.settlement = settlement;
@@ -29,6 +31,11 @@ namespace Empire_Rewritten
         public FacilityManager()
         {
           
+        }
+
+        public bool CanBuildNewFacilities()
+        {
+            return MaxFacilities > FacilityCount;
         }
 
         /// <summary>
@@ -94,6 +101,7 @@ namespace Empire_Rewritten
         {
             Scribe_Collections.Look(ref installedFacilities, "installedFacilities", LookMode.Deep);
             Scribe_Values.Look(ref settlement, "settlement");
+            Scribe_Values.Look(ref stage, "stage");
         }
 
         /// <summary>
@@ -162,6 +170,41 @@ namespace Empire_Rewritten
             get
             {
                 return installedFacilities.Keys;
+            }
+        }
+
+
+        public bool IsFullyUpgraded
+        {
+            get
+            {
+                return stage>=10;
+            }
+        }
+
+        public int MaxFacilities
+        {
+            get
+            {
+                return stage;
+            }
+        }
+
+        public int FacilityCount
+        {
+            get
+            {
+                if (RefreshFacilityCount)
+                {
+                    int count = 0;
+                    foreach(Facility facility in installedFacilities.Values)
+                    {
+                        count+=facility.Amount;
+                    }
+                    facilityCount=count;
+
+                }
+                return facilityCount;
             }
         }
     }

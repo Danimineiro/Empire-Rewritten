@@ -89,8 +89,6 @@ namespace Empire_Rewritten.Borders
 
         /// <summary>
         /// Get neighbors recursively.
-        /// 
-        /// 
         /// </summary>
         /// <param name="neighbor"></param>
         /// <param name="times"></param>

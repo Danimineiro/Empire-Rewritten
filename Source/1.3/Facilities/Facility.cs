@@ -22,7 +22,13 @@ namespace Empire_Rewritten
                 return worker;
             }
         }
-
+        public int Amount
+        {
+            get
+            {
+                return amount;
+            }
+        }
         private bool ShouldRecalculateModifiers = true;
         private List<ResourceModifier> modifiers = new List<ResourceModifier>();
         private Settlement settlement;

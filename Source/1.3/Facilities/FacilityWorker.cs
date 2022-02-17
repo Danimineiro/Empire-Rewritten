@@ -15,7 +15,7 @@ namespace Empire_Rewritten
         public FacilityDef facilityDef;
         public virtual IEnumerable<Gizmo> GetGizmos()
         {
-            yield return null;
+            return new List<Gizmo>();
         }
 
         public virtual bool CanBuildAt(FacilityManager manager)
