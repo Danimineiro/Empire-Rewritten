@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+	<Empire_UnimplementedEthicActionName>EthicAbilityWorker.GetActionNameTranslationKey isn't implemented!</Empire_UnimplementedEthicActionName>
+	<Empire_UnimplementedEthicActionDescription>EthicAbilityWorker.GetActionDescriptionTranslationKey isn't implemented!</Empire_UnimplementedEthicActionDescription>
+</LanguageData>

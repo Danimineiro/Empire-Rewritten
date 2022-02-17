@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Empire_Rewritten.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,7 +27,16 @@ namespace Empire_Rewritten
             }
         }
 
+        public readonly bool requiresIdeology = false;
+        public readonly bool requiresRoyality = false;
+        public readonly List<string> requiredModIDs = new List<string>();
+
         public Type facilityWorker;
+
+        /// <summary>
+        /// Returns if all required Mods are loaded
+        /// </summary>
+        public bool RequiredModsLoaded => ModChecker.RequiredModsLoaded(requiredModIDs, requiresRoyality, requiresIdeology);
 
         public List<ThingDefCountClass> costList;
 
