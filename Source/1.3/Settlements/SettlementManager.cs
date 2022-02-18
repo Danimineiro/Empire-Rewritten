@@ -31,8 +31,11 @@ namespace Empire_Rewritten
         {
             get
             {
-                if(cachedBorder == null)
-                    cachedBorder=BorderManager.GetBorderManager.GetBorder(faction);
+                if (cachedBorder == null || borderIsDirty)
+                {
+                    borderIsDirty = false;
+                    cachedBorder = BorderManager.GetBorderManager.GetBorder(faction);
+                }
                 return cachedBorder;
             }
         }
