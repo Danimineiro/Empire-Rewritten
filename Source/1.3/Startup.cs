@@ -23,7 +23,6 @@ namespace Empire_Rewritten
             Log.Message("[Empire Rewritten] just here to say hello! ^-^ Have a nice day and great fun with Empire!".Rainbowify(" ", 35));
             AppendActionsToWorldStart();
             HarmonyPatcher.DoPatches();
-            AppendCreateFactionDatasFunction();
         }
 
         /// <summary>
