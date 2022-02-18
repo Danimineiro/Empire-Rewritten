@@ -267,7 +267,7 @@ namespace Empire_Rewritten
 
                 MouseoverSounds.DoRegion(tempRect);
                 Widgets.DrawHighlightIfMouseover(tempRect);
-                TooltipHandler.TipRegion(tempRect, $"Empire_ResourceInfoWindowTip{((ResourceStat)i).ToString().CapitalizeFirst()}".Translate(addOrMult.Translate()));
+                TooltipHandler.TipRegion(tempRect, $"Empire_ResourceInfoWindowTip{((ResourceStat)i).ToString().CapitalizeFirst()}".Translate(addOrMult));
             }
         }
 
