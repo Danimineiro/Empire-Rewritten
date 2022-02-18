@@ -64,6 +64,92 @@
 			</points>
 		</swampinessCurve>
 	</Empire_Rewritten.ResourceDef>
+
+	<Empire_Rewritten.ResourceDef ParentName="Empire_ResourceBase">
+		<defName>Empire_Logging</defName>
+		<label>Logging</label>
+
+		<iconData>
+			<texPath>Resources/ProductionLogging</texPath>
+		</iconData>
+		
+		<stuffCategories>
+			<li>Woody</li>
+		</stuffCategories>
+		<allowedThingDefs>
+			<li>WoodLog</li>
+		</allowedThingDefs>
+
+		<hillinessFactors>
+			<flat>1</flat>
+			<smallHills>0.98</smallHills>
+			<largeHills>0.90</largeHills>
+			<mountainous>0.85</mountainous>
+		</hillinessFactors>
+
+		<hillinessOffsets>
+			<flat>0.2</flat>
+			<smallHills>0</smallHills>
+			<largeHills>-0.2</largeHills>
+			<mountainous>-0.8</mountainous>
+		</hillinessOffsets>
+
+		<waterBodyFactors>
+			<lake>1.1</lake>
+			<river>1.2</river>
+			<ocean>0.8</ocean> <!-- Saltwater -->
+		</waterBodyFactors>
+
+		<waterBodyOffsets>
+			<lake>0.2</lake>	<!-- Just more water -->
+			<river>-0.2</river> <!-- Less growing space -->
+			<ocean>-0.5</ocean> <!-- Saltwater -->
+		</waterBodyOffsets>
+
+		<temperatureCurve Inherit="False">
+			<points>
+				<li>-270, 0.0</li>
+				<li>-100, 0.0</li>
+				<li> -50, 0.2</li>
+				<li> -25, 0.5</li>
+				<li>   0, 0.9</li>
+				<li>  12, 1</li>
+				<li>  27, 1</li>
+				<li>  38, 0.95</li>
+				<li>42.5, 0.75</li>
+				<li>  47, 0.25</li>
+				<li>  50, 0.125</li>
+				<li>  50, 0.125</li>
+			</points>
+		</temperatureCurve>
+
+		<rainfallCurve Inherit="False">
+			<points>
+				<li>   0,  0</li>
+				<li> 500,  0.6</li>
+				<li>2500,  1</li>
+				<li>7500,  1.25</li>
+			</points>
+		</rainfallCurve>
+
+		<heightCurve Inherit="False">
+			<points>
+				<li>   0, 0.85</li>
+				<li> 200, 1</li> <!-- Avoid coasts -->
+				<li>2500, 1</li>
+			</points>
+		</heightCurve>
+
+		<swampinessCurve Inherit="False">
+			<points>
+				<li> 0.5, 1.0</li>
+				<li> 0.6, 0.95</li>
+				<li> 0.8, 0.7</li>
+				<li> 1.0, 0.4</li>
+			</points>
+		</swampinessCurve>
+		
+	</Empire_Rewritten.ResourceDef>
 	
 	<Empire_Rewritten.ResourceDef ParentName="Empire_ResourceBase">
 		<defName>Empire_Mining</defName>
