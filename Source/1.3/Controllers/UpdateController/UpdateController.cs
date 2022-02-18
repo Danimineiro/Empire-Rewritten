@@ -44,6 +44,10 @@ namespace Empire_Rewritten
 
                 factionController = value;
             }
+            get
+            {
+                return factionController;
+            }
         }
 
         public static UpdateController GetUpdateController => updateControllerCached;

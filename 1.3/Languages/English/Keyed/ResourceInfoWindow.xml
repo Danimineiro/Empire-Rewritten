@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+	<Empire_ResourceInfoWindowSelector>Select a resource to look at</Empire_ResourceInfoWindowSelector>
+	<Empire_ResourceInfoWindowHeightCurve>Height Curve</Empire_ResourceInfoWindowHeightCurve>
+	<Empire_ResourceInfoWindowHeightCurveLabelX>Height (in Meters):</Empire_ResourceInfoWindowHeightCurveLabelX>
+	
+	<Empire_ResourceInfoWindowTempCurve>Temperature Curve</Empire_ResourceInfoWindowTempCurve>
+	<Empire_ResourceInfoWindowTempCurveLabelX>Temperature (in Celsius):</Empire_ResourceInfoWindowTempCurveLabelX>
+	
+	<Empire_ResourceInfoWindowRainfallCurve>Rainfall Curve</Empire_ResourceInfoWindowRainfallCurve>
+	<Empire_ResourceInfoWindowRainfallCurveLabelX>Rainfall (in mm):</Empire_ResourceInfoWindowRainfallCurveLabelX>
+
+	<Empire_ResourceInfoWindowSwampinessCurve>Swampiness Curve</Empire_ResourceInfoWindowSwampinessCurve>
+	<Empire_ResourceInfoWindowSwampinessCurveLabelX>Swampiness:</Empire_ResourceInfoWindowSwampinessCurveLabelX>
+
+	<Empire_ResourceInfoWindowCurveMissing>This resource doesn't have a curve</Empire_ResourceInfoWindowCurveMissing>
+	<Empire_ResourceInfoWindowEfficiency>Y = Efficiency</Empire_ResourceInfoWindowEfficiency>
+
+	<Empire_ResourceInfoWindowLake>neighbouring lake</Empire_ResourceInfoWindowLake>
+	<Empire_ResourceInfoWindowOcean>neighbouring ocean</Empire_ResourceInfoWindowOcean>
+	<Empire_ResourceInfoWindowRiver>river</Empire_ResourceInfoWindowRiver>
+
+	<Empire_ResourceInfoWindowFlat>flat terrain</Empire_ResourceInfoWindowFlat>
+	<Empire_ResourceInfoWindowSmallHills>small hills</Empire_ResourceInfoWindowSmallHills>
+	<Empire_ResourceInfoWindowLargeHills>large hills</Empire_ResourceInfoWindowLargeHills>
+	<Empire_ResourceInfoWindowMountainous>mountainous terrain</Empire_ResourceInfoWindowMountainous>
+
+	<Empire_ResourceInfoWindowOffset>offset</Empire_ResourceInfoWindowOffset>
+	<Empire_ResourceInfoWindowFactor>factor</Empire_ResourceInfoWindowFactor>
+
+	<Empire_ResourceInfoWindowTipLake>This value gets {0} applied to the resource modifier when the tile is neighbouring a lake.</Empire_ResourceInfoWindowTipLake>
+	<Empire_ResourceInfoWindowTipOcean>This value gets {0} applied to the resource modifier when the tile is neighbouring an ocean.</Empire_ResourceInfoWindowTipOcean>
+	<Empire_ResourceInfoWindowTipRiver>This value gets {0} applied to the resource modifier when the tile has a river.</Empire_ResourceInfoWindowTipRiver>
+
+	<Empire_ResourceInfoWindowTipFlat>This value gets {0} applied to the resource modifier when the tile is on flat terrain.</Empire_ResourceInfoWindowTipFlat>
+	<Empire_ResourceInfoWindowTipSmallHills>This value gets {0} applied to the resource modifier when the tile has small hills.</Empire_ResourceInfoWindowTipSmallHills>
+	<Empire_ResourceInfoWindowTipLargeHills>This value gets {0} applied to the resource modifier when the tile has large hills.</Empire_ResourceInfoWindowTipLargeHills>
+	<Empire_ResourceInfoWindowTipMountainous>This value gets {0} applied to the resource modifier when the tile has mountainous terrain.</Empire_ResourceInfoWindowTipMountainous>
+
+	<Empire_ResourceInfoWindowAdditively>additively</Empire_ResourceInfoWindowAdditively>
+	<Empire_ResourceInfoWindowMultiplicatively>multiplicatively</Empire_ResourceInfoWindowMultiplicatively>
+</LanguageData>

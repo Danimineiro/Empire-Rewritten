@@ -17,6 +17,40 @@ namespace Empire_Rewritten
         private Dictionary<Settlement, FacilityManager> settlements = new Dictionary<Settlement, FacilityManager>();
         private StorageTracker storageTracker = new StorageTracker();
 
+        /// <summary>
+        /// Compiles a complete dictionary of all the resources a faction is producing and their modifiers.
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<ResourceDef,ResourceModifier> ResourceModifiersFromAllFacilities()
+        {
+            Dictionary<ResourceDef,ResourceModifier> resourceModifiers = new Dictionary<ResourceDef, ResourceModifier>();
+            List<FacilityManager> facilities = settlements.Values.ToList();
+            foreach(FacilityManager facilityManager in facilities)
+            {
+                List<ResourceModifier> facilityMods = facilityManager.modifiers;
+                foreach(ResourceModifier resourceModifier in facilityMods)
+                {
+                    if (resourceModifiers.ContainsKey(resourceModifier.def))
+                    {
+                        ResourceModifier newModifier = resourceModifiers[resourceModifier.def].MergeWithModifier(resourceModifier);
+                        resourceModifiers[resourceModifier.def] = newModifier;
+                    }
+                    else
+                    {
+                        resourceModifiers.Add(resourceModifier.def, resourceModifier);
+                    }
+                }
+            }
+            return resourceModifiers;
+        }
+
+        public StorageTracker StorageTracker
+        {
+            get
+            {
+                return storageTracker;
+            }
+        }
         public SettlementManager()
         {
 
@@ -27,6 +61,10 @@ namespace Empire_Rewritten
             get { return settlements; }
         }
 
+        /// <summary>
+        /// Add a settlement to the tracker.
+        /// </summary>
+        /// <param name="settlement"></param>
         public void AddSettlement(Settlement settlement)
         {
             FacilityManager tracker = new FacilityManager(settlement);
@@ -50,6 +88,10 @@ namespace Empire_Rewritten
             return null;
         }
 
+        public IEnumerable<FacilityManager> GetAllFacilityManagers()
+        {
+            return settlements.Values;
+        }
         public string GetUniqueLoadID()
         {
             return $"SettlementTracker_{GetHashCode()}";
