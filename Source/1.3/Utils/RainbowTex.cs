@@ -57,19 +57,8 @@ namespace Empire_Rewritten.Utils
         /// <param name="str"></param>
         /// <param name="maxlength"></param>
         /// <returns>the string, but longer because it now has a lot of color attributes</returns>
-        public static string Rainbowify(this string str, string splitAtChar = " ", int change = 17, string putInBetweenWords = " ", int maxLength = 1000) =>
-            Rainbowify(SplitString(str, splitAtChar), change, putInBetweenWords, maxLength);
-
-        /// <summary>
-        /// Rainbowifys any string <paramref name="str"/>, by splitting it into parts of size <paramref name="splitSize"/>
-        /// </summary>
-        /// <param name="str"></param>
-        /// <param name="splitSize"></param>
-        /// <param name="maxLength"></param>
-        /// <returns>the string, but longer because it now has a lot of color attributes</returns>
-        public static string Rainbowify(this string str, int splitSize = 0, int change = 17, string putInBetweenWords = "", int maxLength = 1000) =>
-            Rainbowify(SplitString(str, splitSize), change, putInBetweenWords, maxLength);
-
+        public static string Rainbowify(this string str, string splitAtChar = " ", int change = 17, int maxLength = 1000) =>
+            Rainbowify(SplitString(str, splitAtChar), change, splitAtChar, maxLength);
 
         /// <summary>
         /// Splits a string <paramref name="str"/> at the given <paramref name="splitAtChar"/> or every letter
