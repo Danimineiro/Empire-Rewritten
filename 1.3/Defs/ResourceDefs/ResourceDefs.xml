@@ -161,10 +161,10 @@
 		<iconData>
 			<texPath>Resources/Logging</texPath>
 		</iconData>
-		
-		<stuffCategories>
+
+		<stuffCategoryDefs>
 			<li>Woody</li>
-		</stuffCategories>
+		</stuffCategoryDefs>
 		<allowedThingDefs>
 			<li>WoodLog</li>
 		</allowedThingDefs>
@@ -247,11 +247,11 @@
 		<iconData>
 			<texPath>Resources/Mining</texPath>
 		</iconData>
-		
-		<stuffCategories>
+
+		<stuffCategoryDefs>
 			<li>Metallic</li>
 			<li>Stony</li>
-		</stuffCategories>
+		</stuffCategoryDefs>
 		<thingCategoryDefs>
 			<li>StoneBlocks</li>
 		</thingCategoryDefs>
