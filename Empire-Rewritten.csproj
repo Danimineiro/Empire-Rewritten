@@ -11,10 +11,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Source\1.3\Documentation\.obsidian\app.json" />
-    <Content Include="Source\1.3\Documentation\.obsidian\appearance.json" />
-    <Content Include="Source\1.3\Documentation\.obsidian\core-plugins.json" />
-    <Content Include="Source\1.3\Documentation\.obsidian\hotkeys.json" />
+    <Compile Remove="Source\1.3\Documentation\.obsidian\**" />
+    <EmbeddedResource Remove="Source\1.3\Documentation\.obsidian\**" />
+    <None Remove="Source\1.3\Documentation\.obsidian\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,7 +24,6 @@
   <ItemGroup>
     <None Include="1.3\Assemblies\Empire-Rewritten.dll" />
     <None Include="1.3\Assemblies\Empire-Rewritten.pdb" />
-    <None Include="Source\1.3\Documentation\.obsidian\workspace" />
   </ItemGroup>
 
   <ItemGroup>
