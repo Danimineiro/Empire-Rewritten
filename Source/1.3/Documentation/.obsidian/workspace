@@ -1,0 +1,94 @@
+{
+  "main": {
+    "id": "61a5d626fdd11aac",
+    "type": "split",
+    "children": [
+      {
+        "id": "fece2fc32c8f3691",
+        "type": "leaf",
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "Resources.md",
+            "mode": "preview",
+            "source": false
+          }
+        }
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "e0aa7736132dda99",
+    "type": "split",
+    "children": [
+      {
+        "id": "06ccb1e67a5a9334",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f0b2778f03ae7ded",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "9ef55126bd6552a4",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "9cdf96daecba03f0",
+    "type": "split",
+    "children": [
+      {
+        "id": "6ac21271dc97acda",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "efbd067622676696",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Resources.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": true,
+                "unlinkedCollapsed": true
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "active": "fece2fc32c8f3691",
+  "lastOpenFiles": [
+    "Resources.md"
+  ]
+}
