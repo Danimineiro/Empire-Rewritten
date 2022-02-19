@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Empire_Rewritten.Util
+namespace Empire_Rewritten.Utils
 {
     public static class RectExtensions
     {

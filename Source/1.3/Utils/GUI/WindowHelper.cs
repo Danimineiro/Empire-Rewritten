@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
 
-namespace Empire_Rewritten.Util
+namespace Empire_Rewritten.Utils
 {
     /// <summary>
     /// This class provides some useful and often used basic window operations
