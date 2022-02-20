@@ -74,11 +74,10 @@
 		</iconData>
 
 		<thingCategoryDefs>
-			<li>FoodMeals</li>
+			<li>PlantFoodRaw</li>
 		</thingCategoryDefs>
 		<allowedThingDefs>
 			<li>Hay</li>
-			<li>Kibble</li>
 		</allowedThingDefs>
 
 		<hillinessFactors>
