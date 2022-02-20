@@ -249,10 +249,9 @@
 
 		<stuffCategoryDefs>
 			<li>Metallic</li>
-			<li>Stony</li>
 		</stuffCategoryDefs>
 		<thingCategoryDefs>
-			<li>StoneBlocks</li>
+			<li>StoneChunks</li>
 		</thingCategoryDefs>
 		<allowedThingDefs>
 			<li>ComponentIndustrial</li>
