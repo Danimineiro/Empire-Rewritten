@@ -4,18 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Empire_Rewritten.Borders;
+using RimWorld.Planet;
 
 namespace Empire_Rewritten
 {
     public class CivicWorker
     {
-
-        public virtual float CalculateBorderWeight(Border border)
+        public virtual float CalculateDistanceWeight(float distanceWeight)
         {
-            float result = 0;
-
-
-            return result;
+            return distanceWeight / 5;
         }
 
     }

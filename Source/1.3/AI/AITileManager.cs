@@ -40,14 +40,13 @@ namespace Empire_Rewritten.AI
             }
         }
 
-        private Dictionary<int, float> tileWeights = new Dictionary<int, float>();
+        private readonly Dictionary<int, float> tileWeights = new Dictionary<int, float>();
 
 
         public float GetTileWeight(int id)
         {
-            if(tileWeights.ContainsKey(id))
-                return tileWeights[id];
-            tileWeights.Add(id,CalculateTileWeight(id));
+            if(!tileWeights.ContainsKey(id))
+                tileWeights.Add(id,CalculateTileWeight(id));
             return tileWeights[id];
         }
 
@@ -87,7 +86,22 @@ namespace Empire_Rewritten.AI
                     }
                 }
             }
+
             float distanceWeight = (foundASettlement ? smallestDist : -1000) * -1;
+
+
+            FactionController factionController = UpdateController.GetUpdateController.FactionController;
+            FactionCivicAndEthicData factionCivicAndEthicData = factionController.GetOwnedCivicAndEthicData(player.Faction);
+            List<CivicDef> civicDefs = factionCivicAndEthicData.Civics;
+            foreach(CivicDef civicDef in civicDefs)
+            {
+                CivicWorker worker = civicDef.Worker;
+                if(worker != null)
+                {
+                    distanceWeight += worker.CalculateDistanceWeight(distanceWeight);
+                }
+            }
+            
 
 
 

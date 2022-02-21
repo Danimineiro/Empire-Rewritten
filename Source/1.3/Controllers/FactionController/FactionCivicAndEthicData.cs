@@ -22,7 +22,7 @@ namespace Empire_Rewritten
             this.civics = civics.ToList();
             this.ethics = ethics.ToList(); 
         }
-
+        
         /// <summary>
         /// Provides the faction that this class saves data about
         /// </summary>
