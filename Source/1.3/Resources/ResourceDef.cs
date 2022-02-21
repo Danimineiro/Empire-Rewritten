@@ -28,7 +28,7 @@ namespace Empire_Rewritten
         public SimpleCurve swampinessCurve;
 
         public List<BiomeModifier> biomeModifiers;
-        public List<StuffCategoryDef> stuffCategories;
+        public List<StuffCategoryDef> stuffCategoryDefs;
         public List<ThingCategoryDef> thingCategoryDefs;
         public List<ThingDef> allowedThingDefs;
         public List<ThingDef> postRemoveThingDefs;
@@ -62,7 +62,7 @@ namespace Empire_Rewritten
             {
                 if (!hasCachedThingDefs)
                 {
-                    stuffCategories?.ForEach(category => resourcesCreated.SetAllow(category, true));
+                    stuffCategoryDefs?.ForEach(category => resourcesCreated.SetAllow(category, true));
                     thingCategoryDefs?.ForEach(category => resourcesCreated.SetAllow(category, true));
                     allowedThingDefs?.ForEach(thingDef => resourcesCreated.SetAllow(thingDef, true));
                     postRemoveThingDefs?.ForEach(thingDef => resourcesCreated.SetAllow(thingDef, false));
