@@ -56,15 +56,19 @@ namespace Empire_Rewritten
 
         public Type facilityWorker;
 
+        public List<ThingDefCountClass> costList;
+=========
+        public List<ThingDefCountClass> costList;
+=========
         public readonly bool requiresIdeology = false;
         public readonly bool requiresRoyality = false;
         public readonly List<string> requiredModIDs = new List<string>();
 
-        /// <summary>
-        /// Returns if all required Mods are loaded
-        /// </summary>
-        public bool RequiredModsLoaded => ModChecker.RequiredModsLoaded(requiredModIDs, requiresRoyality, requiresIdeology);
 
+        /// Returns if all required Mods are loaded
+>>>>>>>>> Temporary merge branch 2
+        public bool RequiredModsLoaded => ModChecker.RequiredModsLoaded(requiredModIDs, requiresRoyality, requiresIdeology);
+>>>>>>>>> Temporary merge branch 2
 
         public List<ThingDefCountClass> costList = new List<ThingDefCountClass>();
         public override IEnumerable<string> ConfigErrors()

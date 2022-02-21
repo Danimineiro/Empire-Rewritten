@@ -23,11 +23,9 @@ namespace Empire_Rewritten
         public ThingFilter resourcesCreated = new ThingFilter();
 
         public SimpleCurve temperatureCurve;
-        public SimpleCurve elevationAboveSeaLevelCurve;
         public SimpleCurve rainfallCurve;
         public SimpleCurve heightCurve;
         public SimpleCurve swampinessCurve;
-
 
         public List<BiomeModifier> biomeModifiers;
         public List<StuffCategoryDef> stuffCategories;
@@ -35,8 +33,12 @@ namespace Empire_Rewritten
         public List<ThingDef> allowedThingDefs;
         public List<ThingDef> postRemoveThingDefs;
 
-        public bool getsOceanBonus;
-        public bool getsRiverBonus;
+        public HillinessValues hillinessFactors;
+        public HillinessValues hillinessOffsets;
+
+        public WaterBodyValues waterBodyFactors;
+        public WaterBodyValues waterBodyOffsets;
+
         private bool hasCachedThingDefs = false;
 
         /// <summary>
@@ -82,16 +84,38 @@ namespace Empire_Rewritten
 
             float tempVal = temperatureCurve.Evaluate(tile.temperature);
             float heightVal = heightCurve.Evaluate((float)tile.hilliness);
-            float elevationVal = elevationAboveSeaLevelCurve.Evaluate(tile.elevation);
             float swampinessVal = swampinessCurve.Evaluate(tile.swampiness);
             float rainfallVal = rainfallCurve.Evaluate(tile.rainfall);
             ResourceModifier biomeModifier = GetBiomeModifier(tile);
-            result *= (tempVal * heightVal*biomeModifier.multiplier * swampinessVal * rainfallVal * elevationVal);
+            result *= (tempVal * heightVal*biomeModifier.multiplier * swampinessVal * rainfallVal);
 
             ResourceModifier modifer = new ResourceModifier(this, biomeModifier.offset, result);
             
 
             return modifer;
+        }
+
+        /// <param name="stat"></param>
+        /// <param name="isOffset"></param>
+        /// <returns>the value of any given <paramref name="stat"/> and <paramref name="isOffset"/> combination</returns>
+        public float GetBonus(ResourceStat stat, bool isOffset)
+        {
+            if (stat.IsWaterBody())
+            {
+                if (isOffset)
+                {
+                    return waterBodyOffsets.GetValue(stat);
+                }
+
+                return waterBodyFactors.GetValue(stat);
+            }
+
+            if (isOffset)
+            {
+                return hillinessOffsets.GetValue(stat);
+            }
+
+            return hillinessFactors.GetValue(stat);
         }
 
         public ResourceModifier GetBiomeModifier(Tile tile)
