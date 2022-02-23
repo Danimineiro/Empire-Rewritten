@@ -51,7 +51,6 @@ namespace Empire_Rewritten.Borders
             
             if(!BorderManager.GetBorderManager.AnyFactionOwnsTile(id)){
                 tiles.Add(id);
-                BorderDrawer.SetDirty();
             }
             
         }
@@ -139,17 +138,8 @@ namespace Empire_Rewritten.Borders
 
         private Dictionary<Faction, int> borderIDs = new Dictionary<Faction, int>();
 
-
         private static BorderManager borderManager;
         
-        public List<Border> Borders
-        {
-            get
-            {
-                return borders;
-            }
-        }
-
         public static BorderManager GetBorderManager
         {
             get
@@ -174,7 +164,6 @@ namespace Empire_Rewritten.Borders
             }
             return false;
         }
-
 
         public bool FactionOwnsTile(Faction faction, int tile)
         {

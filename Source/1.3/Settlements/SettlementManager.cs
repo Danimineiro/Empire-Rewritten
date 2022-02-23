@@ -116,7 +116,7 @@ namespace Empire_Rewritten
                     Settlement settlement = (Settlement)WorldObjectMaker.MakeWorldObject(WorldObjectDefOf.Settlement);
                     settlement.Tile = tileID;
                     settlement.SetFaction(this.faction);
-                   
+
                     List<string> used = new List<string>();
                     List<Settlement> settlements = Find.WorldObjects.Settlements;
                     foreach (Settlement found in settlements)

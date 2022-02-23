@@ -88,29 +88,22 @@ namespace Empire_Rewritten.AI
             }
 
             float distanceWeight = (foundASettlement ? smallestDist : -1000) * -1;
-            /*
+
 
             FactionController factionController = UpdateController.GetUpdateController.FactionController;
-            if (factionController != null)
+            FactionCivicAndEthicData factionCivicAndEthicData = factionController.GetOwnedCivicAndEthicData(player.Faction);
+            List<CivicDef> civicDefs = factionCivicAndEthicData.Civics;
+            foreach(CivicDef civicDef in civicDefs)
             {
-                FactionCivicAndEthicData factionCivicAndEthicData = factionController.GetOwnedCivicAndEthicData(player.Faction);
-                if (factionCivicAndEthicData != null)
+                CivicWorker worker = civicDef.Worker;
+                if(worker != null)
                 {
-                    List<CivicDef> civicDefs = factionCivicAndEthicData.Civics;
-                    if (!civicDefs.NullOrEmpty() && factionCivicAndEthicData != null)
-                    {
-                        foreach (CivicDef civicDef in civicDefs)
-                        {
-                            CivicWorker worker = civicDef.Worker;
-                            if (worker != null)
-                            {
-                                distanceWeight += worker.CalculateDistanceWeight(distanceWeight);
-                            }
-                        }
-                    }
+                    distanceWeight += worker.CalculateDistanceWeight(distanceWeight);
                 }
             }
-            */
+            
+
+
 
             weight += techWeight + hillinessOffsetWeight + randomOffsetWeight + distanceWeight;
             return weight;
@@ -126,6 +119,7 @@ namespace Empire_Rewritten.AI
                 if (!tileWeights.ContainsKey(tile)){
                     tileWeights.Add(tile,CalculateTileWeight(tile));
                     counter++;
+                    Log.Message(counter.ToString());
                 }
                 if (counter == 10)
                     break;
