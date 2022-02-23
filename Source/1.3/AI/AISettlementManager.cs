@@ -83,7 +83,7 @@ namespace Empire_Rewritten.AI
         public void SearchForTile()
         {
 
-            List<int> tileOptions = player.TileManager.GetTiles.ToList();
+            IEnumerable<int> tileOptions = player.TileManager.GetTiles;
 
             //Default largestweight to -1000 so it's almost always initally overridden.
             float largestWeight = -1000;

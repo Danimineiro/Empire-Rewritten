@@ -51,6 +51,7 @@ namespace Empire_Rewritten.Borders
             
             if(!BorderManager.GetBorderManager.AnyFactionOwnsTile(id)){
                 tiles.Add(id);
+                BorderDrawer.SetDirty();
             }
             
         }
@@ -77,13 +78,13 @@ namespace Empire_Rewritten.Borders
         public void SettlementClaimTiles(Settlement settlement)
         {
             int tileID = settlement.Tile;
-            void TestTask()
-            {
-                List<int> tiles = GetTilesRecursively(tileID, (int)(faction.def.techLevel+1));
-                ClaimTiles(tiles);
-            }
-            Task task = new Task(TestTask);
-            task.Start();
+           void TestTask()
+             {
+                 List<int> tiles = GetTilesRecursively(tileID, (int)(faction.def.techLevel+1));
+                 ClaimTiles(tiles);
+             }
+             Task task = new Task(TestTask);
+             task.Start();
 
         }
 
@@ -106,13 +107,18 @@ namespace Empire_Rewritten.Borders
            
             foreach (int tile in resultCopy)
             {
-                List<int> tiles = GetTilesRecursively(tile, times-count);
-                foreach (int nTile in tiles)
+                Tile worldTile = worldGrid[tile];
+                if (!worldTile.WaterCovered && worldTile.hilliness != Hilliness.Impassable)
                 {
-                    if (!result.Contains(nTile))
-                        result.Add(nTile);
+                    List<int> tiles = GetTilesRecursively(tile, times - count);
+                    foreach (int nTile in tiles)
+                    {
+                        Tile newTile = worldGrid[nTile];
+                        if (!result.Contains(nTile) && !newTile.WaterCovered && newTile.hilliness != Hilliness.Impassable)
+                            result.Add(nTile);
+                    }
+                    count++;
                 }
-                count++;
             }
             return result;
         }

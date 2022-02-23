@@ -89,7 +89,7 @@ namespace Empire_Rewritten.AI
 
             float distanceWeight = (foundASettlement ? smallestDist : -1000) * -1;
 
-
+            /*
             FactionController factionController = UpdateController.GetUpdateController.FactionController;
             FactionCivicAndEthicData factionCivicAndEthicData = factionController.GetOwnedCivicAndEthicData(player.Faction);
             List<CivicDef> civicDefs = factionCivicAndEthicData.Civics;
@@ -103,7 +103,7 @@ namespace Empire_Rewritten.AI
             }
             
 
-
+            */
 
             weight += techWeight + hillinessOffsetWeight + randomOffsetWeight + distanceWeight;
             return weight;
@@ -112,14 +112,14 @@ namespace Empire_Rewritten.AI
         public void CalculateAllUnknownTiles()
         {
             List<int> tiles = BorderManager.GetBorderManager.GetBorder(player.Faction).Tiles.ListFullCopy();
-            
-            int counter=0;
-            foreach(int tile in tiles)
+            Log.Message("test");
+            int counter = 0;
+            foreach (int tile in tiles)
             {
-                if (!tileWeights.ContainsKey(tile)){
-                    tileWeights.Add(tile,CalculateTileWeight(tile));
+                if (!tileWeights.ContainsKey(tile))
+                {
+                    tileWeights.Add(tile, CalculateTileWeight(tile));
                     counter++;
-                    Log.Message(counter.ToString());
                 }
                 if (counter == 10)
                     break;
