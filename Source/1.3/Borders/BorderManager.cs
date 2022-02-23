@@ -140,6 +140,14 @@ namespace Empire_Rewritten.Borders
 
         private static BorderManager borderManager;
         
+        public List<Border> Borders
+        {
+            get
+            {
+                return borders;
+            }
+        }
+
         public static BorderManager GetBorderManager
         {
             get
