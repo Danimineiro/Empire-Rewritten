@@ -10,8 +10,6 @@ namespace Empire_Rewritten.Borders
     {
         private static bool dirty;
         private Dictionary<Border,List<int>> tilesDrawnOn =new Dictionary<Border, List<int>>();
-        private bool enabled = true;
-        public void Toggle()=>enabled = !enabled;
         public static new void SetDirty()=>dirty=true;
         protected override int Layer => base.Layer;
 
@@ -56,7 +54,7 @@ namespace Empire_Rewritten.Borders
                     tilesDrawnOn[border].Add(tile);
                     LayerSubMesh layerSubMesh = base.GetSubMesh(material);
                     Vector3 vector = Find.WorldGrid.GetTileCenter(tile);
-                    WorldRendererUtility.PrintQuadTangentialToPlanet(vector, vector, worldGrid.averageTileSize,1 , layerSubMesh, false, false, false);
+                    WorldRendererUtility.PrintQuadTangentialToPlanet(vector, vector, worldGrid.averageTileSize,0.5f , layerSubMesh, false, false, false);
                 }
             }
         }

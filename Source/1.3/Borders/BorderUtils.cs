@@ -8,11 +8,12 @@ namespace Empire_Rewritten.Borders
 {
     public static class BorderUtils
     {
+        public static bool enabled = true;
         public static float BorderAlpha
         {
             get
             {
-                return PlaySettingsControlsPatch.ShowBorders ?  0.8f : 0;
+                return enabled ?  0.8f : 0;
             }
         }
     }

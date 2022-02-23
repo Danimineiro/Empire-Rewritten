@@ -92,7 +92,7 @@ namespace Empire_Rewritten.AI
            foreach(int tileOption in tileOptions)
             {
                 float weight = player.TileManager.GetTileWeight(tileOption);
-                if (largestWeight < weight && TileFinder.IsValidTileForNewSettlement(tileOption))
+                if (largestWeight < weight)
                 {
                     largestWeight = weight;
                     result = tileOption;
