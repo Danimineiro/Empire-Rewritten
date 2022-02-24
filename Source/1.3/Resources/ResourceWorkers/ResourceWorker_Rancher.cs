@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Verse;
 
-namespace Empire_Rewritten
+namespace Empire_Rewritten.Resources
 {
     public class ResourceWorker_Rancher : ResourceWorker
     {

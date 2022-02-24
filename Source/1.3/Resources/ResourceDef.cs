@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Verse;
 
-namespace Empire_Rewritten
+namespace Empire_Rewritten.Resources
 {
     public class BiomeModifier : ResourceMod
     {
@@ -104,7 +104,7 @@ namespace Empire_Rewritten
             result *= (tempVal * heightVal*biomeModifier.multiplier * swampinessVal * rainfallVal);
 
             ResourceModifier modifer = new ResourceModifier(this, biomeModifier.offset, result);
-            
+
 
             return modifer;
         }

@@ -1,6 +1,7 @@
-﻿using Verse;
+﻿using Empire_Rewritten.Resources;
+using Verse;
 
-namespace Empire_Rewritten
+namespace Empire_Rewritten.Resources
 {
     public enum ResourceStat
     {
