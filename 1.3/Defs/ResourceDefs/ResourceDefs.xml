@@ -309,5 +309,82 @@
 			</points>
 		</heightCurve>
 	
-</Empire_Rewritten.ResourceDef>
+	</Empire_Rewritten.ResourceDef>
+
+	<Empire_Rewritten.ResourceDef ParentName="Empire_ResourceBase">
+		<defName>Empire_Ranching</defName>
+		<label>Ranching</label>
+		<resourceWorker>Empire_Rewritten.ResourceWorker_Rancher</resourceWorker>
+
+		<hillinessFactors>
+			<flat>1</flat>
+			<smallHills>0.93</smallHills>
+			<largeHills>0.85</largeHills>
+			<mountainous>0.6</mountainous>
+		</hillinessFactors>
+
+		<hillinessOffsets>
+			<flat>0.25</flat>
+			<smallHills>-0.05</smallHills>
+			<largeHills>-0.15</largeHills>
+			<mountainous>-0.45</mountainous>
+		</hillinessOffsets>
+
+		<waterBodyFactors>
+			<lake>1.1</lake>
+			<river>1.2</river>
+			<ocean>1</ocean>
+		</waterBodyFactors>
+
+		<waterBodyOffsets>
+			<lake>0.2</lake>
+			<river>0.3</river>
+			<ocean>0</ocean>
+		</waterBodyOffsets>
+
+		<temperatureCurve Inherit="False">
+			<points>
+				<li>-270, 0.0</li>
+				<li>   2, 0.0</li>
+				<li>  10, 0.6</li>
+				<li>  15, 0.9</li>
+				<li>  20, 1.0</li>
+				<li>  21, 1.0</li>
+				<li>  27, 0.94</li>
+				<li>  33, 0.7</li>
+				<li>  45, 0.25</li>
+				<li>  50, 0.0</li>
+				<li>  50, 0.0</li>
+			</points>
+		</temperatureCurve>
+
+		<rainfallCurve Inherit="False">
+			<points>
+				<li>   0,  0</li>
+				<li> 500,  0.6</li>
+				<li>2200,  1</li>
+				<li>5000,  1</li>
+				<li>7500,  0.6</li>
+			</points>
+		</rainfallCurve>
+
+		<heightCurve Inherit="False">
+			<points>
+				<li>   0, 1</li>
+				<li> 200, 1</li>
+				<li>1800, 1</li>
+				<li>2500, 0.9</li>
+			</points>
+		</heightCurve>
+
+		<swampinessCurve Inherit="False">
+			<points>
+				<li> 0.5, 1</li>
+				<li> 0.6, 0.9</li>
+				<li> 0.8, 0.7</li>
+				<li> 1.0, 0.2</li>
+			</points>
+		</swampinessCurve>
+
+	</Empire_Rewritten.ResourceDef>
 </Defs>
