@@ -32,7 +32,9 @@ namespace Empire_Rewritten
 
         public List<BiomeModifier> biomeModifiers;
         public List<StuffCategoryDef> stuffCategoryDefs;
+        public List<StuffCategoryDef> removeStuffCategoryDefs;
         public List<ThingCategoryDef> thingCategoryDefs;
+        public List<ThingCategoryDef> removeThingCategoryDefs;
         public List<ThingDef> allowedThingDefs;
         public List<ThingDef> postRemoveThingDefs;
 
@@ -56,7 +58,11 @@ namespace Empire_Rewritten
                 if (!hasCachedThingDefs)
                 {
                     stuffCategoryDefs?.ForEach(category => resourcesCreated.SetAllow(category, true));
+                    removeStuffCategoryDefs?.ForEach(category => resourcesCreated.SetAllow(category, false));
+
                     thingCategoryDefs?.ForEach(category => resourcesCreated.SetAllow(category, true));
+                    removeThingCategoryDefs?.ForEach(category => resourcesCreated.SetAllow(category, false));
+
                     allowedThingDefs?.ForEach(thingDef => resourcesCreated.SetAllow(thingDef, true));
                     postRemoveThingDefs?.ForEach(thingDef => resourcesCreated.SetAllow(thingDef, false));
 
