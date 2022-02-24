@@ -22,6 +22,9 @@ namespace Empire_Rewritten
 
         public ThingFilter resourcesCreated = new ThingFilter();
 
+        private ResourceWorker worker = null;
+        public Type resourceWorker;
+
         public SimpleCurve temperatureCurve;
         public SimpleCurve rainfallCurve;
         public SimpleCurve heightCurve;
@@ -56,10 +59,25 @@ namespace Empire_Rewritten
                     thingCategoryDefs?.ForEach(category => resourcesCreated.SetAllow(category, true));
                     allowedThingDefs?.ForEach(thingDef => resourcesCreated.SetAllow(thingDef, true));
                     postRemoveThingDefs?.ForEach(thingDef => resourcesCreated.SetAllow(thingDef, false));
+
+                    ResourceWorker?.PostModifyThingFilter();
+
                     hasCachedThingDefs = true;
                 }
 
                 return resourcesCreated;
+            }
+        }
+
+        /// <summary>
+        /// returns the defs ResourceWorker, if it has one
+        /// </summary>
+        public ResourceWorker ResourceWorker
+        {
+            get
+            {
+                if (resourceWorker == null) return null;
+                return worker ?? (worker = (ResourceWorker)Activator.CreateInstance(resourceWorker, resourcesCreated));
             }
         }
 
@@ -125,6 +143,18 @@ namespace Empire_Rewritten
                 }
             }
             return cachedBiomeModifiers[biome];
+        }
+
+        public override IEnumerable<string> ConfigErrors()
+        {
+            if (resourceWorker != null && !resourceWorker.IsSubclassOf(typeof(ResourceWorker)))
+            {
+                yield return $"{resourceWorker} does not inherit from FacilityWorker!";
+            }
+            foreach (string str in base.ConfigErrors())
+            {
+                yield return str;
+            }
         }
     }
 }
