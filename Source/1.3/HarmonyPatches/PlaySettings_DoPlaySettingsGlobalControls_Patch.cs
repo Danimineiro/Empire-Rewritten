@@ -1,6 +1,6 @@
 ﻿using RimWorld;
 using Verse;
-namespace Empire_Rewritten
+namespace Empire_Rewritten.HarmonyPatching
 {
     public static class PlaySettingsControlsPatch
     {

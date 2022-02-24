@@ -63,8 +63,6 @@ namespace Empire_Rewritten.Borders
             {
                 ClaimTile(tile);
             }
-            Log.Message($"Claiming {ids.Count} tiles for {faction}");
-            Log.Message($"Tiles usuable: {tiles.Count}");
         }
 
         public void UnclaimTile(int id)
@@ -78,13 +76,13 @@ namespace Empire_Rewritten.Borders
         public void SettlementClaimTiles(Settlement settlement)
         {
             int tileID = settlement.Tile;
-           void TestTask()
-             {
-                 List<int> tiles = GetTilesRecursively(tileID, (int)(faction.def.techLevel+1));
-                 ClaimTiles(tiles);
-             }
-             Task task = new Task(TestTask);
-             task.Start();
+            void GetTiles()
+            {
+                List<int> tiles = GetTilesRecursively(tileID, (int)(faction.def.techLevel + 1));
+                ClaimTiles(tiles);
+            }
+            Task task = new Task(GetTiles);
+            task.Start();
 
         }
 

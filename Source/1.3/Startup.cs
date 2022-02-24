@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RimWorld;
+using Empire_Rewritten.HarmonyPatching;
 using Empire_Rewritten.Utils;
 using RimWorld.Planet;
 

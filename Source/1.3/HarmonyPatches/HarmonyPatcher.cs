@@ -8,7 +8,7 @@ using RimWorld;
 using RimWorld.Planet;
 using Verse;
 
-namespace Empire_Rewritten
+namespace Empire_Rewritten.HarmonyPatching
 {
     public static class HarmonyPatcher
     {
@@ -20,6 +20,7 @@ namespace Empire_Rewritten
             Harmony harmony = new Harmony("EmpireRewritten.HarmonyPatches");
             harmony.Patch(AccessTools.Method(typeof(Settlement), "GetGizmos"),postfix: new HarmonyMethod(typeof(SettlementGizmoPatch), "GizmoPatch"));
             harmony.Patch(AccessTools.Method(typeof(PlaySettings), "DoPlaySettingsGlobalControls"), postfix: new HarmonyMethod(typeof(PlaySettingsControlsPatch), "Postfix"));
+            harmony.Patch(AccessTools.Method(typeof(SettleUtility), "AddNewHome"), postfix: new HarmonyMethod(typeof(SettleUtilityPatch), "Postfix"));
             Log.Message("[Empire]: Patches completed!");
         }
     }

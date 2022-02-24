@@ -22,9 +22,12 @@ namespace Empire_Rewritten
             {
                 SettlementManager manager = GetManager(settlement);
                IEnumerable<Gizmo> gizmos = manager.GetFacilityManager(settlement).GetGizmos();
-                foreach(Gizmo gizmo in gizmos)
+                foreach (Gizmo gizmo in gizmos)
                 {
-                    yield return gizmo;
+                    if (gizmo != null)
+                    {
+                        yield return gizmo;
+                    }
                 }
             }
             yield break;

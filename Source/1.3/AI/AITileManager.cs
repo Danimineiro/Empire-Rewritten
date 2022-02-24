@@ -111,8 +111,7 @@ namespace Empire_Rewritten.AI
 
         public void CalculateAllUnknownTiles()
         {
-            List<int> tiles = BorderManager.GetBorderManager.GetBorder(player.Faction).Tiles.ListFullCopy();
-            Log.Message("test");
+            IEnumerable<int> tiles = BorderManager.GetBorderManager.GetBorder(player.Faction).Tiles.ListFullCopy();
             int counter = 0;
             foreach (int tile in tiles)
             {
