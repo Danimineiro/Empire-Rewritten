@@ -1,6 +1,4 @@
-﻿using Verse;
-
-namespace Empire_Rewritten.Resources
+﻿namespace Empire_Rewritten.Resources
 {
     public class WaterBodyValues : IResourceStat
     {

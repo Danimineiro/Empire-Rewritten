@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Defs>
-	<Empire_Rewritten.ResourceDef Name="Empire_ResourceBase" Abstract="True">
+	<Empire_Rewritten.Resources.ResourceDef Name="Empire_ResourceBase" Abstract="True">
 		<description>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</description>
 
 		<iconData>
@@ -63,9 +63,9 @@
 				<li> 1.0, 0.80</li>
 			</points>
 		</swampinessCurve>
-	</Empire_Rewritten.ResourceDef>
+	</Empire_Rewritten.Resources.ResourceDef>
 
-	<Empire_Rewritten.ResourceDef ParentName="Empire_ResourceBase">
+	<Empire_Rewritten.Resources.ResourceDef ParentName="Empire_ResourceBase">
 		<defName>Empire_Agriculture</defName>
 		<label>Agriculture</label>
 
@@ -155,9 +155,9 @@
 			</points>
 		</swampinessCurve>
 		
-	</Empire_Rewritten.ResourceDef>
-	
-	<Empire_Rewritten.ResourceDef ParentName="Empire_ResourceBase">
+	</Empire_Rewritten.Resources.ResourceDef>
+
+	<Empire_Rewritten.Resources.ResourceDef ParentName="Empire_ResourceBase">
 		<defName>Empire_Logging</defName>
 		<label>Logging</label>
 
@@ -241,9 +241,9 @@
 			</points>
 		</swampinessCurve>
 		
-	</Empire_Rewritten.ResourceDef>
-	
-	<Empire_Rewritten.ResourceDef ParentName="Empire_ResourceBase">
+	</Empire_Rewritten.Resources.ResourceDef>
+
+	<Empire_Rewritten.Resources.ResourceDef ParentName="Empire_ResourceBase">
 		<defName>Empire_Mining</defName>
 		<label>Mining</label>
 		
@@ -309,12 +309,12 @@
 			</points>
 		</heightCurve>
 	
-	</Empire_Rewritten.ResourceDef>
+	</Empire_Rewritten.Resources.ResourceDef>
 
-	<Empire_Rewritten.ResourceDef ParentName="Empire_ResourceBase">
+	<Empire_Rewritten.Resources.ResourceDef ParentName="Empire_ResourceBase">
 		<defName>Empire_Ranching</defName>
 		<label>Ranching</label>
-		<resourceWorker>Empire_Rewritten.ResourceWorker_Rancher</resourceWorker>
+		<resourceWorker>Empire_Rewritten.Resources.ResourceWorker_Rancher</resourceWorker>
 
 		<hillinessFactors>
 			<flat>1</flat>
@@ -386,5 +386,5 @@
 			</points>
 		</swampinessCurve>
 
-	</Empire_Rewritten.ResourceDef>
+	</Empire_Rewritten.Resources.ResourceDef>
 </Defs>
