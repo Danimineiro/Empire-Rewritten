@@ -13,7 +13,7 @@ namespace Empire_Rewritten.Resources
         /// <returns></returns>
         public override ThingFilter PostModifyThingFilter()
         {
-            foreach(PawnKindDef def in DefDatabase<PawnKindDef>.AllDefsListForReading.Where(def => def.RaceProps.Roamer))
+            foreach (PawnKindDef def in DefDatabase<PawnKindDef>.AllDefsListForReading.Where(def => def.RaceProps?.Roamer == true))
             {
                 filter.SetAllow(def.race, true);
             }
