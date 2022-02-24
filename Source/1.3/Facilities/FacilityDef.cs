@@ -1,4 +1,5 @@
-﻿using Empire_Rewritten.Utils;
+﻿using Empire_Rewritten.Resources;
+using Empire_Rewritten.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;

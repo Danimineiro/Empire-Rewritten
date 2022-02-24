@@ -1,4 +1,5 @@
-﻿using RimWorld.Planet;
+﻿using Empire_Rewritten.Resources;
+using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
 using System.Linq;

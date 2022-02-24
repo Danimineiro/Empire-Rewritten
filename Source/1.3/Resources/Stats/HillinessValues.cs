@@ -1,4 +1,4 @@
-﻿namespace Empire_Rewritten
+﻿namespace Empire_Rewritten.Resources
 {
     public class HillinessValues : IResourceStat
     {

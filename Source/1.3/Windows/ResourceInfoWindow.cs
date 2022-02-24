@@ -7,6 +7,7 @@ using UnityEngine;
 using Empire_Rewritten.Utils;
 using Verse;
 using Verse.Sound;
+using Empire_Rewritten.Resources;
 
 namespace Empire_Rewritten
 {
@@ -178,6 +179,7 @@ namespace Empire_Rewritten
 
                 MouseoverSounds.DoRegion(rect_ThingDefsHighlight);
                 Widgets.DrawHighlightIfMouseover(rect_ThingDefsHighlight);
+                TooltipHandler.TipRegion(rect_ThingDefsHighlight, current.description);
                 Widgets.ThingIcon(rect_ThingDefIcons, current);
                 Widgets.Label(rect_ThingDefs, current.LabelCap);
                 Widgets.InfoCardButton(rect_ThingDefs.RightPartPixels(rect_ThingDefs.height), current);
