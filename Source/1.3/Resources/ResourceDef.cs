@@ -7,8 +7,17 @@ using System.Text;
 using System.Threading.Tasks;
 using Verse;
 
-namespace Empire_Rewritten
+namespace Empire_Rewritten.Resources
 {
+    public static class DebugActionsMisc
+    {
+        [DebugAction("Empire", "Clear Cached Resources", allowedGameStates = AllowedGameStates.Playing)]
+        public static void ClearDataPlaying() => DefDatabase<ResourceDef>.AllDefsListForReading.ForEach(def => def.ClearCachedData());
+
+        [DebugAction("Empire", "Clear Cached Resources", allowedGameStates = AllowedGameStates.Entry)]
+        public static void ClearDataEntry() => ClearDataPlaying();
+    }
+
     public class BiomeModifier : ResourceMod
     {
         public BiomeDef biome;
@@ -22,6 +31,9 @@ namespace Empire_Rewritten
 
         public ThingFilter resourcesCreated = new ThingFilter();
 
+        private ResourceWorker worker = null;
+        public Type resourceWorker;
+
         public SimpleCurve temperatureCurve;
         public SimpleCurve rainfallCurve;
         public SimpleCurve heightCurve;
@@ -29,7 +41,9 @@ namespace Empire_Rewritten
 
         public List<BiomeModifier> biomeModifiers;
         public List<StuffCategoryDef> stuffCategoryDefs;
+        public List<StuffCategoryDef> removeStuffCategoryDefs;
         public List<ThingCategoryDef> thingCategoryDefs;
+        public List<ThingCategoryDef> removeThingCategoryDefs;
         public List<ThingDef> allowedThingDefs;
         public List<ThingDef> postRemoveThingDefs;
 
@@ -62,14 +76,35 @@ namespace Empire_Rewritten
             {
                 if (!hasCachedThingDefs)
                 {
+                    resourcesCreated.SetDisallowAll();
+
                     stuffCategoryDefs?.ForEach(category => resourcesCreated.SetAllow(category, true));
+                    removeStuffCategoryDefs?.ForEach(category => resourcesCreated.SetAllow(category, false));
+
                     thingCategoryDefs?.ForEach(category => resourcesCreated.SetAllow(category, true));
+                    removeThingCategoryDefs?.ForEach(category => resourcesCreated.SetAllow(category, false));
+
                     allowedThingDefs?.ForEach(thingDef => resourcesCreated.SetAllow(thingDef, true));
                     postRemoveThingDefs?.ForEach(thingDef => resourcesCreated.SetAllow(thingDef, false));
+
+                    ResourceWorker?.PostModifyThingFilter();
+
                     hasCachedThingDefs = true;
                 }
 
                 return resourcesCreated;
+            }
+        }
+
+        /// <summary>
+        /// returns the defs ResourceWorker, if it has one
+        /// </summary>
+        public ResourceWorker ResourceWorker
+        {
+            get
+            {
+                if (resourceWorker == null) return null;
+                return worker ?? (worker = (ResourceWorker)Activator.CreateInstance(resourceWorker, resourcesCreated));
             }
         }
 
@@ -87,10 +122,10 @@ namespace Empire_Rewritten
             float swampinessVal = swampinessCurve.Evaluate(tile.swampiness);
             float rainfallVal = rainfallCurve.Evaluate(tile.rainfall);
             ResourceModifier biomeModifier = GetBiomeModifier(tile);
-            result *= (tempVal * heightVal*biomeModifier.multiplier * swampinessVal * rainfallVal);
+            result *= tempVal * heightVal * biomeModifier.multiplier * swampinessVal * rainfallVal;
 
             ResourceModifier modifer = new ResourceModifier(this, biomeModifier.offset, result);
-            
+
 
             return modifer;
         }
@@ -135,6 +170,25 @@ namespace Empire_Rewritten
                 }
             }
             return cachedBiomeModifiers[biome];
+        }
+
+        public override void ClearCachedData()
+        {
+            cachedBiomeModifiers.Clear();
+            hasCachedThingDefs = false;
+            base.ClearCachedData();
+        }
+
+        public override IEnumerable<string> ConfigErrors()
+        {
+            if (resourceWorker != null && !resourceWorker.IsSubclassOf(typeof(ResourceWorker)))
+            {
+                yield return $"{resourceWorker} does not inherit from FacilityWorker!";
+            }
+            foreach (string str in base.ConfigErrors())
+            {
+                yield return str;
+            }
         }
     }
 }

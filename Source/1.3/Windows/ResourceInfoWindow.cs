@@ -7,6 +7,7 @@ using UnityEngine;
 using Empire_Rewritten.Utils;
 using Verse;
 using Verse.Sound;
+using Empire_Rewritten.Resources;
 
 namespace Empire_Rewritten
 {

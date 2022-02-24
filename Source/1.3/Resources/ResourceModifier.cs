@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Verse;
 
-namespace Empire_Rewritten
+namespace Empire_Rewritten.Resources
 {
     /// <summary>
     /// This is for use in defs, because structs cannot be loaded from XML. Holds a resource multiplier and offset value.
@@ -41,9 +41,9 @@ namespace Empire_Rewritten
         /// <returns></returns>
         public ResourceModifier MergeWithModifier(ResourceModifier other)
         {
-            if (other.def == this.def)
+            if (other.def == def)
             {
-                return new ResourceModifier(this.def, other.offset + this.offset,other.multiplier*this.multiplier);
+                return new ResourceModifier(def, other.offset + offset, other.multiplier * multiplier);
             }
             else
             {
@@ -59,7 +59,7 @@ namespace Empire_Rewritten
         /// <returns></returns>
         public float TotalProduced()
         {
-            return (float)(this.multiplier* this.offset);
+            return (float)(multiplier * offset);
         }
     }
 }

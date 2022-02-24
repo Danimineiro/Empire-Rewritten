@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RimWorld;
+using Empire_Rewritten.Resources;
 using RimWorld.Planet;
 using Verse;
 using Empire_Rewritten.Borders;

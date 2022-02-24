@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Empire_Rewritten.Resources;
 using RimWorld;
 using Verse;
-namespace Empire_Rewritten { 
+namespace Empire_Rewritten
+{
     public class StorageTracker : IExposable, ILoadReferenceable
     {
         private Dictionary<ThingDef, int> storedThings = new Dictionary<ThingDef, int>();

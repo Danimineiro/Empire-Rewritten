@@ -1,5 +1,6 @@
 ﻿using Empire_Rewritten.Borders;
 using RimWorld;
+using Empire_Rewritten.Resources;
 using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
