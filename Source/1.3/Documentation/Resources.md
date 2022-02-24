@@ -22,7 +22,7 @@ The amount of resources collected is determined by 1 \* TileModifiers \* \[Modif
 	</Empire_Rewritten.ResourceDef>
 </Defs>
 ```
-- Fill in the `defName`, `Label`  and `description` fields. We recommend prefixing your `defName` with the name of your mod or a common prefix your mod uses
+- Fill in the `defName`, `Label`  and `description` fields. We recommend prefixing your `defName` with the name of your mod or a common prefix your mod uses. If needed or wanted, you can also define a `Empire_Rewritten.ResourceWorker` using the optional `resourceWorker` field. It can modify the internal `Verse.ThingFilter` using C#
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
@@ -48,7 +48,7 @@ The amount of resources collected is determined by 1 \* TileModifiers \* \[Modif
 	</Empire_Rewritten.ResourceDef>
 </Defs>
 ```
-- Define the `ThingDefs` that can be gathered from the Resource using the `stuffCategories`, `thingCategoryDefs`, `allowedThingDefs` and `postRemoveThingDefs` fields
+- Define the `ThingDefs` that can be gathered from the Resource using the `stuffCategories`, `thingCategoryDefs` and `allowedThingDefs` fields. You can remove `Thingdefs` using the `removeStuffCategoryDefs`, `removeThingCategoryDefs` and  `postRemoveThingDefs`  fields. (Order: `stuffCategoryDefs` => `removeStuffCategoryDefs` => `thingCategoryDefs` => `removeThingCategoryDefs` => `allowedThingDefs` => `postRemoveThingDefs` => `ResourceWorker`) 
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
