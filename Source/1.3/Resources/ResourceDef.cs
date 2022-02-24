@@ -9,6 +9,15 @@ using Verse;
 
 namespace Empire_Rewritten.Resources
 {
+    public static class DebugActionsMisc
+    {
+        [DebugAction("Empire", "Clear Cached Resources", allowedGameStates = AllowedGameStates.Playing)]
+        public static void ClearDataPlaying() => DefDatabase<ResourceDef>.AllDefsListForReading.ForEach(def => def.ClearCachedData());
+
+        [DebugAction("Empire", "Clear Cached Resources", allowedGameStates = AllowedGameStates.Entry)]
+        public static void ClearDataEntry() => ClearDataPlaying();
+    }
+
     public class BiomeModifier : ResourceMod
     {
         public BiomeDef biome;
@@ -57,6 +66,8 @@ namespace Empire_Rewritten.Resources
             {
                 if (!hasCachedThingDefs)
                 {
+                    resourcesCreated.SetDisallowAll();
+
                     stuffCategoryDefs?.ForEach(category => resourcesCreated.SetAllow(category, true));
                     removeStuffCategoryDefs?.ForEach(category => resourcesCreated.SetAllow(category, false));
 
@@ -101,7 +112,7 @@ namespace Empire_Rewritten.Resources
             float swampinessVal = swampinessCurve.Evaluate(tile.swampiness);
             float rainfallVal = rainfallCurve.Evaluate(tile.rainfall);
             ResourceModifier biomeModifier = GetBiomeModifier(tile);
-            result *= (tempVal * heightVal*biomeModifier.multiplier * swampinessVal * rainfallVal);
+            result *= tempVal * heightVal * biomeModifier.multiplier * swampinessVal * rainfallVal;
 
             ResourceModifier modifer = new ResourceModifier(this, biomeModifier.offset, result);
 
@@ -149,6 +160,13 @@ namespace Empire_Rewritten.Resources
                 }
             }
             return cachedBiomeModifiers[biome];
+        }
+
+        public override void ClearCachedData()
+        {
+            cachedBiomeModifiers.Clear();
+            hasCachedThingDefs = false;
+            base.ClearCachedData();
         }
 
         public override IEnumerable<string> ConfigErrors()
