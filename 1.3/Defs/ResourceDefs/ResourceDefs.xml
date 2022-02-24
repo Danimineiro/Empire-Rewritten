@@ -69,15 +69,19 @@
 		<defName>Empire_Agriculture</defName>
 		<label>Agriculture</label>
 
-		<iconData>
+		<!--<iconData>
 			<texPath>Resources/Food</texPath>
-		</iconData>
+		</iconData>-->
 
 		<thingCategoryDefs>
 			<li>PlantFoodRaw</li>
+			<li>PlantMatter</li>
 		</thingCategoryDefs>
 		<allowedThingDefs>
 			<li>Hay</li>
+			<li>Cloth</li>
+			<li>DevilstrandCloth</li>
+			<li>MedicineHerbal</li>
 		</allowedThingDefs>
 
 		<hillinessFactors>
