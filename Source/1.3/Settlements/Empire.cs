@@ -8,12 +8,14 @@ using Empire_Rewritten.Resources;
 using RimWorld.Planet;
 using Verse;
 using Empire_Rewritten.Borders;
+using Empire_Rewritten.Facilities;
+
 namespace Empire_Rewritten
 {
     /// <summary>
-    /// Manages settlements and their FacilitiyManager
+    /// Manages settlements, and storage.
     /// </summary>
-    public class SettlementManager : IExposable, ILoadReferenceable
+    public class Empire : IExposable, ILoadReferenceable
     {
 
         private Dictionary<Settlement, FacilityManager> settlements = new Dictionary<Settlement, FacilityManager>();
@@ -85,12 +87,12 @@ namespace Empire_Rewritten
                 return storageTracker;
             }
         }
-        public SettlementManager()
+        public Empire()
         {
 
         }
 
-        public SettlementManager(Faction faction)
+        public Empire(Faction faction)
         {
             this.faction = faction;
         }

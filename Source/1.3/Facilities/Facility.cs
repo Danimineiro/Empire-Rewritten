@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Verse;
 
-namespace Empire_Rewritten
+namespace Empire_Rewritten.Facilities
 {
     public class Facility : IExposable, ILoadReferenceable
     {

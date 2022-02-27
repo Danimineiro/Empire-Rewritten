@@ -6,8 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Verse;
-
-namespace Empire_Rewritten
+namespace Empire_Rewritten.Facilities
 {
     /// <summary>
     /// This manages all the facilities for a settlement.

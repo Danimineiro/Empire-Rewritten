@@ -25,7 +25,7 @@ namespace Empire_Rewritten
         /// </summary>
         /// <param name="owner"></param>
         /// <param name="settlementManager"></param>
-        public FactionSettlementData(Faction owner, SettlementManager settlementManager)
+        public FactionSettlementData(Faction owner, Empire settlementManager)
         {
             this.owner = owner;
             this.originalOwner = owner; 
@@ -34,7 +34,7 @@ namespace Empire_Rewritten
 
         public Faction owner;
         private Faction originalOwner;
-        private SettlementManager settlementManager;
+        private Empire settlementManager;
 
         /// <summary>
         /// Returns the original Owner, shouldn't ever be changed
@@ -44,7 +44,7 @@ namespace Empire_Rewritten
         /// <summary>
         /// Returns the SettlementManager, shouldn't ever be changed
         /// </summary>
-        public SettlementManager SettlementManager => settlementManager;
+        public Empire SettlementManager => settlementManager;
 
 
         /// <summary>
@@ -56,11 +56,12 @@ namespace Empire_Rewritten
             List<FactionSettlementData> factionSettlementDatas = new List<FactionSettlementData>();
             foreach (Faction faction in Find.FactionManager.AllFactionsListForReading)
             {
-                factionSettlementDatas.Add(new FactionSettlementData(faction, new SettlementManager(faction)));
+                factionSettlementDatas.Add(new FactionSettlementData(faction, new Empire(faction)));
             }
 
             return factionSettlementDatas;
         }
+
 
         public void ExposeData()
         {

@@ -10,7 +10,6 @@ namespace Empire_Rewritten.Borders
     {
         private static bool dirty;
         private Dictionary<Border,List<int>> tilesDrawnOn =new Dictionary<Border, List<int>>();
-        private bool enabled = true;
         public static new void SetDirty()=>dirty=true;
         protected override int Layer => base.Layer;
 

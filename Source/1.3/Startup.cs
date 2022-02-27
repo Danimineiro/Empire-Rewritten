@@ -34,6 +34,7 @@ namespace Empire_Rewritten
         {
             Log.Message($"<color=orange>[Empire]</color> Attaching actions to world start");
             UpdateController.AddFinalizeInitHook(AddFactionControllerIfMissing);
+            UpdateController.AddFinalizeInitHook(InitPlayerHandler);
             UpdateController.AddFinalizeInitHook(AddAIToNonPlayers);
         }
 
@@ -60,6 +61,11 @@ namespace Empire_Rewritten
                     factionController.CreateNewAIPlayer(faction);
                 }
             }
+        }
+
+        private static void InitPlayerHandler(FactionController factionController)
+        {
+            PlayerHandler.Initalize(factionController);
         }
     }
 }

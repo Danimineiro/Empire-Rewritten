@@ -8,7 +8,7 @@ using Verse;
 using Empire_Rewritten.Borders;
 using Empire_Rewritten.AI;
 using RimWorld.Planet;
-
+using Empire_Rewritten.Player;
 namespace Empire_Rewritten
 {
     public class FactionController : IExposable
@@ -54,7 +54,7 @@ namespace Empire_Rewritten
 
         /// <param name="faction"></param>
         /// <returns>The <c>SettlementManager</c> owned by a given <paramref name="faction"/></returns>
-        public SettlementManager GetOwnedSettlementManager(Faction faction)
+        public Empire GetOwnedSettlementManager(Faction faction)
         {
             foreach (FactionSettlementData factionSettlementData in factionSettlementDataList)
             {
@@ -74,13 +74,24 @@ namespace Empire_Rewritten
             return AIFactions.ContainsKey(faction) ? AIFactions[faction] : null;
         }
 
+        public void CreatePlayer()
+        {
+            Faction faction = Faction.OfPlayer;
+            FactionSettlementData factionSettlementData = new FactionSettlementData(faction, new Empire(faction));
+            factionSettlementDataList.Add(factionSettlementData);
+            UserPlayer player = new UserPlayer(faction);
+            IEnumerable<WorldObject> settlements = Find.WorldObjects.Settlements.Where(x =>x.Faction == faction);
+            BorderManager.GetBorder(faction).SettlementClaimTiles((Settlement)settlements.First());
+
+        }
+
         public void CreateNewAIPlayer(Faction faction)
         {
             AIPlayer aIPlayer = new AIPlayer(faction);
             AIFactions.Add(faction,aIPlayer);
 
             //Find preexisting settlements.
-            IEnumerable<WorldObject> settlements = Find.WorldObjects.AllWorldObjects.Where(x => x is Settlement s && s.Faction == faction);
+            IEnumerable<WorldObject> settlements = Find.WorldObjects.Settlements.Where(x => x.Faction == faction);
             if (settlements.Count() > 0) {
                 List<WorldObject> list = settlements.ToList();
                 aIPlayer.Manager.AddSettlement(list[0] as Settlement);
@@ -146,7 +157,7 @@ namespace Empire_Rewritten
             NotifyCivicsOrEthicsChanged(GetOwnedSettlementManager(faction));
         }
 
-        public void NotifyCivicsOrEthicsChanged(SettlementManager settlementManager)
+        public void NotifyCivicsOrEthicsChanged(Empire settlementManager)
         {
             throw new NotImplementedException();
         }

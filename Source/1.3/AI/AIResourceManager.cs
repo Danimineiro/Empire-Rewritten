@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Verse;
+using Empire_Rewritten.Resources;
 
 namespace Empire_Rewritten.AI
 {

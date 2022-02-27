@@ -13,7 +13,7 @@ namespace Empire_Rewritten.AI
         private AISettlementManager settlementManager;
         private AIResourceManager resourceManager;
         private AITileManager tileManager;
-        private SettlementManager cachedManager;
+        private Empire cachedManager;
         private bool ManagerIsDirty = true;
 
         public AITileManager TileManager
@@ -28,14 +28,14 @@ namespace Empire_Rewritten.AI
             }
         }
 
-        public SettlementManager Manager
+        public Empire Manager
         {
             get
             {
                 if (cachedManager== null || ManagerIsDirty)
                 {
                   
-                    ManagerIsDirty = true;
+                    ManagerIsDirty = false;
                     UpdateController updateController = UpdateController.GetUpdateController;
                     FactionController factionController = updateController.FactionController;
 
