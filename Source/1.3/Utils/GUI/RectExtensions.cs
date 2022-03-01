@@ -1,37 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Empire_Rewritten.Utils
+namespace Empire_Rewritten.Utils.GUI
 {
     public static class RectExtensions
     {
         /// <summary>
-        /// Moves a <paramref name="rect"/> using a vector <paramref name="vec"/>
+        ///     Creates a copy of this <see cref="Rect" /> moved by a <see cref="Vector2" />
         /// </summary>
-        /// <param name="rect"></param>
-        /// <param name="vec"></param>
-        /// <returns>the moved <paramref name="rect"/></returns>
-        public static Rect MoveRect(this Rect rect, Vector2 vec) => new Rect(rect.x + vec.x, rect.y + vec.y, rect.width, rect.height);
-        
-        /// <summary>
-        /// Moves a <paramref name="rect"/> by <paramref name="x"/> and <paramref name="y"/>
-        /// </summary>
-        /// <param name="rect"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns>the moved <paramref name="rect"/></returns>
-        public static Rect MoveRect(this Rect rect, int x, int y) => MoveRect(rect, new Vector2(x, y));
+        /// <param name="rect">the <see cref="Rect" /> to move</param>
+        /// <param name="vec">the distance to move <paramref name="rect" /></param>
+        /// <returns>A copy of <paramref name="rect" />, moved by the distance specified in <paramref name="vec" /></returns>
+        public static Rect MoveRect(this Rect rect, Vector2 vec)
+        {
+            var newRect = new Rect(rect);
+            newRect.position += vec;
+            return newRect;
+        }
 
         /// <summary>
-        /// Adds or subtracts <paramref name="scaleByPixel"/> from a <paramref name="rect"/>s sides
+        ///     Creates a copy of a <see cref="Rect" /> with its left edge moved by <paramref name="scaleBy" />, while
+        ///     maintaining its width.
         /// </summary>
-        /// <param name="rect"></param>
-        /// <param name="scaleByPixel"></param>
-        /// <returns></returns>
-        public static Rect ScaleXByPixel(this Rect rect, float scaleByPixel) => new Rect(rect.x - scaleByPixel, rect.y, rect.width + scaleByPixel, rect.height);
+        /// <param name="rect">The <see cref="Rect" /> to modify</param>
+        /// <param name="scaleBy">The amount of units to scale <paramref name="rect" /> by</param>
+        /// <returns>A copy of <paramref name="rect" /> with its left edge moved to the left by <paramref name="scaleBy" /> units</returns>
+        public static Rect ScaleX(this Rect rect, float scaleBy)
+        {
+            var newRect = new Rect(rect);
+            newRect.xMin -= scaleBy;
+            return newRect;
+        }
     }
 }

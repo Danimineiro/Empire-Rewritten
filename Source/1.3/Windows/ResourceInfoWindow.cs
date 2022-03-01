@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using Empire_Rewritten.Utils;
+using Empire_Rewritten.Utils.GUI;
 using Verse;
 using Verse.Sound;
 using Empire_Rewritten.Resources;
@@ -260,12 +261,12 @@ namespace Empire_Rewritten
                 else
                     Widgets.DrawLightHighlight(tempRect);
 
-                Widgets.Label(tempRect.ScaleXByPixel(-5f), ((ResourceStat)i).Translate(isOffset).CapitalizeFirst());
+                Widgets.Label(tempRect.ScaleX(-5f), ((ResourceStat)i).Translate(isOffset).CapitalizeFirst());
 
                 if (isOffset)
-                    Widgets.Label(tempRect.ScaleXByPixel(-5f).RightHalf(), defSelected.GetBonus((ResourceStat)i, isOffset).ToString());
+                    Widgets.Label(tempRect.ScaleX(-5f).RightHalf(), defSelected.GetBonus((ResourceStat)i, isOffset).ToString());
                 else
-                    Widgets.Label(tempRect.ScaleXByPixel(-5f).RightHalf(), defSelected.GetBonus((ResourceStat)i, isOffset).ToStringPercent());
+                    Widgets.Label(tempRect.ScaleX(-5f).RightHalf(), defSelected.GetBonus((ResourceStat)i, isOffset).ToStringPercent());
 
                 MouseoverSounds.DoRegion(tempRect);
                 Widgets.DrawHighlightIfMouseover(tempRect);
