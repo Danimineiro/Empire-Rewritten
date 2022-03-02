@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Empire_Rewritten.Facilities;
 using Empire_Rewritten.Resources;
 using RimWorld.Planet;
 using Verse;
@@ -45,7 +46,7 @@ namespace Empire_Rewritten.Settlements
             var resourceModifiers = new Dictionary<ResourceDef, ResourceModifier>();
 
             foreach (var resourceModifier in
-                     settlements.Values.SelectMany(facilityManager => facilityManager.modifiers))
+                     settlements.Values.SelectMany(facilityManager => facilityManager.Modifiers))
             {
                 if (resourceModifiers.ContainsKey(resourceModifier.def))
                 {

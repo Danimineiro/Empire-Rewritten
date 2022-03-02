@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Empire_Rewritten.Facilities;
 using Verse;
 
 namespace Empire_Rewritten.AI
@@ -55,7 +56,7 @@ namespace Empire_Rewritten.AI
                     updateDefCache= false;
                     foreach(FacilityManager manager in Facilities)
                     {
-                        cachedFacilitiesDef.AddRange(manager.FacilityDefsInsalled);
+                        cachedFacilitiesDef.AddRange(manager.FacilityDefsInstalled);
                     }
                 }
                 return cachedFacilitiesDef;
