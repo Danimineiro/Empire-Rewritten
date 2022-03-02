@@ -1,11 +1,5 @@
 ﻿using Verse;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using RimWorld;
-using Empire_Rewritten.Utils;
+using Empire_Rewritten.Utils.Text;
 
 namespace Empire_Rewritten
 {
@@ -20,7 +14,7 @@ namespace Empire_Rewritten
         /// </summary>
         static Startup()
         {
-            Log.Message("[Empire Rewritten] just here to say hello! ^-^ Have a nice day and great fun with Empire!".Rainbowify(" ", 35));
+            Log.Message("[Empire Rewritten] just here to say hello! ^-^ Have a nice day and great fun with Empire!".Rainbowify(' ', 35));
             AppendActionsToWorldStart();
             HarmonyPatcher.DoPatches();
         }

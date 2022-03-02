@@ -1,113 +1,115 @@
 ﻿using System;
-using System.Linq;
-using Verse;
-using HarmonyLib;
+using System.Text;
 
-namespace Empire_Rewritten.Utils
+namespace Empire_Rewritten.Utils.Text
 {
     internal static class RainbowTex
     {
-        private static int red = 255;
-        private static int green = 0;
-        private static int blue = 255;
+        private static int _red = 255;
+        private static int _green;
+        private static int _blue = 255;
+
+        private static string CurrentHex => $"#{_red.AsHex()}{_green.AsHex()}{_blue.AsHex()}";
 
         /// <summary>
-        /// Rainbowifys an array <paramref name="words"/> of words
+        ///     Converts a <see cref="T:string[]" /> into a rainbowified <see cref="string" />.
         /// </summary>
-        /// <param name="words"></param>
-        /// <param name="maxLength"></param>
-        /// <returns>the string, but longer because it now has a lot of color attributes</returns>
-        public static string Rainbowify(this string[] words, int change = 17, string putInBetweenWords = " ", int maxLength = 1000)
+        /// <param name="words">The <see cref="T:string[]" /> to rainbowify</param>
+        /// <param name="change"></param>
+        /// <param name="joiner">
+        ///     The <see cref="string" /> to put between each of the <paramref name="words">words</paramref>; If null, uses the
+        ///     <see cref="string.Empty">empty string</see>
+        /// </param>
+        /// <param name="maxLength">The maximum length of the returned <see cref="string" /></param>
+        /// <returns>
+        ///     The elements of <paramref name="words" /> joined and rainbowified.
+        ///     Will not be longer than <paramref name="maxLength" />, but may be missing words at the end.
+        /// </returns>
+        public static string Rainbowify(this string[] words, int change = 17, string joiner = " ", int maxLength = 1000)
         {
-            int length = 0;
+            if (joiner is null) joiner = string.Empty;
+            var final = new StringBuilder();
 
-            foreach (string word in words.Where(str => str != null))
+            for (var i = 0; i < words.Length; i++)
             {
-                length += word.Length;
-            }
-
-            string returnString = "";
-            int processed = 0;
-
-            for (int i = 0; i < words.Length; i++)
-            {
-                if (words[i] == null)
-                {
-                    Log.Message("Here");
+                var word = words[i];
+                // If word would overflow maxLength, stop
+                if (final.Length + joiner.Length + word.Length + "<color=#000000></color>".Length > maxLength)
                     break;
-                }
 
-                string word = words[i];
-                processed += word.Length + 1;
-                returnString += $"<color=#{Convert.ToString(red, 16).AddLeading()}{Convert.ToString(green, 16).AddLeading()}{Convert.ToString(blue, 16).AddLeading()}>{word}</color>{putInBetweenWords}";
+                final.Append($"<color={CurrentHex}>{word}</color>");
 
-                ChangeHexColors(red, ref green, ref blue, change);
-                ChangeHexColors(green, ref blue, ref red, change);
-                ChangeHexColors(blue, ref red, ref green, change);
+                ChangeHexColors(_red, ref _green, ref _blue, change);
+                ChangeHexColors(_green, ref _blue, ref _red, change);
+                ChangeHexColors(_blue, ref _red, ref _green, change);
 
-                if (words.Length < i + 1 && (returnString.Length + (words[i+1]?.Length ?? 0) - processed + "<color=#FFFFFF></color>".Length) > maxLength - 30) break;
+                if (i < words.Length - 1)
+                    final.Append(joiner);
             }
 
-            return returnString;
+            return final.ToString();
         }
 
         /// <summary>
-        /// Rainbowifies any string
+        ///     Rainbowifies a <see cref="string" />
         /// </summary>
-        /// <param name="str"></param>
-        /// <param name="maxlength"></param>
-        /// <returns>the string, but longer because it now has a lot of color attributes</returns>
-        public static string Rainbowify(this string str, string splitAtChar = " ", int change = 17, int maxLength = 1000) =>
-            Rainbowify(SplitString(str, splitAtChar), change, splitAtChar, maxLength);
-
-        /// <summary>
-        /// Splits a string <paramref name="str"/> at the given <paramref name="splitAtChar"/> or every letter
-        /// </summary>
-        /// <param name="str"></param>
-        /// <param name="splitAtChar"></param>
-        /// <returns>the generated array</returns>
-        private static string[] SplitString(string str, string splitAtChar)
+        /// <param name="str">The <see cref="string" /> to rainbowify</param>
+        /// <param name="splitAt">
+        ///     The <see cref="char">char?</see> to split <paramref name="str" /> at; If <c>null</c>, splits after every
+        ///     character
+        /// </param>
+        /// <param name="change"></param>
+        /// <param name="maxLength">The maximum length of the returned <see cref="string" /></param>
+        /// <returns>
+        ///     A rainbowified version of <paramref name="str" />. Will not be longer than <paramref name="maxLength" />, but
+        ///     may be cut off at the end.
+        /// </returns>
+        public static string Rainbowify(this string str, char? splitAt = ' ', int change = 17, int maxLength = 1000)
         {
-            if (splitAtChar.NullOrEmpty()) return SplitString(str, 1);
-
-            return str.Split(splitAtChar[0]);
+            return Rainbowify(SplitString(str, splitAt), change, splitAt?.ToString(), maxLength);
         }
 
         /// <summary>
-        /// Splits a string <paramref name="str"/> into an array where each entry has a length of <paramref name="splitSize"/>
+        ///     Splits a <see cref="string" /> on a given <see cref="char">char?</see>.
         /// </summary>
-        /// <param name="str"></param>
-        /// <param name="splitSize"></param>
-        /// <returns>the generated array</returns>
+        /// <param name="str">The <see cref="string" /> to split</param>
+        /// <param name="splitAt">The <see cref="char">char?</see> to split on; If <c>null</c>, splits into 1-character strings</param>
+        /// <returns>A <see cref="T:string[]" /> of the split strings</returns>
+        private static string[] SplitString(string str, char? splitAt)
+        {
+            return splitAt is char splitAtChar ? str.Split(splitAtChar) : SplitString(str);
+        }
+
+        /// <summary>
+        ///     Splits a <see cref="string" /> into an <see cref="T:string[]" /> of equal-length strings.
+        /// </summary>
+        /// <param name="str">The <see cref="string" /> to split</param>
+        /// <param name="splitSize">The length each string should have</param>
+        /// <returns>
+        ///     A <see cref="T:string[]" /> with members of length <paramref name="splitSize" />. The last entry may be
+        ///     shorter if <paramref name="str" />'s length is not evenly divisible by <paramref name="splitSize" />
+        /// </returns>
         private static string[] SplitString(string str, int splitSize = 1)
         {
-            string[] array = new string[str.Length];
+            var splitArray = new string[str.Length / splitSize + 1];
             splitSize = Math.Max(splitSize, 1);
 
-            for (int i = 0; i < array.Length ; i += splitSize)
-            {
-                string temp = "";
+            for (var i = 0; i < splitArray.Length; i++)
+                if ((i + 1) * splitSize > str.Length)
+                    splitArray[i] = str.Substring(i * splitSize);
+                else
+                    splitArray[i] = str.Substring(i * splitSize, splitSize);
 
-                Log.Message($"arrayLength: {array.Length}, i: {i}");
-
-                for (int j = i; j < splitSize + i && j < array.Length; j++)
-                {
-                    temp += str[j];
-                    Log.Message($"arrayLength: {temp}, j: {j}");
-                }
-
-                array[i] = temp;
-            }
-
-            return array;
+            return splitArray;
         }
 
         /// <summary>
-        /// Rainbow
+        ///     TODO: Document
         /// </summary>
         /// <param name="color0"></param>
         /// <param name="color1"></param>
         /// <param name="color2"></param>
+        /// <param name="change"></param>
         private static void ChangeHexColors(int color0, ref int color1, ref int color2, int change)
         {
             if (color0 == 255 && color1 < 255)
@@ -121,15 +123,14 @@ namespace Empire_Rewritten.Utils
         }
 
         /// <summary>
-        /// Adds a leading 0 to the given string if the string has a length of less than 1
+        ///     Converts an <see cref="int" /> to its hex representation (as a <see cref="string" />), with a length of at least 2,
+        ///     padding '0' if necessary.
         /// </summary>
-        /// <param name="num"></param>
-        /// <returns>another string</returns>
-        private static string AddLeading(this string num)
+        /// <param name="num">The <see cref="int" /> to convert</param>
+        /// <returns><paramref name="num" /> as a hex <see cref="string" /></returns>
+        private static string AsHex(this int num)
         {
-            if (num.Length == 1) return $"0{num}";
-
-            return num;
+            return Convert.ToString(num, 16).PadLeft(2, '0');
         }
     }
 }
