@@ -1,24 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HarmonyLib;
+﻿using HarmonyLib;
 using RimWorld.Planet;
 using Verse;
 
-namespace Empire_Rewritten
+namespace Empire_Rewritten.HarmonyPatches
 {
     public static class HarmonyPatcher
     {
         /// <summary>
-        /// Run our harmony patches.
+        ///     Runs our harmony patches.
         /// </summary>
         public static void DoPatches()
         {
-            Harmony harmony = new Harmony("EmpireRewritten.HarmonyPatches");
-            harmony.Patch(AccessTools.Method(typeof(Settlement), "GetGizmos"),postfix: new HarmonyMethod(typeof(SettlementGizmoPatch), "GizmoPatch"));
-            Log.Message("[Empire]: Patches completed!");
+            var harmony = new Harmony("EmpireRewritten.HarmonyPatches");
+
+            harmony.Patch(typeof(Settlement).GetMethod(nameof(Settlement.GetGizmos)),
+                          null,
+                          new HarmonyMethod(typeof(SettlementGizmoPatch), nameof(SettlementGizmoPatch.GizmoPatch)));
+
+            Log.Message("<color=orange>[Empire]</color> Patches completed!");
         }
     }
 }

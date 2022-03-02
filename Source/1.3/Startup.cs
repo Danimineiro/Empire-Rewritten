@@ -1,5 +1,6 @@
 ﻿using Verse;
 using Empire_Rewritten.Utils.Text;
+using Empire_Rewritten.HarmonyPatches;
 
 namespace Empire_Rewritten
 {
