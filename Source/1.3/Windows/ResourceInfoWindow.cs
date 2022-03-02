@@ -9,6 +9,7 @@ using Empire_Rewritten.Utils.GUI;
 using Verse;
 using Verse.Sound;
 using Empire_Rewritten.Resources;
+using Empire_Rewritten.Resources.Stats;
 
 namespace Empire_Rewritten
 {
