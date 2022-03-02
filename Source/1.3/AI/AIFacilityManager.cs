@@ -39,7 +39,7 @@ namespace Empire_Rewritten.AI
                 if (cachedFacilities.NullOrEmpty() ||updateCache)
                 {
                     updateCache= false;
-                    cachedFacilities= (List<FacilityManager>)player.Manager.GetAllFacilityManagers();
+                    cachedFacilities= player.Manager.AllFacilityManagers.ToList();
                     updateDefCache = true;
                 }
                 return cachedFacilities;

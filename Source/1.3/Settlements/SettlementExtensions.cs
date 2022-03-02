@@ -1,33 +1,34 @@
-﻿using RimWorld;
-using RimWorld.Planet;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using RimWorld;
+using RimWorld.Planet;
 using Verse;
 
-namespace Empire_Rewritten
+namespace Empire_Rewritten.Settlements
 {
     public static class SettlementExtensions
     {
+        /// <summary>
+        ///     Gets the <see cref="SettlementManager" /> of a given <see cref="Settlement" />.
+        /// </summary>
+        /// <param name="settlement">The <see cref="Settlement" /> to get the <see cref="SettlementManager" /> of</param>
+        /// <returns>The <see cref="SettlementManager" /> of <paramref name="settlement" /></returns>
         public static SettlementManager GetManager(this Settlement settlement)
         {
-            UpdateController updateController = UpdateController.GetUpdateController;
-            return updateController.FactionController.GetOwnedSettlementManager(settlement.Faction);
+            return UpdateController.GetUpdateController.FactionController.GetOwnedSettlementManager(settlement.Faction);
         }
+
+        /// <summary>
+        ///     Gets all <see cref="Gizmo">Gizmos</see> provided by <see cref="Facility">Facilities</see> of a given
+        ///     <see cref="Settlement" />.
+        /// </summary>
+        /// <param name="settlement">The <see cref="Settlement" /> to get the <see cref="Gizmo">Gizmos</see> of</param>
+        /// <returns>The <see cref="Gizmo">Gizmos</see> of <paramref name="settlement" /></returns>
         public static IEnumerable<Gizmo> GetExtendedGizmos(this Settlement settlement)
         {
-            if (settlement.Faction == Faction.OfPlayer)
-            {
-                SettlementManager manager = GetManager(settlement);
-               IEnumerable<Gizmo> gizmos = manager.GetFacilityManager(settlement).GetGizmos();
-                foreach(Gizmo gizmo in gizmos)
-                {
-                    yield return gizmo;
-                }
-            }
-            yield break;
+            return settlement.Faction == Faction.OfPlayer
+                ? GetManager(settlement).GetFacilityManager(settlement).GetGizmos()
+                : Enumerable.Empty<Gizmo>();
         }
     }
 }
