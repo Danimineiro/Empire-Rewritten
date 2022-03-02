@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Empire_Rewritten.Controllers.UpdateController;
 using Empire_Rewritten.Facilities;
 using RimWorld;
 using RimWorld.Planet;
@@ -16,7 +17,8 @@ namespace Empire_Rewritten.Settlements
         /// <returns>The <see cref="SettlementManager" /> of <paramref name="settlement" /></returns>
         public static SettlementManager GetManager(this Settlement settlement)
         {
-            return UpdateController.GetUpdateController.FactionController.GetOwnedSettlementManager(settlement.Faction);
+            return UpdateController.CurrentWorldInstance.FactionController
+                                   .GetOwnedSettlementManager(settlement.Faction);
         }
 
         /// <summary>
