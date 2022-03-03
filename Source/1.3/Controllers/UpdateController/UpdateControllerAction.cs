@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
 using Verse;
 
 namespace Empire_Rewritten.Controllers
@@ -6,19 +7,16 @@ namespace Empire_Rewritten.Controllers
     public class UpdateControllerAction
     {
         private readonly Action<FactionController> action;
-        private readonly Func<bool> shouldDiscardOverride;
-
-        private readonly int maxExecutions;
 
         /// <summary>
         ///     How often this <see cref="UpdateControllerAction" /> has been executed so far.
         /// </summary>
-        public int useCounter;
+        public int useCounter = 0;
 
         /// <summary>
         ///     Constructs a new <see cref="UpdateControllerAction" /> that executes a given <see cref="Action{T}" /> if conditions
         ///     are met.
-        ///     Will be discarded if <paramref name="shouldDiscardOverride" /> returns true
+        ///     Will be discarded if <paramref name="shouldDiscard" /> returns true
         /// </summary>
         /// <param name="shouldExecute">
         ///     The function that determines if the <see cref="UpdateControllerAction.action" /> should be
@@ -28,34 +26,14 @@ namespace Empire_Rewritten.Controllers
         ///     The <see cref="Action{T}" /> to execute. Takes a single <see cref="FactionController" /> as
         ///     parameter.
         /// </param>
-        /// <param name="shouldDiscardOverride">
+        /// <param name="shouldDiscard">
         ///     Discards this <see cref="UpdateControllerAction" /> if it returns true. Runs every tick!
         /// </param>
-        public UpdateControllerAction(Action<FactionController> action, Func<bool> shouldExecute, Func<bool> shouldDiscardOverride)
+        public UpdateControllerAction([NotNull] Action<FactionController> action, [NotNull] Func<bool> shouldExecute, [NotNull] Func<bool> shouldDiscard)
         {
+            this.action = action;
             ShouldExecute = shouldExecute;
-            this.action = action;
-            useCounter = 0;
-            this.shouldDiscardOverride = shouldDiscardOverride;
-        }
-
-        /// <summary>
-        ///     Constructs a new <see cref="UpdateControllerAction" /> that controls when a given <paramref name="action" /> should
-        ///     execute
-        ///     Executes whenever <code>Find.TickManager.TicksGame % <paramref name="tickInterval" /> == 0</code>
-        ///     Will be discarded if <paramref name="shouldDiscardOverride" /> returns true
-        /// </summary>
-        /// <param name="tickInterval"></param>
-        /// <param name="action"></param>
-        /// <param name="shouldDiscardOverride">
-        ///     Discards this <see cref="UpdateControllerAction" /> if it returns true. Runs every tick!
-        /// </param>
-        public UpdateControllerAction(Action<FactionController> action, int tickInterval, Func<bool> shouldDiscardOverride)
-        {
-            ShouldExecute = () => Find.TickManager.TicksGame % tickInterval == 0;
-            this.action = action;
-            useCounter = 0;
-            this.shouldDiscardOverride = shouldDiscardOverride;
+            ShouldDiscard = shouldDiscard;
         }
 
         /// <summary>
@@ -74,13 +52,32 @@ namespace Empire_Rewritten.Controllers
         ///     The amount of executions before this <see cref="UpdateControllerAction" /> should be discarded.
         ///     If <c>&lt;= 0</c>, don't discard
         /// </param>
-        public UpdateControllerAction(Action<FactionController> action, Func<bool> shouldExecute, int maxExecutions = 0)
+        public UpdateControllerAction([NotNull] Action<FactionController> action, [NotNull] Func<bool> shouldExecute, int maxExecutions = 0)
         {
-            ShouldExecute = shouldExecute;
             this.action = action;
-            useCounter = 0;
-            this.maxExecutions = maxExecutions;
+            ShouldExecute = shouldExecute;
+            ShouldDiscard = ShouldDiscardDefault(maxExecutions);
         }
+
+
+        /// <summary>
+        ///     Constructs a new <see cref="UpdateControllerAction" /> that controls when a given <paramref name="action" /> should
+        ///     execute
+        ///     Executes whenever <code>Find.TickManager.TicksGame % <paramref name="tickInterval" /> == 0</code>
+        ///     Will be discarded if <paramref name="shouldDiscard" /> returns true
+        /// </summary>
+        /// <param name="tickInterval"></param>
+        /// <param name="action"></param>
+        /// <param name="shouldDiscard">
+        ///     Discards this <see cref="UpdateControllerAction" /> if it returns true. Runs every tick!
+        /// </param>
+        public UpdateControllerAction([NotNull] Action<FactionController> action, int tickInterval, [NotNull] Func<bool> shouldDiscard)
+        {
+            this.action = action;
+            ShouldExecute = ShouldExecuteDefault(tickInterval);
+            ShouldDiscard = shouldDiscard;
+        }
+
 
         /// <summary>
         ///     Constructs a new <see cref="UpdateControllerAction" /> that controls when a given <paramref name="action" /> should
@@ -91,36 +88,29 @@ namespace Empire_Rewritten.Controllers
         /// <param name="tickInterval"></param>
         /// <param name="action"></param>
         /// <param name="maxExecutions"></param>
-        public UpdateControllerAction(Action<FactionController> action, int tickInterval, int maxExecutions = 0)
+        public UpdateControllerAction([NotNull] Action<FactionController> action, int tickInterval, int maxExecutions = 0)
         {
-            ShouldExecute = () => Find.TickManager.TicksGame % tickInterval == 0;
             this.action = action;
-            useCounter = 0;
-            this.maxExecutions = maxExecutions;
+            ShouldExecute = ShouldExecuteDefault(tickInterval);
+            ShouldDiscard = ShouldDiscardDefault(maxExecutions);
         }
+
 
         /// <summary>
         ///     Decides if the <seealso cref="UpdateControllerAction.action" /> can be discarded
-        ///     Uses <see cref="UpdateControllerAction.shouldDiscardOverride"/> if available
+        ///     Uses <see cref="UpdateControllerAction.shouldDiscard"/> if available
         /// </summary>
-        private bool ShouldDiscard
-        {
-            get
-            {
-                if (shouldDiscardOverride != null)
-                {
-                    return shouldDiscardOverride();
-                }
-
-                return maxExecutions > 0 && useCounter >= maxExecutions;
-            }
-        }
+        private Func<bool> ShouldDiscard { get; }
 
         /// <summary>
         ///     The <see cref="Func{TResult}" /> that determines if the <see cref="UpdateControllerAction.action" /> should be
         ///     executed
         /// </summary>
         private Func<bool> ShouldExecute { get; }
+
+        private Func<bool> ShouldDiscardDefault(int maxExecutions) => () => maxExecutions > 0 && useCounter >= maxExecutions;
+
+        private Func<bool> ShouldExecuteDefault(int tickInterval) => () => Find.TickManager.TicksGame % tickInterval == 0;
 
         /// <summary>
         ///     Tries to run the <see cref="UpdateControllerAction.action" /> if conditions are met.
@@ -140,16 +130,14 @@ namespace Empire_Rewritten.Controllers
                 useCounter++;
             }
 
-            shouldDiscard = ShouldDiscard;
+            shouldDiscard = ShouldDiscard();
 
             return shouldExecute;
         }
 
         public override string ToString()
         {
-            string discardInfo = (shouldDiscardOverride == null) ? (maxExecutions == 0) ? "never discards" : $"maxExecutions: {maxExecutions}" : " uses discard override";
-
-            return $"[{GetType().Name}] useCounter: {useCounter}, {discardInfo}, has shouldExecute: {ShouldExecute != null}, has action {action != null}";
+            return $"[{GetType().Name}] useCounter: {useCounter}.";
         }
     }
 }
