@@ -1,4 +1,5 @@
 ﻿using System;
+using Empire_Rewritten.Controllers.UpdateController;
 using Empire_Rewritten.Settlements;
 using RimWorld;
 
@@ -19,7 +20,7 @@ namespace Empire_Rewritten.AI
                 if (cachedManager== null || ManagerIsDirty)
                 {
                     ManagerIsDirty = true;
-                    UpdateController updateController = UpdateController.GetUpdateController;
+                    UpdateController updateController = UpdateController.CurrentWorldInstance;
                     FactionController factionController = updateController.FactionController;
 
                     cachedManager = factionController.GetOwnedSettlementManager(Faction);
