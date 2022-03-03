@@ -77,6 +77,12 @@ namespace Empire_Rewritten
         /// <param name="action"></param>
         public static void AddFinalizeInitHook(Action<FactionController> action)
         {
+            if (GetUpdateController != null)
+            {
+                Log.Warning("Tried to add a FinalizeInitHook after WorldComp was already created! Skipping...");
+                return;
+            }
+
             finalizeInitHooks.Add(action);
         }
 
