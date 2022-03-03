@@ -100,7 +100,8 @@ namespace Empire_Rewritten.AI
                 {
                     foreach (ThingDefCountClass thingDefCountClass in facilityDef.costList)
                     {
-                        storageTracker.RemoveThingsFromStorage(thingDefCountClass.thingDef, thingDefCountClass.count);
+                        storageTracker.TryRemoveThingsFromStorage(thingDefCountClass.thingDef,
+                                                                  thingDefCountClass.count);
                     }
 
                     manager.AddFacility(facilityDef);
