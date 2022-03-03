@@ -24,8 +24,8 @@ namespace Empire_Rewritten.Resources
 
         public ResourceModifier(ResourceDef resourceDef, int offsetValue = 0, float multiplierValue = 1)
         {
-            def        = resourceDef;
-            offset     = offsetValue;
+            def = resourceDef;
+            offset = offsetValue;
             multiplier = multiplierValue;
         }
 

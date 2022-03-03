@@ -17,7 +17,7 @@ namespace Empire_Rewritten.Resources.ResourceWorkers
         /// <returns>Reference to the modified <see cref="ThingFilter" /></returns>
         public override ThingFilter PostModifyThingFilter()
         {
-            foreach (var def in DefDatabase<PawnKindDef>.AllDefsListForReading.Where(
+            foreach (PawnKindDef def in DefDatabase<PawnKindDef>.AllDefsListForReading.Where(
                          def => def.RaceProps?.Roamer == true))
             {
                 filter.SetAllow(def.race, true);

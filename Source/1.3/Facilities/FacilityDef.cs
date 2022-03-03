@@ -53,7 +53,7 @@ namespace Empire_Rewritten.Facilities
                 yield return $"{facilityWorker} does not inherit from FacilityWorker!";
             }
 
-            foreach (var str in base.ConfigErrors())
+            foreach (string str in base.ConfigErrors())
             {
                 yield return str;
             }

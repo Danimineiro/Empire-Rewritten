@@ -32,10 +32,12 @@ namespace Empire_Rewritten.Utils.Text
 
             for (var i = 0; i < words.Length; i++)
             {
-                var word = words[i];
+                string word = words[i];
                 // If word would overflow maxLength, stop
                 if (final.Length + joiner.Length + word.Length + "<color=#000000></color>".Length > maxLength)
+                {
                     break;
+                }
 
                 final.Append($"<color={CurrentHex}>{word}</color>");
 
@@ -44,7 +46,9 @@ namespace Empire_Rewritten.Utils.Text
                 ChangeHexColors(_blue, ref _red, ref _green, change);
 
                 if (i < words.Length - 1)
+                {
                     final.Append(joiner);
+                }
             }
 
             return final.ToString();
@@ -95,10 +99,16 @@ namespace Empire_Rewritten.Utils.Text
             splitSize = Math.Max(splitSize, 1);
 
             for (var i = 0; i < splitArray.Length; i++)
+            {
                 if ((i + 1) * splitSize > str.Length)
+                {
                     splitArray[i] = str.Substring(i * splitSize);
+                }
                 else
+                {
                     splitArray[i] = str.Substring(i * splitSize, splitSize);
+                }
+            }
 
             return splitArray;
         }

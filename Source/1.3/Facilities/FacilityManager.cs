@@ -88,11 +88,12 @@ namespace Empire_Rewritten.Facilities
         {
             var calculatedModifiers = new Dictionary<ResourceDef, ResourceModifier>();
 
-            foreach (var modifier in installedFacilities.Values.SelectMany(facility => facility.ResourceModifiers))
+            foreach (ResourceModifier modifier in installedFacilities.Values.SelectMany(
+                         facility => facility.ResourceModifiers))
             {
                 if (calculatedModifiers.ContainsKey(modifier.def))
                 {
-                    var newModifier = calculatedModifiers[modifier.def].MergeWithModifier(modifier);
+                    ResourceModifier newModifier = calculatedModifiers[modifier.def].MergeWithModifier(modifier);
                     calculatedModifiers[modifier.def] = newModifier;
                 }
                 else
@@ -113,7 +114,7 @@ namespace Empire_Rewritten.Facilities
         /// </param>
         public void SetDataDirty(bool shouldRefreshGizmos = false)
         {
-            refreshGizmos    = shouldRefreshGizmos;
+            refreshGizmos = shouldRefreshGizmos;
             refreshModifiers = true;
         }
 

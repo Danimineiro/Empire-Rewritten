@@ -17,8 +17,10 @@ namespace Empire_Rewritten.Resources.Stats
     {
         public static string Translate(this ResourceStat stat, bool isOffset)
         {
-            var translationPartOne = $"Empire_ResourceInfoWindow{stat.ToString().CapitalizeFirst()}".TranslateSimple();
-            var translationPartTwo = $"Empire_ResourceInfoWindow{(isOffset ? "Offset" : "Factor")}".TranslateSimple();
+            string translationPartOne =
+                $"Empire_ResourceInfoWindow{stat.ToString().CapitalizeFirst()}".TranslateSimple();
+            string translationPartTwo =
+                $"Empire_ResourceInfoWindow{(isOffset ? "Offset" : "Factor")}".TranslateSimple();
             return $"{translationPartOne} {translationPartTwo}";
         }
 

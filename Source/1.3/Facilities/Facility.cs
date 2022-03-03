@@ -17,9 +17,9 @@ namespace Empire_Rewritten.Facilities
 
         public Facility(FacilityDef def, Settlement settlement)
         {
-            this.def        = def;
+            this.def = def;
             this.settlement = settlement;
-            amount          = 1;
+            amount = 1;
         }
 
         [UsedImplicitly]
@@ -61,8 +61,8 @@ namespace Empire_Rewritten.Facilities
         /// <param name="amountToAdd">The <see cref="int">amount</see> of facilities to add</param>
         public void AddFacilities(int amountToAdd)
         {
-            amount                     += amountToAdd;
-            shouldRecalculateModifiers =  true;
+            amount += amountToAdd;
+            shouldRecalculateModifiers = true;
         }
 
         /// <summary>
@@ -100,15 +100,15 @@ namespace Empire_Rewritten.Facilities
         {
             modifiers.Clear();
 
-            var defs = def.resourceMultipliers.Keys.Concat(def.resourceOffsets.Keys);
+            IEnumerable<ResourceDef> defs = def.resourceMultipliers.Keys.Concat(def.resourceOffsets.Keys);
 
-            foreach (var resourceDef in defs)
+            foreach (ResourceDef resourceDef in defs)
             {
-                var tile = Find.WorldGrid.tiles[settlement.Tile];
-                var modifier = resourceDef.GetTileModifier(tile);
+                Tile tile = Find.WorldGrid.tiles[settlement.Tile];
+                ResourceModifier modifier = resourceDef.GetTileModifier(tile);
 
                 modifier.multiplier *= amount * def.resourceMultipliers.TryGetValue(resourceDef, 1f);
-                modifier.offset     += amount * def.resourceOffsets.TryGetValue(resourceDef, 1);
+                modifier.offset += amount * def.resourceOffsets.TryGetValue(resourceDef, 1);
 
                 modifiers.Add(modifier);
             }

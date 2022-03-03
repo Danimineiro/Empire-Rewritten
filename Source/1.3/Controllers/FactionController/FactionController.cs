@@ -52,7 +52,9 @@ namespace Empire_Rewritten.Controllers
             foreach (FactionSettlementData factionSettlementData in factionSettlementDataList)
             {
                 if (factionSettlementData.owner == faction)
+                {
                     return factionSettlementData.SettlementManager;
+                }
             }
 
             return null;

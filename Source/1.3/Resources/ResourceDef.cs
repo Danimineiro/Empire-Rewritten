@@ -91,7 +91,7 @@ namespace Empire_Rewritten.Resources
             get
             {
                 if (resourceWorker == null) return null;
-                return worker ?? (worker = (ResourceWorker) Activator.CreateInstance(resourceWorker, resourcesCreated));
+                return worker ?? (worker = (ResourceWorker)Activator.CreateInstance(resourceWorker, resourcesCreated));
             }
         }
 
@@ -104,11 +104,11 @@ namespace Empire_Rewritten.Resources
         {
             float result = 1;
 
-            var tempVal = temperatureCurve.Evaluate(tile.temperature);
-            var heightVal = heightCurve.Evaluate((float) tile.hilliness);
-            var swampinessVal = swampinessCurve.Evaluate(tile.swampiness);
-            var rainfallVal = rainfallCurve.Evaluate(tile.rainfall);
-            var biomeModifier = GetBiomeModifier(tile);
+            float tempVal = temperatureCurve.Evaluate(tile.temperature);
+            float heightVal = heightCurve.Evaluate((float)tile.hilliness);
+            float swampinessVal = swampinessCurve.Evaluate(tile.swampiness);
+            float rainfallVal = rainfallCurve.Evaluate(tile.rainfall);
+            ResourceModifier biomeModifier = GetBiomeModifier(tile);
             result *= tempVal * heightVal * biomeModifier.multiplier * swampinessVal * rainfallVal;
 
             var modifer = new ResourceModifier(this, biomeModifier.offset, result);
@@ -146,7 +146,7 @@ namespace Empire_Rewritten.Resources
         /// </exception>
         public ResourceModifier GetBiomeModifier(Tile tile)
         {
-            var biome = tile.biome;
+            BiomeDef biome = tile.biome;
             if (biome is null)
             {
                 throw new ArgumentNullException(nameof(tile.biome));
@@ -156,7 +156,7 @@ namespace Empire_Rewritten.Resources
 
             if (!biomeModifiers.NullOrEmpty() && biomeModifiers.Any(x => x.biome == biome))
             {
-                var biomeModifier = biomeModifiers.Find(x => x.biome == biome);
+                BiomeModifier biomeModifier = biomeModifiers.Find(x => x.biome == biome);
                 var modifier = new ResourceModifier(this, biomeModifier.offset, biomeModifier.multiplier);
                 cachedBiomeModifiers.Add(biome, modifier);
                 return modifier;
@@ -183,7 +183,7 @@ namespace Empire_Rewritten.Resources
                 yield return $"{resourceWorker} does not inherit from FacilityWorker!";
             }
 
-            foreach (var str in base.ConfigErrors())
+            foreach (string str in base.ConfigErrors())
             {
                 yield return str;
             }
