@@ -11,7 +11,7 @@ namespace Empire_Rewritten
     public class UpdateController : WorldComponent
     {
         private FactionController factionController;
-        private static readonly List<UpdateControllerAction> actions = new List<UpdateControllerAction>();
+        private readonly List<UpdateControllerAction> actions = new List<UpdateControllerAction>();
         private static readonly List<Action<FactionController>> finalizeInitHooks = new List<Action<FactionController>>();
         private static UpdateController updateControllerCached;
 
@@ -57,7 +57,7 @@ namespace Empire_Rewritten
         /// </summary>
         /// <param name="updateCall"></param>
         /// <param name="shouldExecute"></param>
-        public static void AddUpdateCall(Action<FactionController> updateCall, Func<bool> shouldExecute)
+        public void AddUpdateCall(Action<FactionController> updateCall, Func<bool> shouldExecute)
         {
             actions.Add(new UpdateControllerAction(updateCall, shouldExecute));
         }
@@ -66,7 +66,7 @@ namespace Empire_Rewritten
         /// Registers an <paramref name="action"/> to be called as determined by its internal functions
         /// </summary>
         /// <param name="action"></param>
-        public static void AddUpdateCall(UpdateControllerAction action)
+        public void AddUpdateCall(UpdateControllerAction action)
         {
             actions.Add(action);
         }
