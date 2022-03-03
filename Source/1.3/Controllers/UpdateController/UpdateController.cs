@@ -63,7 +63,7 @@ namespace Empire_Rewritten.Controllers
         ///     A <see cref="Func{T}" /> that returns whether the <see cref="UpdateControllerAction" />
         ///     should be executed.
         /// </param>
-        public static void AddUpdateCall(Action<FactionController> updateCall, Func<bool> shouldExecute)
+        public static void AddUpdateCall([NotNull] Action<FactionController> updateCall, [NotNull] Func<bool> shouldExecute)
         {
             Actions.Add(new UpdateControllerAction(updateCall, shouldExecute));
         }
@@ -73,7 +73,7 @@ namespace Empire_Rewritten.Controllers
         ///     <see cref="UpdateControllerAction.ShouldExecute" /> method
         /// </summary>
         /// <param name="action">The <see cref="UpdateControllerAction" /> to be added</param>
-        public static void AddUpdateCall(UpdateControllerAction action)
+        public static void AddUpdateCall([NotNull] UpdateControllerAction action)
         {
             Actions.Add(action);
         }
@@ -85,7 +85,7 @@ namespace Empire_Rewritten.Controllers
         ///     The <see cref="Action{T}" /> to call after world gen; takes a single
         ///     <see cref="FactionController" /> as parameter
         /// </param>
-        public static void AddFinalizeInitHook(Action<FactionController> action)
+        public static void AddFinalizeInitHook([NotNull] Action<FactionController> action)
         {
             FinalizeInitHooks.Add(action);
         }
@@ -97,7 +97,7 @@ namespace Empire_Rewritten.Controllers
         ///     An <see cref="IEnumerable{T}" /> of <see cref="Action{T}" /> to call after world gen;
         ///     The actions take a single <see cref="FactionController" /> as parameter
         /// </param>
-        public static void AddFinalizeInitHooks(IEnumerable<Action<FactionController>> actions)
+        public static void AddFinalizeInitHooks([NotNull] IEnumerable<Action<FactionController>> actions)
         {
             FinalizeInitHooks.AddRange(actions);
         }
