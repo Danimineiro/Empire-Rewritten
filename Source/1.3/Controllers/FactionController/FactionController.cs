@@ -22,7 +22,7 @@ namespace Empire_Rewritten
         /// Creates a new FactionController using a List of <c>FactionSettlementData</c> structs
         /// </summary>
         /// <param name="factionSettlementDataList"></param>
-        public FactionController(List<FactionSettlementData> factionSettlementDataList) : this()
+        public FactionController(List<FactionSettlementData> factionSettlementDataList)
         {
             this.factionSettlementDataList = factionSettlementDataList;
         }
