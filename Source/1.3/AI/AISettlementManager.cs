@@ -48,8 +48,7 @@ namespace Empire_Rewritten.AI
 
         public void BuildOrUpgradeNewSettlement()
         {
-            KeyValuePair<Settlement, FacilityManager> settlementAndManager =
-                player.Manager.Settlements.Where(x => true /* !x.Value.IsFullyUpgraded*/).RandomElement();
+            KeyValuePair<Settlement, FacilityManager> settlementAndManager = player.Manager.Settlements.Where(x => true /* !x.Value.IsFullyUpgraded*/).RandomElement();
             Settlement settlement = settlementAndManager.Key;
             FacilityManager facilityManager = settlementAndManager.Value;
             bool UpgradedSettlement = AttemptToUpgradeSettlement(facilityManager);

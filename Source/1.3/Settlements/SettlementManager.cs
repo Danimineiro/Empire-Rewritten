@@ -45,13 +45,11 @@ namespace Empire_Rewritten.Settlements
         {
             var resourceModifiers = new Dictionary<ResourceDef, ResourceModifier>();
 
-            foreach (ResourceModifier resourceModifier in
-                     settlements.Values.SelectMany(facilityManager => facilityManager.Modifiers))
+            foreach (ResourceModifier resourceModifier in settlements.Values.SelectMany(facilityManager => facilityManager.Modifiers))
             {
                 if (resourceModifiers.ContainsKey(resourceModifier.def))
                 {
-                    ResourceModifier newModifier =
-                        resourceModifiers[resourceModifier.def].MergeWithModifier(resourceModifier);
+                    ResourceModifier newModifier = resourceModifiers[resourceModifier.def].MergeWithModifier(resourceModifier);
                     resourceModifiers[resourceModifier.def] = newModifier;
                 }
                 else

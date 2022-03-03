@@ -45,8 +45,7 @@ namespace Empire_Rewritten.Resources
                 return new ResourceModifier(def, other.offset + offset, other.multiplier * multiplier);
             }
 
-            throw new ArgumentOutOfRangeException(nameof(other),
-                                                  "Trying to merge two modifiers of separate ResourceDef types");
+            throw new ArgumentOutOfRangeException(nameof(other), "Trying to merge two modifiers of separate ResourceDef types");
             // Log.Error("[Empire]: Trying to merge two modifiers of separate resource def types!");
             // return this;
         }

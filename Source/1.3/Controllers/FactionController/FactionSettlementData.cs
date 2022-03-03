@@ -62,14 +62,12 @@ namespace Empire_Rewritten.Controllers
         /// <returns>A <see cref="List{T}" /> of the newly created <see cref="FactionSettlementData" /> instances</returns>
         internal static List<FactionSettlementData> CreateFactionSettlementData()
         {
-            return Find.FactionManager.AllFactionsListForReading
-                       .Select(faction => new FactionSettlementData(faction, new SettlementManager())).ToList();
+            return Find.FactionManager.AllFactionsListForReading.Select(faction => new FactionSettlementData(faction, new SettlementManager())).ToList();
         }
 
         public override string ToString()
         {
-            return
-                $"[FactionSettlementData] owner: {owner.Name}, originalOwner: {originalOwner.Name}, settlementManager: {settlementManager}";
+            return $"[FactionSettlementData] owner: {owner.Name}, originalOwner: {originalOwner.Name}, settlementManager: {settlementManager}";
         }
     }
 }

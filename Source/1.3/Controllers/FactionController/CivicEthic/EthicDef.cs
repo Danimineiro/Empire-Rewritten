@@ -8,8 +8,7 @@ using Verse;
 
 namespace Empire_Rewritten.Controllers.CivicEthic
 {
-    [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature | ImplicitUseKindFlags.Assign,
-                    ImplicitUseTargetFlags.WithMembers)]
+    [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature | ImplicitUseKindFlags.Assign, ImplicitUseTargetFlags.WithMembers)]
     public class EthicDef : Def
     {
         public readonly List<Type> abilityWorkers;

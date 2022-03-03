@@ -14,8 +14,7 @@ namespace Empire_Rewritten.Controllers
     {
         private static readonly List<UpdateControllerAction> Actions = new List<UpdateControllerAction>();
 
-        private static readonly List<Action<FactionController>> FinalizeInitHooks =
-            new List<Action<FactionController>>();
+        private static readonly List<Action<FactionController>> FinalizeInitHooks = new List<Action<FactionController>>();
 
         private FactionController factionController;
 

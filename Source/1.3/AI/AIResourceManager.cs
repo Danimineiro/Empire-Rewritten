@@ -132,8 +132,7 @@ namespace Empire_Rewritten.AI
         /// <returns></returns>
         public Dictionary<ResourceDef, float> AllResourcesProduced()
         {
-            Dictionary<ResourceDef, ResourceModifier> modifiers =
-                parentPlayer.Manager.ResourceModifiersFromAllFacilities();
+            Dictionary<ResourceDef, ResourceModifier> modifiers = parentPlayer.Manager.ResourceModifiersFromAllFacilities();
             var result = new Dictionary<ResourceDef, float>();
             foreach (ResourceDef def in modifiers.Keys)
             {
@@ -149,8 +148,7 @@ namespace Empire_Rewritten.AI
             if (!criticalResources.EnumerableNullOrEmpty())
             {
                 Dictionary<ResourceDef, float> resourcesProduced = AllResourcesProduced();
-                criticalResources.RemoveAll(x => resourcesProduced.ContainsKey(x) &&
-                                                 resourcesProduced[x] > LowResourceDecider / 2f);
+                criticalResources.RemoveAll(x => resourcesProduced.ContainsKey(x) && resourcesProduced[x] > LowResourceDecider / 2f);
             }
         }
     }

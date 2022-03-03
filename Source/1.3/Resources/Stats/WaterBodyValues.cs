@@ -3,8 +3,7 @@ using JetBrains.Annotations;
 
 namespace Empire_Rewritten.Resources.Stats
 {
-    [UsedImplicitly(ImplicitUseKindFlags.InstantiatedNoFixedConstructorSignature | ImplicitUseKindFlags.Assign,
-                    ImplicitUseTargetFlags.WithMembers)]
+    [UsedImplicitly(ImplicitUseKindFlags.InstantiatedNoFixedConstructorSignature | ImplicitUseKindFlags.Assign, ImplicitUseTargetFlags.WithMembers)]
     public class WaterBodyValues : IResourceValues
     {
         public float lake;
@@ -34,8 +33,7 @@ namespace Empire_Rewritten.Resources.Stats
                 case ResourceStat.SmallHills:
                 case ResourceStat.LargeHills:
                 case ResourceStat.Mountainous:
-                    throw new ArgumentOutOfRangeException(nameof(stat), stat,
-                                                          "Invalid ResourceStat, has to be a Water Body");
+                    throw new ArgumentOutOfRangeException(nameof(stat), stat, "Invalid ResourceStat, has to be a Water Body");
                 default:
                     throw new ArgumentOutOfRangeException(nameof(stat), stat, "Invalid value");
             }

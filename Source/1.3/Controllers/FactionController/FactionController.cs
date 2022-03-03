@@ -14,8 +14,7 @@ namespace Empire_Rewritten.Controllers
     /// </summary>
     public class FactionController : IExposable
     {
-        private readonly List<FactionCivicAndEthicData> factionCivicAndEthicDataList =
-            new List<FactionCivicAndEthicData>();
+        private readonly List<FactionCivicAndEthicData> factionCivicAndEthicDataList = new List<FactionCivicAndEthicData>();
 
         private List<FactionSettlementData> factionSettlementDataList = new List<FactionSettlementData>();
 

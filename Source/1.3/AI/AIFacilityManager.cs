@@ -65,8 +65,7 @@ namespace Empire_Rewritten.AI
             List<ResourceDef> resourceDefs = player.ResourceManager.FindLowResources();
             ResourceDef def = resourceDefs.RandomElement();
 
-            FacilityDef facilityDef = FacilityDefsInstalled.Where(
-                facility => facility.ProducedResources.Contains(def)).RandomElementWithFallback();
+            FacilityDef facilityDef = FacilityDefsInstalled.Where(facility => facility.ProducedResources.Contains(def)).RandomElementWithFallback();
 
             return facilityDef != null && BuildNewFacility(facilityDef);
         }
@@ -80,8 +79,7 @@ namespace Empire_Rewritten.AI
         public bool BuildNewFacility(FacilityDef facilityDef)
         {
             var hasRemovedAll = true;
-            KeyValuePair<Settlement, FacilityManager> settlementAndManager =
-                player.Manager.Settlements.First(x => x.Value.CanBuildAt(facilityDef));
+            KeyValuePair<Settlement, FacilityManager> settlementAndManager = player.Manager.Settlements.First(x => x.Value.CanBuildAt(facilityDef));
 
             FacilityManager manager = settlementAndManager.Value;
             Settlement settlement = settlementAndManager.Key;
@@ -91,17 +89,14 @@ namespace Empire_Rewritten.AI
                 StorageTracker storageTracker = player.Manager.StorageTracker;
                 foreach (ThingDefCountClass thingDefCount in facilityDef.costList)
                 {
-                    hasRemovedAll = hasRemovedAll &&
-                                    storageTracker.CanRemoveThingsFromStorage(
-                                        thingDefCount.thingDef, thingDefCount.count);
+                    hasRemovedAll = hasRemovedAll && storageTracker.CanRemoveThingsFromStorage(thingDefCount.thingDef, thingDefCount.count);
                 }
 
                 if (hasRemovedAll)
                 {
                     foreach (ThingDefCountClass thingDefCountClass in facilityDef.costList)
                     {
-                        storageTracker.TryRemoveThingsFromStorage(thingDefCountClass.thingDef,
-                                                                  thingDefCountClass.count);
+                        storageTracker.TryRemoveThingsFromStorage(thingDefCountClass.thingDef, thingDefCountClass.count);
                     }
 
                     manager.AddFacility(facilityDef);
@@ -122,9 +117,7 @@ namespace Empire_Rewritten.AI
 
             if (resourceDef == null) return false;
 
-            FacilityDef facilityDef = FacilityDefsInstalled
-                                      .Where(x => x.ProducedResources.Contains(resourceDef))
-                                      .RandomElementWithFallback();
+            FacilityDef facilityDef = FacilityDefsInstalled.Where(x => x.ProducedResources.Contains(resourceDef)).RandomElementWithFallback();
 
             return facilityDef != null && RemoveFacility(facilityDef);
         }
@@ -132,8 +125,7 @@ namespace Empire_Rewritten.AI
 
         public bool RemoveFacility([NotNull] FacilityDef facilityDef)
         {
-            (Settlement settlement, FacilityManager facilityManager) =
-                player.Manager.Settlements.First(x => x.Value.HasFacility(facilityDef));
+            (Settlement settlement, FacilityManager facilityManager) = player.Manager.Settlements.First(x => x.Value.HasFacility(facilityDef));
 
             if (settlement == null || facilityManager == null) return false;
 

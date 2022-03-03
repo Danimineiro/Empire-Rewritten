@@ -71,12 +71,8 @@ namespace Empire_Rewritten.Facilities
             refreshModifiers = false;
 
             gizmos.Clear();
-            gizmos.AddRange(installedFacilities
-                            .Keys.Where(facilityDef => facilityDef.facilityWorker != null)
-                            .SelectMany(facilityDef =>
-                                            ((FacilityWorker)Activator.CreateInstance(facilityDef.facilityWorker))
-                                            .GetGizmos())
-            );
+            gizmos.AddRange(installedFacilities.Keys.Where(facilityDef => facilityDef.facilityWorker != null)
+                                               .SelectMany(facilityDef => ((FacilityWorker)Activator.CreateInstance(facilityDef.facilityWorker)).GetGizmos()));
 
             return gizmos;
         }
@@ -88,8 +84,7 @@ namespace Empire_Rewritten.Facilities
         {
             var calculatedModifiers = new Dictionary<ResourceDef, ResourceModifier>();
 
-            foreach (ResourceModifier modifier in installedFacilities.Values.SelectMany(
-                         facility => facility.ResourceModifiers))
+            foreach (ResourceModifier modifier in installedFacilities.Values.SelectMany(facility => facility.ResourceModifiers))
             {
                 if (calculatedModifiers.ContainsKey(modifier.def))
                 {

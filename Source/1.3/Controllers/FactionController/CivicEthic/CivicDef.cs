@@ -6,8 +6,7 @@ using Verse;
 
 namespace Empire_Rewritten.Controllers.CivicEthic
 {
-    [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature | ImplicitUseKindFlags.Assign,
-                    ImplicitUseTargetFlags.WithMembers)]
+    [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature | ImplicitUseKindFlags.Assign, ImplicitUseTargetFlags.WithMembers)]
     public class CivicDef : Def
     {
         [NoTranslate] public readonly List<string> requiredEthicDefNames = new List<string>();

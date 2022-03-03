@@ -18,8 +18,7 @@ namespace Empire_Rewritten
         [UsedImplicitly]
         static Startup()
         {
-            Log.Message("[Empire Rewritten] just here to say hello! ^-^ Have a nice day and great fun with Empire!"
-                            .Rainbowify(' ', 35));
+            Log.Message("[Empire Rewritten] just here to say hello! ^-^ Have a nice day and great fun with Empire!".Rainbowify(' ', 35));
             AppendActionsToWorldStart();
             HarmonyPatcher.DoPatches();
         }
@@ -45,8 +44,7 @@ namespace Empire_Rewritten
         {
             if (UpdateController.CurrentWorldInstance.HasFactionController) return;
 
-            UpdateController.CurrentWorldInstance.FactionController =
-                new FactionController(FactionSettlementData.CreateFactionSettlementData());
+            UpdateController.CurrentWorldInstance.FactionController = new FactionController(FactionSettlementData.CreateFactionSettlementData());
         }
     }
 }

@@ -17,8 +17,7 @@ namespace Empire_Rewritten.Settlements
         /// <returns>The <see cref="SettlementManager" /> of <paramref name="settlement" /></returns>
         public static SettlementManager GetManager(this Settlement settlement)
         {
-            return UpdateController.CurrentWorldInstance.FactionController
-                                   .GetOwnedSettlementManager(settlement.Faction);
+            return UpdateController.CurrentWorldInstance.FactionController.GetOwnedSettlementManager(settlement.Faction);
         }
 
         /// <summary>
@@ -29,9 +28,7 @@ namespace Empire_Rewritten.Settlements
         /// <returns>The <see cref="Gizmo">Gizmos</see> of <paramref name="settlement" /></returns>
         public static IEnumerable<Gizmo> GetExtendedGizmos(this Settlement settlement)
         {
-            return settlement.Faction == Faction.OfPlayer
-                ? GetManager(settlement).GetFacilityManager(settlement).GetGizmos()
-                : Enumerable.Empty<Gizmo>();
+            return settlement.Faction == Faction.OfPlayer ? GetManager(settlement).GetFacilityManager(settlement).GetGizmos() : Enumerable.Empty<Gizmo>();
         }
     }
 }

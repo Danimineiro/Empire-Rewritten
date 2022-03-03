@@ -26,11 +26,9 @@ namespace Empire_Rewritten.Utils.Misc
         ///     Whether all specified <paramref name="requiredModIDs" />, as well as the specified DLCs are currently loaded
         ///     and active
         /// </returns>
-        public static bool RequiredModsLoaded(List<string> requiredModIDs, bool requiresRoyalty = false,
-            bool requiresIdeology = false)
+        public static bool RequiredModsLoaded(List<string> requiredModIDs, bool requiresRoyalty = false, bool requiresIdeology = false)
         {
-            return (ModsConfig.RoyaltyActive || !requiresRoyalty) &&
-                   (ModsConfig.IdeologyActive || !requiresIdeology) && AreModsLoaded(requiredModIDs);
+            return (ModsConfig.RoyaltyActive || !requiresRoyalty) && (ModsConfig.IdeologyActive || !requiresIdeology) && AreModsLoaded(requiredModIDs);
         }
     }
 }

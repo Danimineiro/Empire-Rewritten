@@ -101,16 +101,13 @@ namespace Empire_Rewritten.Windows
         private void DrawCurves()
         {
             GUI.BeginGroup(RectCurveContainer);
-            DrawLabeledCurve(RectCurve, defSelected.temperatureCurve, "Empire_ResourceInfoWindowTempCurve".Translate(),
-                             "Empire_ResourceInfoWindowTempCurveLabelX".Translate(), new FloatRange(-50f, 50f));
-            DrawLabeledCurve(RectCurve.MoveRect(CurveOffset), defSelected.rainfallCurve,
-                             "Empire_ResourceInfoWindowRainfallCurve".Translate(),
+            DrawLabeledCurve(RectCurve, defSelected.temperatureCurve, "Empire_ResourceInfoWindowTempCurve".Translate(), "Empire_ResourceInfoWindowTempCurveLabelX".Translate(),
+                             new FloatRange(-50f, 50f));
+            DrawLabeledCurve(RectCurve.MoveRect(CurveOffset), defSelected.rainfallCurve, "Empire_ResourceInfoWindowRainfallCurve".Translate(),
                              "Empire_ResourceInfoWindowRainfallCurveLabelX".Translate(), new FloatRange(0f, 7500f));
-            DrawLabeledCurve(RectCurve.MoveRect(CurveOffset * 2), defSelected.heightCurve,
-                             "Empire_ResourceInfoWindowHeightCurve".Translate(),
-                             "Empire_ResourceInfoWindowHeightCurveLabelX".Translate(), new FloatRange(0f, 2500f));
-            DrawLabeledCurve(RectCurve.MoveRect(CurveOffset * 3), defSelected.swampinessCurve,
-                             "Empire_ResourceInfoWindowSwampinessCurve".Translate(),
+            DrawLabeledCurve(RectCurve.MoveRect(CurveOffset * 2), defSelected.heightCurve, "Empire_ResourceInfoWindowHeightCurve".Translate(), "Empire_ResourceInfoWindowHeightCurveLabelX".Translate(),
+                             new FloatRange(0f, 2500f));
+            DrawLabeledCurve(RectCurve.MoveRect(CurveOffset * 3), defSelected.swampinessCurve, "Empire_ResourceInfoWindowSwampinessCurve".Translate(),
                              "Empire_ResourceInfoWindowSwampinessCurveLabelX".Translate(), new FloatRange(0f, 1f));
             GUI.EndGroup();
         }
@@ -125,8 +122,7 @@ namespace Empire_Rewritten.Windows
         /// </param>
         /// <param name="labelX">The <see cref="SimpleCurveDrawerStyle.LabelX" /></param>
         /// <param name="range">The <see cref="SimpleCurveDrawerStyle.FixedSection" /></param>
-        private static void DrawLabeledCurve(Rect rect, SimpleCurve curve, string labelRight, string labelX,
-            FloatRange range)
+        private static void DrawLabeledCurve(Rect rect, SimpleCurve curve, string labelRight, string labelX, FloatRange range)
         {
             if (curve == null)
             {
@@ -238,8 +234,7 @@ namespace Empire_Rewritten.Windows
             Rect tempDescRect = tempFullHeight.TopPartPixels(descHeight);
             Rect tempValuesRect = tempFullHeight.BottomPartPixels(tempFullHeight.height - descHeight - 5f);
 
-            var tempTex = new Rect(tempValuesRect.x, tempValuesRect.y, tempValuesRect.width - 17f,
-                                   15f * RectDefDescValue.height);
+            var tempTex = new Rect(tempValuesRect.x, tempValuesRect.y, tempValuesRect.width - 17f, 15f * RectDefDescValue.height);
 
             Widgets.Label(tempDescRect, $"{defSelected.description}");
 
@@ -283,11 +278,9 @@ namespace Empire_Rewritten.Windows
         {
             for (var i = 0; i < 7; i++)
             {
-                string addOrMultiply = $"Empire_ResourceInfoWindow{(isOffset ? "Additively" : "Multiplicatively")}"
-                    .TranslateSimple();
+                string addOrMultiply = $"Empire_ResourceInfoWindow{(isOffset ? "Additively" : "Multiplicatively")}".TranslateSimple();
 
-                Rect tempRect =
-                    RectDefDescValue.MoveRect(new Vector2(0f, RectDefDescValue.height * (i + valueOffset)));
+                Rect tempRect = RectDefDescValue.MoveRect(new Vector2(0f, RectDefDescValue.height * (i + valueOffset)));
 
                 if (i % 2 == 0)
                 {
@@ -302,15 +295,11 @@ namespace Empire_Rewritten.Windows
 
                 float bonus = defSelected.GetBonus((ResourceStat)i, isOffset);
                 // Without InvariantCulture, this would look different on e.g. German systems vs British ones (1,1 vs 1.1)
-                Widgets.Label(tempRect.ScaleX(-5f).RightHalf(),
-                              isOffset ? bonus.ToString(CultureInfo.InvariantCulture) : bonus.ToStringPercent());
+                Widgets.Label(tempRect.ScaleX(-5f).RightHalf(), isOffset ? bonus.ToString(CultureInfo.InvariantCulture) : bonus.ToStringPercent());
 
                 MouseoverSounds.DoRegion(tempRect);
                 Widgets.DrawHighlightIfMouseover(tempRect);
-                TooltipHandler.TipRegion(
-                    tempRect,
-                    $"Empire_ResourceInfoWindowTip{((ResourceStat)i).ToString().CapitalizeFirst()}"
-                        .Translate(addOrMultiply));
+                TooltipHandler.TipRegion(tempRect, $"Empire_ResourceInfoWindowTip{((ResourceStat)i).ToString().CapitalizeFirst()}".Translate(addOrMultiply));
             }
         }
 

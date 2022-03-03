@@ -3,8 +3,7 @@ using JetBrains.Annotations;
 
 namespace Empire_Rewritten.Resources.Stats
 {
-    [UsedImplicitly(ImplicitUseKindFlags.InstantiatedNoFixedConstructorSignature | ImplicitUseKindFlags.Assign,
-                    ImplicitUseTargetFlags.WithMembers)]
+    [UsedImplicitly(ImplicitUseKindFlags.InstantiatedNoFixedConstructorSignature | ImplicitUseKindFlags.Assign, ImplicitUseTargetFlags.WithMembers)]
     public class HillinessValues : IResourceValues
     {
         public float flat;
@@ -36,8 +35,7 @@ namespace Empire_Rewritten.Resources.Stats
                 case ResourceStat.Lake:
                 case ResourceStat.River:
                 case ResourceStat.Ocean:
-                    throw new ArgumentOutOfRangeException(nameof(stat), stat,
-                                                          "Invalid ResourceStat, has to be a terrain type");
+                    throw new ArgumentOutOfRangeException(nameof(stat), stat, "Invalid ResourceStat, has to be a terrain type");
                 default:
                     throw new ArgumentOutOfRangeException(nameof(stat), stat, "Invalid value");
             }

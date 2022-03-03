@@ -56,8 +56,7 @@ namespace Empire_Rewritten
             {
                 if (newCount < 0)
                 {
-                    Log.Warning(
-                        $"<color=orange>[Empire]</color> We had negative of {def.defName} after {nameof(TryRemoveThingsFromStorage)}, this shouldn't happen");
+                    Log.Warning($"<color=orange>[Empire]</color> We had negative of {def.defName} after {nameof(TryRemoveThingsFromStorage)}, this shouldn't happen");
                 }
 
                 storedThings.Remove(def);

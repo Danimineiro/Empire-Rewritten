@@ -13,9 +13,7 @@ namespace Empire_Rewritten.HarmonyPatches
         {
             var harmony = new Harmony("EmpireRewritten.HarmonyPatches");
 
-            harmony.Patch(typeof(Settlement).GetMethod(nameof(Settlement.GetGizmos)),
-                          null,
-                          new HarmonyMethod(typeof(SettlementGizmoPatch), nameof(SettlementGizmoPatch.GizmoPatch)));
+            harmony.Patch(typeof(Settlement).GetMethod(nameof(Settlement.GetGizmos)), null, new HarmonyMethod(typeof(SettlementGizmoPatch), nameof(SettlementGizmoPatch.GizmoPatch)));
 
             Log.Message("<color=orange>[Empire]</color> Patches completed!");
         }

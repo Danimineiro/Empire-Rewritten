@@ -16,12 +16,10 @@ namespace Empire_Rewritten.Resources
         public BiomeDef biome;
     }
 
-    [UsedImplicitly(ImplicitUseKindFlags.InstantiatedNoFixedConstructorSignature | ImplicitUseKindFlags.Assign,
-                    ImplicitUseTargetFlags.WithMembers)]
+    [UsedImplicitly(ImplicitUseKindFlags.InstantiatedNoFixedConstructorSignature | ImplicitUseKindFlags.Assign, ImplicitUseTargetFlags.WithMembers)]
     public class ResourceDef : Def
     {
-        private readonly Dictionary<BiomeDef, ResourceModifier> cachedBiomeModifiers =
-            new Dictionary<BiomeDef, ResourceModifier>();
+        private readonly Dictionary<BiomeDef, ResourceModifier> cachedBiomeModifiers = new Dictionary<BiomeDef, ResourceModifier>();
 
         public List<ThingDef> allowedThingDefs;
 

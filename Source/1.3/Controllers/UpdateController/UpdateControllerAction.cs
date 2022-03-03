@@ -91,8 +91,7 @@ namespace Empire_Rewritten.Controllers
 
         public override string ToString()
         {
-            return
-                $"[{GetType().Name}] useCounter: {useCounter}, maxExecutions: {maxExecutions}, has shouldExecute: {ShouldExecute != null}, has action {action != null}";
+            return $"[{GetType().Name}] useCounter: {useCounter}, maxExecutions: {maxExecutions}, has shouldExecute: {ShouldExecute != null}, has action {action != null}";
         }
     }
 }

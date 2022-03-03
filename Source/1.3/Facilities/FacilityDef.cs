@@ -7,8 +7,7 @@ using Verse;
 
 namespace Empire_Rewritten.Facilities
 {
-    [UsedImplicitly(ImplicitUseKindFlags.InstantiatedNoFixedConstructorSignature | ImplicitUseKindFlags.Assign,
-                    ImplicitUseTargetFlags.WithMembers)]
+    [UsedImplicitly(ImplicitUseKindFlags.InstantiatedNoFixedConstructorSignature | ImplicitUseKindFlags.Assign, ImplicitUseTargetFlags.WithMembers)]
     public class FacilityDef : Def
     {
         private readonly List<ResourceDef> producedResources = new List<ResourceDef>();
