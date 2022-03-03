@@ -12,7 +12,7 @@ namespace Empire_Rewritten.Controllers
     [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
     public class UpdateController : WorldComponent
     {
-        private static readonly List<UpdateControllerAction> Actions = new List<UpdateControllerAction>();
+        private readonly List<UpdateControllerAction> Actions = new List<UpdateControllerAction>();
 
         private static readonly List<Action<FactionController>> FinalizeInitHooks = new List<Action<FactionController>>();
 
@@ -63,7 +63,7 @@ namespace Empire_Rewritten.Controllers
         ///     A <see cref="Func{T}" /> that returns whether the <see cref="UpdateControllerAction" />
         ///     should be executed.
         /// </param>
-        public static void AddUpdateCall([NotNull] Action<FactionController> updateCall, [NotNull] Func<bool> shouldExecute)
+        public void AddUpdateCall([NotNull] Action<FactionController> updateCall, [NotNull] Func<bool> shouldExecute)
         {
             Actions.Add(new UpdateControllerAction(updateCall, shouldExecute));
         }
@@ -73,7 +73,7 @@ namespace Empire_Rewritten.Controllers
         ///     <see cref="UpdateControllerAction.ShouldExecute" /> method
         /// </summary>
         /// <param name="action">The <see cref="UpdateControllerAction" /> to be added</param>
-        public static void AddUpdateCall([NotNull] UpdateControllerAction action)
+        public void AddUpdateCall([NotNull] UpdateControllerAction action)
         {
             Actions.Add(action);
         }
@@ -87,6 +87,12 @@ namespace Empire_Rewritten.Controllers
         /// </param>
         public static void AddFinalizeInitHook([NotNull] Action<FactionController> action)
         {
+            if (CurrentWorldInstance != null)
+            {
+                Log.Warning("Tried to add a FinalizeInitHook after WorldComp was already created! Skipping...");
+                return;
+            }
+
             FinalizeInitHooks.Add(action);
         }
 
