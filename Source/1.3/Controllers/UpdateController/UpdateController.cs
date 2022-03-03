@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 using RimWorld.Planet;
 using Verse;
 
-namespace Empire_Rewritten.Controllers.UpdateController
+namespace Empire_Rewritten.Controllers
 {
     /// <summary>
     ///     The "Main" function of the mod, updates other modules and components occasionally
@@ -111,7 +111,7 @@ namespace Empire_Rewritten.Controllers.UpdateController
         {
             Actions.RemoveAll(updateControllerAction =>
             {
-                updateControllerAction.TryExecute(factionController, out var shouldDiscard);
+                updateControllerAction.TryExecute(factionController, out bool shouldDiscard);
                 return shouldDiscard;
             });
         }

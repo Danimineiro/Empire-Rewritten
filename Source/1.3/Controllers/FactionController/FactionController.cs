@@ -1,50 +1,68 @@
-﻿using RimWorld;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Verse;
+using Empire_Rewritten.Controllers.CivicEthic;
 using Empire_Rewritten.Settlements;
+using JetBrains.Annotations;
+using RimWorld;
+using Verse;
 
-namespace Empire_Rewritten
+namespace Empire_Rewritten.Controllers
 {
+    /// <summary>
+    ///     Manages <see cref="Faction">Factions</see> and their Settlements, Ethics, and Civics.
+    ///     There will be one of these per <see cref="RimWorld.Planet.World" />
+    /// </summary>
     public class FactionController : IExposable
     {
+        private readonly List<FactionCivicAndEthicData> factionCivicAndEthicDataList =
+            new List<FactionCivicAndEthicData>();
+
         private List<FactionSettlementData> factionSettlementDataList = new List<FactionSettlementData>();
-        private readonly List<FactionCivicAndEthicData> factionCivicAndEthicDataList = new List<FactionCivicAndEthicData>();
 
         /// <summary>
-        /// Needed for loading
+        ///     Needed for loading
         /// </summary>
-        public FactionController() { }
+        [UsedImplicitly]
+        public FactionController()
+        {
+        }
 
         /// <summary>
-        /// Creates a new FactionController using a List of <c>FactionSettlementData</c> structs
+        ///     Creates a new <see cref="FactionController" />, telling it which <see cref="FactionSettlementData" /> it is
+        ///     responsible for.
         /// </summary>
-        /// <param name="factionSettlementDataList"></param>
+        /// <param name="factionSettlementDataList">
+        ///     The <see cref="FactionSettlementData" /> instances that this
+        ///     <see cref="FactionController" /> should maintain
+        /// </param>
         public FactionController(List<FactionSettlementData> factionSettlementDataList)
         {
             this.factionSettlementDataList = factionSettlementDataList;
         }
 
+        public void ExposeData()
+        {
+            Scribe_Collections.Look(ref factionSettlementDataList, "FactionSettlementDataList");
+        }
+
         /// <param name="faction"></param>
-        /// <returns>The <c>SettlementManager</c> owned by a given <paramref name="faction"/></returns>
+        /// <returns>The <c>SettlementManager</c> owned by a given <paramref name="faction" /></returns>
         public SettlementManager GetOwnedSettlementManager(Faction faction)
         {
             foreach (FactionSettlementData factionSettlementData in factionSettlementDataList)
             {
-                if (factionSettlementData.owner == faction) return factionSettlementData.SettlementManager;
+                if (factionSettlementData.owner == faction)
+                    return factionSettlementData.SettlementManager;
             }
 
             return null;
         }
 
         /// <summary>
-        /// Adds one <paramref name="civic"/> to a <paramref name="faction"/>
+        ///     Adds a given <see cref="EthicDef" /> to a <see cref="Faction" />
         /// </summary>
-        /// <param name="faction"></param>
-        /// <param name="civic"></param>
+        /// <param name="faction">The <see cref="Faction" /> to modify</param>
+        /// <param name="civic">The <see cref="CivicDef" /> to add to <paramref name="faction" /></param>
         public void AddCivicToFaction(Faction faction, CivicDef civic)
         {
             GetOwnedCivicAndEthicData(faction).Civics.Add(civic);
@@ -52,25 +70,21 @@ namespace Empire_Rewritten
         }
 
         /// <summary>
-        /// Adds multiple <paramref name="civics"/> to a <paramref name="faction"/>
+        ///     Adds multiple given <see cref="EthicDef">EthicDefs</see> to a <see cref="Faction" /> at once
         /// </summary>
-        /// <param name="faction"></param>
-        /// <param name="civics"></param>
+        /// <param name="faction">The <see cref="Faction" /> to modify</param>
+        /// <param name="civics">The <see cref="CivicDef">CivicDefs</see> to add to <paramref name="faction" /></param>
         public void AddCivicsToFaction(Faction faction, IEnumerable<CivicDef> civics)
         {
-            foreach (CivicDef civic in civics)
-            {
-                GetOwnedCivicAndEthicData(faction).Civics.Add(civic);
-            }
-
+            GetOwnedCivicAndEthicData(faction).Civics.AddRange(civics);
             NotifyCivicsOrEthicsChanged(GetOwnedSettlementManager(faction));
         }
 
         /// <summary>
-        /// Adds a singel <paramref name="ethic"/> to a <paramref name="faction"/>
+        ///     Adds a given <see cref="EthicDef" /> to a <see cref="Faction" />
         /// </summary>
-        /// <param name="faction"></param>
-        /// <param name="ethic"></param>
+        /// <param name="faction">The <see cref="Faction" /> to modify</param>
+        /// <param name="ethic">The <see cref="EthicDef" /> to add to <paramref name="faction" /></param>
         public void AddEthicToFaction(Faction faction, EthicDef ethic)
         {
             GetOwnedCivicAndEthicData(faction).Ethics.Add(ethic);
@@ -78,17 +92,13 @@ namespace Empire_Rewritten
         }
 
         /// <summary>
-        /// Adds multiple <paramref name="ethics"/> to a <paramref name="faction"/>
+        ///     Adds multiple given <see cref="EthicDef">EthicDefs</see> to a <see cref="Faction" /> at once
         /// </summary>
-        /// <param name="faction"></param>
-        /// <param name="ethics"></param>
+        /// <param name="faction">The <see cref="Faction" /> to modify</param>
+        /// <param name="ethics">The <see cref="EthicDef">EthicDefs</see> to add to <paramref name="faction" /></param>
         public void AddEthicsToFaction(Faction faction, IEnumerable<EthicDef> ethics)
         {
-            foreach (EthicDef ethic in ethics)
-            {
-                GetOwnedCivicAndEthicData(faction).Ethics.Add(ethic);
-            }
-
+            GetOwnedCivicAndEthicData(faction).Ethics.AddRange(ethics);
             NotifyCivicsOrEthicsChanged(GetOwnedSettlementManager(faction));
         }
 
@@ -97,21 +107,14 @@ namespace Empire_Rewritten
             throw new NotImplementedException();
         }
 
-        /// <param name="faction"></param>
-        /// <returns>The <c>FactionCivicAndEthicData</c>s linked to a given <paramref name="faction"/></returns>
+        /// <summary>
+        ///     Gets the <see cref="FactionCivicAndEthicData" /> of a given <see cref="Faction" />
+        /// </summary>
+        /// <param name="faction">The <see cref="Faction" /> to get the <see cref="FactionCivicAndEthicData" /> of</param>
+        /// <returns>The <see cref="FactionCivicAndEthicData" /> linked to <paramref name="faction" /></returns>
         public FactionCivicAndEthicData GetOwnedCivicAndEthicData(Faction faction)
         {
-            foreach (FactionCivicAndEthicData factionCivicAndEthicData in factionCivicAndEthicDataList)
-            {
-                if (factionCivicAndEthicData.Faction == faction) return factionCivicAndEthicData;
-            }
-
-            return null;
-        }
-
-        public void ExposeData()
-        {
-            Scribe_Collections.Look(ref factionSettlementDataList, "FactionSettlementDataList");
+            return factionCivicAndEthicDataList.FirstOrFallback(data => data.Faction == faction);
         }
     }
 }

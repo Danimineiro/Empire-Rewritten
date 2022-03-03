@@ -1,7 +1,7 @@
 ﻿using System;
 using Verse;
 
-namespace Empire_Rewritten.Controllers.UpdateController
+namespace Empire_Rewritten.Controllers
 {
     public class UpdateControllerAction
     {
@@ -77,7 +77,7 @@ namespace Empire_Rewritten.Controllers.UpdateController
         /// <returns>If the <see cref="UpdateControllerAction" /> was executed</returns>
         public bool TryExecute(FactionController factionController, out bool shouldDiscard)
         {
-            var shouldExecute = ShouldExecute();
+            bool shouldExecute = ShouldExecute();
             if (shouldExecute)
             {
                 action(factionController);

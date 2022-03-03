@@ -1,4 +1,4 @@
-﻿using Empire_Rewritten.Controllers.UpdateController;
+﻿using Empire_Rewritten.Controllers;
 using Empire_Rewritten.HarmonyPatches;
 using Empire_Rewritten.Utils.Text;
 using Verse;
@@ -37,7 +37,7 @@ namespace Empire_Rewritten
         private static void AddFactionControllerIfMissing(FactionController controller)
         {
             if (UpdateController.CurrentWorldInstance.HasFactionController) return;
-            UpdateController.CurrentWorldInstance.FactionController = new FactionController(FactionSettlementData.CreateFactionSettlementDatas());
+            UpdateController.CurrentWorldInstance.FactionController = new FactionController(FactionSettlementData.CreateFactionSettlementData());
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using System;
-using Empire_Rewritten.Controllers.UpdateController;
+using Empire_Rewritten.Controllers;
 using Empire_Rewritten.Settlements;
 using RimWorld;
 
