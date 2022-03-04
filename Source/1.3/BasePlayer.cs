@@ -43,9 +43,11 @@ namespace Empire_Rewritten {
             players = new List<BasePlayer>();
             if (!hasStartedOnce)
             {
-                UpdateController.AddUpdateCall(MakeMoves, DoPlayerTick);
-                UpdateController.AddUpdateCall(MakeThreadedMoves, DoPlayerTick);
-                UpdateController.AddUpdateCall(RegisterPlayerFactionAsPlayer, ShouldRegisterPlayerFaction);
+                UpdateController controller = UpdateController.GetUpdateController;
+
+                controller.AddUpdateCall(MakeMoves, DoPlayerTick);
+                controller.AddUpdateCall(MakeThreadedMoves, DoPlayerTick);
+                controller.AddUpdateCall(RegisterPlayerFactionAsPlayer, ShouldRegisterPlayerFaction);
                 hasStartedOnce = true;
             }
         }
