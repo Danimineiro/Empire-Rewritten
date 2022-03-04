@@ -74,9 +74,6 @@ namespace Empire_Rewritten.AI
             this.resourceManager = new AIResourceManager(this);
             this.settlementManager = new AISettlementManager(this);
             this.facilityManager = new AIFacilityManager(this);
-
-            UpdateController.AddUpdateCall(MakeMove,ShouldExecute);
-            UpdateController.AddUpdateCall(MakeThreadedMove, ShouldExecuteThreaded);
         }
 
         public AIResourceManager ResourceManager
