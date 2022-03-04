@@ -11,7 +11,7 @@ namespace Empire_Rewritten.AI
 {
     public class AIResourceManager : AIModule
     {
-        private static List<ResourceDef> cachedDefs = new List<ResourceDef>();
+        private static IEnumerable<ResourceDef> cachedDefs;
         private AIPlayer parentPlayer;
 
         private List<ResourceDef> criticalResources = new List<ResourceDef>();
@@ -20,7 +20,7 @@ namespace Empire_Rewritten.AI
 
         public List<ResourceDef> ExcessResources
         {
-            get { return cachedDefs; }
+            get { return excessResoures; }
         }
 
         public List<ResourceDef> LowResources
@@ -41,11 +41,11 @@ namespace Empire_Rewritten.AI
             parentPlayer = player;
         }
 
-        private List<ResourceDef> FindAllResourceDefs
+        private IEnumerable<ResourceDef> FindAllResourceDefs
         {
             get
             {
-                if (cachedDefs.NullOrEmpty())
+                if (cachedDefs.EnumerableNullOrEmpty())
                 {
                     cachedDefs = DefDatabase<ResourceDef>.AllDefsListForReading;
                 }
@@ -128,15 +128,7 @@ namespace Empire_Rewritten.AI
 
             foreach (ResourceDef def in producedknown.Keys)
             {
-                if (producedknown.ContainsKey(def))
-                {
-                    if (producedknown[def] >= def.desiredAIMaximum)
-                    {
-                        result.Add(def);
-                    }
-                }
-                //If the def is not produced at all, add it!
-                else
+                if (producedknown.ContainsKey(def) && producedknown[def] >= def.desiredAIMaximum)
                 {
                     result.Add(def);
                 }
@@ -202,18 +194,21 @@ namespace Empire_Rewritten.AI
             List<ResourceDef> lowResources = LowResources;
             List<ResourceDef> highResources = ExcessResources;
 
+ 
+
             float weight = 0;
             foreach (ResourceDef resourceDef in lowResources)
             {
-                weight += 1;
+                weight +=  resourceDef.GetTileModifier(tile).TotalProduced();
+           
             }
             foreach (ResourceDef resourceDef in criticalResources)
             {
-                weight += 5;
+                weight += resourceDef.GetTileModifier(tile).TotalProduced() * 5;
             }
             foreach (ResourceDef resourceDef in highResources)
             {
-                weight -= 1;
+                weight -= resourceDef.GetTileModifier(tile).TotalProduced() * 3;
             }
             return weight;
         }

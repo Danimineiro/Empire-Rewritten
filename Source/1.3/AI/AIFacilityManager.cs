@@ -22,7 +22,7 @@ namespace Empire_Rewritten.AI
         HashSet<FacilityDef> cachedFacilitiesDef = new HashSet<FacilityDef>();
         private bool updateCache = true;
         private bool updateDefCache = true;
-
+        
         private bool canMakeFacilities = false;
 
         public bool CanMakeFacilities

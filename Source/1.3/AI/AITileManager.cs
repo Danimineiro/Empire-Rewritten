@@ -61,10 +61,10 @@ namespace Empire_Rewritten.AI
             float techWeight = (float)(TechLevel - 4) * UnityEngine.Random.Range(1, 10);
 
             //Make the AI more "Organic"
-            float randomOffsetWeight = UnityEngine.Random.Range(-5, 10);
+            float randomOffsetWeight = UnityEngine.Random.Range(-2, 2);
 
             //Hills are hard to build on.
-            float hillinessOffsetWeight = (float)tile.hilliness * UnityEngine.Random.Range(-10, -2);
+            float hillinessOffsetWeight = (float)tile.hilliness * UnityEngine.Random.Range(-3, -2);
 
 
             bool foundASettlement = false;
