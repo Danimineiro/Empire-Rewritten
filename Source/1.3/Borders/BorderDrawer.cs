@@ -8,9 +8,9 @@ namespace Empire_Rewritten.Borders
 {
     public class BorderDrawer : WorldLayer
     {
-        private static bool dirty;
+        private bool dirty = true;
         private Dictionary<Border,List<int>> tilesDrawnOn =new Dictionary<Border, List<int>>();
-        public static new void SetDirty()=>dirty=true;
+        public new void SetDirty()=>dirty=true;
         protected override int Layer => base.Layer;
 
         public override IEnumerable Regenerate()
@@ -51,10 +51,17 @@ namespace Empire_Rewritten.Borders
             {
                 if (!tilesDrawnOn[border].Contains(tile))
                 {
-                    tilesDrawnOn[border].Add(tile);
-                    LayerSubMesh layerSubMesh = base.GetSubMesh(material);
-                    Vector3 vector = Find.WorldGrid.GetTileCenter(tile);
-                    WorldRendererUtility.PrintQuadTangentialToPlanet(vector, vector, worldGrid.averageTileSize,1 , layerSubMesh, false, false, false);
+                    try
+                    {
+                        tilesDrawnOn[border].Add(tile);
+                        LayerSubMesh layerSubMesh = base.GetSubMesh(material);
+                        Vector3 vector = Find.WorldGrid.GetTileCenter(tile);
+                        WorldRendererUtility.PrintQuadTangentialToPlanet(vector, vector, worldGrid.averageTileSize, 1, layerSubMesh, false, false, false);
+                    }
+                    catch
+                    {
+
+                    }
                 }
             }
         }

@@ -51,7 +51,7 @@ namespace Empire_Rewritten.Borders
             
             if(!BorderManager.GetBorderManager.AnyFactionOwnsTile(id)){
                 tiles.Add(id);
-                BorderDrawer.SetDirty();
+                Find.World.renderer.SetDirty<BorderDrawer>();
             }
             
         }
