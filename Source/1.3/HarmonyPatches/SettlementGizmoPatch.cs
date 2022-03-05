@@ -10,11 +10,12 @@ namespace Empire_Rewritten
 {
     public static class SettlementGizmoPatch
     {
+        /// <summary>
+        ///     is postfix
+        /// </summary>
         public static void GizmoPatch(Settlement __instance, ref IEnumerable<Gizmo> __result)
         {
-            List<Gizmo> gizmos = (List<Gizmo>)__result;   
-            gizmos.AddRange(__instance.GetExtendedGizmos());
-            __result = gizmos;
+            __result.Concat(__instance.GetExtendedGizmos());
         }
     }
 }
