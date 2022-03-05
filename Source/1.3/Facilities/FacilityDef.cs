@@ -16,8 +16,18 @@ namespace Empire_Rewritten
     }
     public class FacilityDef : Def
     {
+        public readonly bool requiresIdeology = false;
+        public readonly bool requiresRoyality = false;
+        public readonly List<string> requiredModIDs = new List<string>();
+
         public List<ResourceChange> resourceMultipliers = new List<ResourceChange>();
         public List<ResourceChange> resourceOffsets = new List<ResourceChange>();
+        public List<ThingDefCountClass> costList = new List<ThingDefCountClass>();
+
+        public Type facilityWorker;
+        public GraphicData iconData;
+
+        private readonly List<ResourceDef> producedResources = new List<ResourceDef>();
 
         private FacilityWorker worker;
 
@@ -34,7 +44,6 @@ namespace Empire_Rewritten
             }
         }
 
-        private List<ResourceDef> producedResources = new List<ResourceDef>();
         public List<ResourceDef> ProducedResources
         {
             get
@@ -54,14 +63,6 @@ namespace Empire_Rewritten
                 return producedResources;
             }
         }
-
-        public Type facilityWorker;
-
-        public List<ThingDefCountClass> costList;
-        public readonly bool requiresIdeology = false;
-        public readonly bool requiresRoyality = false;
-        public readonly List<string> requiredModIDs = new List<string>();
-
 
         /// Returns if all required Mods are loaded
         public bool RequiredModsLoaded => ModChecker.RequiredModsLoaded(requiredModIDs, requiresRoyality, requiresIdeology);
