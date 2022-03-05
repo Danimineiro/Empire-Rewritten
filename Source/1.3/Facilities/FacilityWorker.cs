@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Empire_Rewritten.Facilities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,9 +13,15 @@ namespace Empire_Rewritten
     /// </summary>
     public class FacilityWorker
     {
+        public FacilityDef facilityDef;
         public virtual IEnumerable<Gizmo> GetGizmos()
         {
-            yield return null;
+            return new List<Gizmo>();
+        }
+
+        public virtual bool CanBuildAt(FacilityManager manager)
+        {
+            return false;
         }
     }
 }

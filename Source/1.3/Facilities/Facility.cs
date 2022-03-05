@@ -7,13 +7,29 @@ using System.Text;
 using System.Threading.Tasks;
 using Verse;
 
-namespace Empire_Rewritten
+namespace Empire_Rewritten.Facilities
 {
     public class Facility : IExposable, ILoadReferenceable
     {
         int amount;
         public FacilityDef def;
 
+        private FacilityWorker worker;
+
+        public FacilityWorker FacilityWorker
+        {
+            get
+            {
+                return worker;
+            }
+        }
+        public int Amount
+        {
+            get
+            {
+                return amount;
+            }
+        }
         private bool ShouldRecalculateModifiers = true;
         private List<ResourceModifier> modifiers = new List<ResourceModifier>();
         private Settlement settlement;
@@ -43,6 +59,12 @@ namespace Empire_Rewritten
             this.def = def;
             this.settlement = settlement;
             amount=1;
+
+            if (def.facilityWorker != null)
+            {
+                worker = (FacilityWorker)Activator.CreateInstance(def.facilityWorker);
+                worker.facilityDef = def;
+            }
         }
 
         public Facility()
@@ -105,14 +127,21 @@ namespace Empire_Rewritten
 
             modifiers = new List<ResourceModifier>();
             List<ResourceDef> defs = new List<ResourceDef>();
-            defs.AddRange(def.resourceMultipliers.Keys);
-            defs.AddRange(def.resourceOffsets.Keys);
+            foreach(ResourceChange change in def.resourceMultipliers)
+            {
+                defs.Add(change.def);
+            }
+            foreach (ResourceChange change in def.resourceOffsets)
+            {
+                defs.Add(change.def);
+            }
+
             foreach (ResourceDef resourceDef in defs)
             {
                 Tile tile = Find.WorldGrid.tiles[settlement.Tile];
                 ResourceModifier modifier = resourceDef.GetTileModifier(tile);
-                modifier.multiplier *= (amount *(def.resourceMultipliers.ContainsKey(resourceDef) ? def.resourceMultipliers[resourceDef] : 1));
-                modifier.offset += (amount * (def.resourceOffsets.ContainsKey(resourceDef) ? def.resourceOffsets[resourceDef] : 0));
+                modifier.multiplier *= (amount *(def.resourceOffsets.Any(x => x.def == resourceDef) ? def.resourceMultipliers.Find(x=>x.def==resourceDef).amount : 1));
+                modifier.offset += (amount * (def.resourceOffsets.Any(x=>x.def==resourceDef) ? def.resourceOffsets.Find(x => x.def == resourceDef).amount : 0));
                 modifiers.Add(modifier);
 
             }

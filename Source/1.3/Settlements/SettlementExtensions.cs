@@ -11,7 +11,7 @@ namespace Empire_Rewritten
 {
     public static class SettlementExtensions
     {
-        public static SettlementManager GetManager(this Settlement settlement)
+        public static Empire GetManager(this Settlement settlement)
         {
             UpdateController updateController = UpdateController.GetUpdateController;
             return updateController.FactionController.GetOwnedSettlementManager(settlement.Faction);
@@ -20,11 +20,14 @@ namespace Empire_Rewritten
         {
             if (settlement.Faction == Faction.OfPlayer)
             {
-                SettlementManager manager = GetManager(settlement);
+                Empire manager = GetManager(settlement);
                IEnumerable<Gizmo> gizmos = manager.GetFacilityManager(settlement).GetGizmos();
-                foreach(Gizmo gizmo in gizmos)
+                foreach (Gizmo gizmo in gizmos)
                 {
-                    yield return gizmo;
+                    if (gizmo != null)
+                    {
+                        yield return gizmo;
+                    }
                 }
             }
             yield break;

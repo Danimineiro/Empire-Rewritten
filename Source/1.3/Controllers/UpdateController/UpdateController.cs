@@ -106,7 +106,6 @@ namespace Empire_Rewritten
                 if (action.ShouldExecute.Invoke())
                 {
                     action.Action.Invoke(factionController);
-                    Log.Message(action.ToString());
                 }
             }
 

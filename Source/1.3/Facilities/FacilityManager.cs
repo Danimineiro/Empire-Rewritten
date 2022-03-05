@@ -6,8 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Verse;
-
-namespace Empire_Rewritten
+namespace Empire_Rewritten.Facilities
 {
     /// <summary>
     /// This manages all the facilities for a settlement.
@@ -20,8 +19,10 @@ namespace Empire_Rewritten
         private List<ResourceModifier> cachedModifiers = new List<ResourceModifier>();
         bool RefreshModifiers = true;
         bool RefreshGizmos = true;
+        bool RefreshFacilityCount = true;
         List<Gizmo> gizmos = new List<Gizmo>();
-
+        int stage = 1;
+        int facilityCount = 0;
         public FacilityManager(Settlement settlement)
         {
             this.settlement = settlement;
@@ -32,6 +33,11 @@ namespace Empire_Rewritten
           
         }
 
+        public bool CanBuildNewFacilities()
+        {
+            return MaxFacilities > FacilityCount;
+        }
+
         /// <summary>
         /// Get gizmos from all facilities in the settlement.
         /// </summary>
@@ -39,18 +45,11 @@ namespace Empire_Rewritten
         {
             if (RefreshModifiers)
             {
+                gizmos.Clear();
                 RefreshModifiers = false;
-                foreach(FacilityDef facilityDef in installedFacilities.Keys.ToList())
+                foreach(Facility facility in installedFacilities.Values)
                 {
-                    if(facilityDef.facilityWorker!= null )
-                    {
-                        FacilityWorker worker = (FacilityWorker)Activator.CreateInstance(facilityDef.facilityWorker);
-                        List<Gizmo> newGizmos = (List<Gizmo>)worker.GetGizmos();
-                        foreach(Gizmo gizmo in newGizmos)
-                        {
-                            gizmos.Add(gizmo);
-                        }
-                    }
+                    gizmos.AddRange(facility.FacilityWorker.GetGizmos());
                 }
             }
             return gizmos;
@@ -102,6 +101,7 @@ namespace Empire_Rewritten
         {
             Scribe_Collections.Look(ref installedFacilities, "installedFacilities", LookMode.Deep);
             Scribe_Values.Look(ref settlement, "settlement");
+            Scribe_Values.Look(ref stage, "stage");
         }
 
         /// <summary>
@@ -113,7 +113,6 @@ namespace Empire_Rewritten
             RefreshGizmos = refreshGizmos;
             RefreshModifiers = true;
         }
-        
         
         
         
@@ -152,14 +151,6 @@ namespace Empire_Rewritten
             }
         }
        
-        /// <summary>
-        /// Can this be built here?
-        /// </summary>
-        /// <returns></returns>
-        public bool CanBuildAt(FacilityDef facilityDef)
-        {
-            return true;
-        }
 
         /// <summary>
         /// Has a facility of facilityDef
@@ -179,6 +170,41 @@ namespace Empire_Rewritten
             get
             {
                 return installedFacilities.Keys;
+            }
+        }
+
+
+        public bool IsFullyUpgraded
+        {
+            get
+            {
+                return stage>=10;
+            }
+        }
+
+        public int MaxFacilities
+        {
+            get
+            {
+                return stage;
+            }
+        }
+
+        public int FacilityCount
+        {
+            get
+            {
+                if (RefreshFacilityCount)
+                {
+                    int count = 0;
+                    foreach(Facility facility in installedFacilities.Values)
+                    {
+                        count+=facility.Amount;
+                    }
+                    facilityCount=count;
+
+                }
+                return facilityCount;
             }
         }
     }

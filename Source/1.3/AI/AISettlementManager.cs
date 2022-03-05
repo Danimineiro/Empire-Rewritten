@@ -1,4 +1,6 @@
-﻿using Empire_Rewritten.Resources;
+﻿using Empire_Rewritten.Borders;
+using RimWorld;
+using Empire_Rewritten.Resources;
 using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
@@ -6,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Verse;
+using Empire_Rewritten.Facilities;
 
 namespace Empire_Rewritten.AI
 {
@@ -13,10 +16,12 @@ namespace Empire_Rewritten.AI
     {
         public AISettlementManager(AIPlayer player) : base(player)
         {
+            worldGrid = Find.WorldGrid;
         }
 
+        private static WorldGrid worldGrid;
         private bool canUpgradeOrBuild;
-
+        
         public bool CanUpgradeOrBuild
         {
             get
@@ -24,8 +29,8 @@ namespace Empire_Rewritten.AI
                 return canUpgradeOrBuild;
             }
         }
-        
-  
+
+
         public bool AttemptToUpgradeSettlement(Settlement settlement)
         {
             FacilityManager facilityManager = player.Manager.GetFacilityManager(settlement);
@@ -44,32 +49,29 @@ namespace Empire_Rewritten.AI
         }
 
 
-        public bool AttemptBuildNewSettlement()
-        {
-            if (!player.FacilityManager.CanMakeFacilities /* || otherFactor */)
-            {
-                //Do something
-            }
 
-            return false;
-        }
 
         public void BuildOrUpgradeNewSettlement()
         {
-            KeyValuePair<Settlement,FacilityManager> settlementAndManager = player.Manager.Settlements.Where(x => true /* !x.Value.IsFullyUpgraded*/).RandomElement();
-            Settlement settlement = settlementAndManager.Key;
-            FacilityManager facilityManager = settlementAndManager.Value;
-            bool UpgradedSettlement = AttemptToUpgradeSettlement(facilityManager);
+            bool UpgradedSettlement = false;
+            if (player.Manager.Settlements.Count > 0)
+            {
+                KeyValuePair<Settlement, FacilityManager> settlementAndManager = player.Manager.Settlements.Where(x =>!x.Value.IsFullyUpgraded).RandomElement();
+                Settlement settlement = settlementAndManager.Key;
+                FacilityManager facilityManager = settlementAndManager.Value;
+                UpgradedSettlement = AttemptToUpgradeSettlement(facilityManager);
+            }
             bool BuiltSettlement = false;
             if (!UpgradedSettlement)
             {
-                BuiltSettlement = AttemptBuildNewSettlement();
+                SearchForTile();
             }
-            
+
             canUpgradeOrBuild = UpgradedSettlement || BuiltSettlement;
         }
 
-       
+      
+
         /// <summary>
         /// Search for tiles to build settlements on based off weights;
         /// Weights:
@@ -80,56 +82,47 @@ namespace Empire_Rewritten.AI
         /// Resources AI has excess of = lower weight
         /// </summary>
         /// <returns></returns>
-        public Tile SearchForTile()
+        public void SearchForTile()
         {
-            Tile t = null;
 
-            //temp test
-            //todo when bordermanager is implimented:
-            //only pull from owned tiles.
-            List<Tile> tiles = Find.WorldGrid.tiles;
-            AIResourceManager aIResourceManager = player.ResourceManager;
-            List<ResourceDef> lowResources = aIResourceManager.FindLowResources();
-            List<ResourceDef> highResources = aIResourceManager.FindExcessResources();
+            IEnumerable<int> tileOptions = player.TileManager.GetTiles;
 
-            Dictionary<float, List<Tile>> tileWeights = new Dictionary<float, List<Tile>>();
-            foreach(Tile tile in tiles)
+            //Default largestweight to -1000 so it's almost always initally overridden.
+            float largestWeight = -1000;
+
+            int result=0;
+           foreach(int tileOption in tileOptions)
             {
-                float weight = 0;
-                foreach(ResourceDef resourceDef in lowResources)
+                float weight = player.TileManager.GetTileWeight(tileOption);
+                if (largestWeight < weight && TileFinder.IsValidTileForNewSettlement(tileOption))
                 {
-                    weight += aIResourceManager.GetAmountProduced(resourceDef);
-                }
-                foreach (ResourceDef resourceDef in highResources)
-                {
-                    weight -= aIResourceManager.GetAmountProduced(resourceDef);
-                }
-
-
-                /*
-                todo: border weight
-                */
-
-                if (tileWeights.ContainsKey(weight))
-                {
-                    tileWeights[weight].Add(tile);
-                }
-                else
-                {
-                    tileWeights.Add(weight, new List<Tile>() { tile});
+                    largestWeight = weight;
+                    result = tileOption;
                 }
             }
+            tileToBuildOn = worldGrid[result];
+        }
 
-            //This should be smarter in the future.
-            float largestWeight = tileWeights.Keys.Max();
-            t = tileWeights[largestWeight].RandomElement();
+        private Tile tileToBuildOn = null;
 
-            return t;
+        public void BuildSettlement()
+        {
+            if (tileToBuildOn != null)
+            {
+                player.Manager.BuildNewSettlementOnTile(tileToBuildOn);
+                tileToBuildOn = null;
+            }
         }
 
         public override void DoModuleAction()
         {
-            
+            SearchForTile();
+            BuildSettlement();
+        }
+
+        public override void DoThreadableAction()
+        {
+          // SearchForTile();
         }
     }
 }

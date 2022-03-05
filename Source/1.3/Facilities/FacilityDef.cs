@@ -9,10 +9,30 @@ using Verse;
 
 namespace Empire_Rewritten
 {
+    public class ResourceChange
+    {
+        public ResourceDef def;
+        public float amount;
+    }
     public class FacilityDef : Def
     {
-        public Dictionary<ResourceDef, float> resourceMultipliers = new Dictionary<ResourceDef, float>();
-        public Dictionary<ResourceDef,int> resourceOffsets = new Dictionary<ResourceDef, int>();
+        public List<ResourceChange> resourceMultipliers = new List<ResourceChange>();
+        public List<ResourceChange> resourceOffsets = new List<ResourceChange>();
+
+        private FacilityWorker worker;
+
+        public FacilityWorker FacilityWorker
+        {
+            get
+            {
+                if(worker == null)
+                {
+                    worker = (FacilityWorker)Activator.CreateInstance(this.facilityWorker);
+                    worker.facilityDef = this;
+                }
+                return worker;
+            }
+        }
 
         private List<ResourceDef> producedResources = new List<ResourceDef>();
         public List<ResourceDef> ProducedResources
@@ -21,25 +41,30 @@ namespace Empire_Rewritten
             {
                 if (producedResources.NullOrEmpty())
                 {
-                    producedResources.AddRange(this.resourceMultipliers.Keys);
-                    producedResources.AddRange(this.resourceOffsets.Keys);
+                    List<ResourceDef> resourceDefs = new List<ResourceDef>();
+                    foreach(ResourceChange change in this.resourceOffsets)
+                    {
+                        resourceDefs.Add(change.def);
+                    }
+                    foreach (ResourceChange change in this.resourceMultipliers)
+                    {
+                        resourceDefs.Add(change.def);
+                    }
                 }
                 return producedResources;
             }
         }
 
+        public Type facilityWorker;
+
+        public List<ThingDefCountClass> costList;
         public readonly bool requiresIdeology = false;
         public readonly bool requiresRoyality = false;
         public readonly List<string> requiredModIDs = new List<string>();
 
-        public Type facilityWorker;
 
-        /// <summary>
         /// Returns if all required Mods are loaded
-        /// </summary>
         public bool RequiredModsLoaded => ModChecker.RequiredModsLoaded(requiredModIDs, requiresRoyality, requiresIdeology);
-
-        public List<ThingDefCountClass> costList;
 
         public override IEnumerable<string> ConfigErrors()
         {

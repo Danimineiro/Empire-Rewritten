@@ -5,14 +5,37 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Verse;
-
+using Empire_Rewritten.Borders;
+using Empire_Rewritten.AI;
+using RimWorld.Planet;
+using Empire_Rewritten.Player;
 namespace Empire_Rewritten
 {
     public class FactionController : IExposable
     {
         private List<FactionSettlementData> factionSettlementDataList = new List<FactionSettlementData>();
         private readonly List<FactionCivicAndEthicData> factionCivicAndEthicDataList = new List<FactionCivicAndEthicData>();
+        private Dictionary<Faction, AIPlayer> AIFactions = new Dictionary<Faction, AIPlayer>();
+        private BorderManager borderManager = new BorderManager();
+        private bool shouldRefreshBorders = true;
 
+        public BorderManager BorderManager
+        {
+            get
+            {
+                return borderManager;
+            }
+        }
+        /// <summary>
+        /// Meant for things that cache the borders to check.
+        /// </summary>
+        public bool ShouldRefreshBorders
+        {
+            get
+            {
+                return shouldRefreshBorders;
+            }
+        }
         /// <summary>
         /// Needed for loading
         /// </summary>
@@ -24,12 +47,14 @@ namespace Empire_Rewritten
         /// <param name="factionSettlementDataList"></param>
         public FactionController(List<FactionSettlementData> factionSettlementDataList)
         {
+            shouldRefreshBorders = true;
+            borderManager= new BorderManager();
             this.factionSettlementDataList = factionSettlementDataList;
         }
 
         /// <param name="faction"></param>
         /// <returns>The <c>SettlementManager</c> owned by a given <paramref name="faction"/></returns>
-        public SettlementManager GetOwnedSettlementManager(Faction faction)
+        public Empire GetOwnedSettlementManager(Faction faction)
         {
             foreach (FactionSettlementData factionSettlementData in factionSettlementDataList)
             {
@@ -37,6 +62,47 @@ namespace Empire_Rewritten
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Gets the AIPlayer of a faction.
+        /// </summary>
+        /// <param name="faction"></param>
+        /// <returns></returns>
+        public AIPlayer GetAIPlayer(Faction faction)
+        {
+            return AIFactions.ContainsKey(faction) ? AIFactions[faction] : null;
+        }
+
+        public void CreatePlayer()
+        {
+            Faction faction = Faction.OfPlayer;
+            FactionSettlementData factionSettlementData = new FactionSettlementData(faction, new Empire(faction));
+            factionSettlementDataList.Add(factionSettlementData);
+            UserPlayer player = new UserPlayer(faction);
+            IEnumerable<WorldObject> settlements = Find.WorldObjects.Settlements.Where(x =>x.Faction == faction);
+            BorderManager.GetBorder(faction).SettlementClaimTiles((Settlement)settlements.First());
+
+        }
+
+        public void CreateNewAIPlayer(Faction faction)
+        {
+            AIPlayer aIPlayer = new AIPlayer(faction);
+            AIFactions.Add(faction,aIPlayer);
+
+            //Find preexisting settlements.
+            IEnumerable<WorldObject> settlements = Find.WorldObjects.Settlements.Where(x => x.Faction == faction);
+            if (settlements.Count() > 0) {
+                List<WorldObject> list = settlements.ToList();
+                aIPlayer.Manager.AddSettlement(list[0] as Settlement);
+                list.RemoveAt(0);
+
+                foreach(WorldObject item in list)
+                {
+                    item.Destroy();
+                }
+            }
+            Log.Message($"Created AI for: {faction.Name}");
         }
 
         /// <summary>
@@ -91,7 +157,7 @@ namespace Empire_Rewritten
             NotifyCivicsOrEthicsChanged(GetOwnedSettlementManager(faction));
         }
 
-        public void NotifyCivicsOrEthicsChanged(SettlementManager settlementManager)
+        public void NotifyCivicsOrEthicsChanged(Empire settlementManager)
         {
             throw new NotImplementedException();
         }
@@ -111,6 +177,7 @@ namespace Empire_Rewritten
         public void ExposeData()
         {
             Scribe_Collections.Look(ref factionSettlementDataList, "FactionSettlementDataList");
+            Scribe_Deep.Look(ref borderManager, "borderManager");
         }
     }
 }

@@ -1,21 +1,32 @@
-﻿using Empire_Rewritten.Resources;
+﻿using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Verse;
+using Empire_Rewritten.Resources;
 
 namespace Empire_Rewritten.AI
 {
     public class AIResourceManager : AIModule
     {
-        private static List<ResourceDef> cachedDefs = new List<ResourceDef>();
+        private static IEnumerable<ResourceDef> cachedDefs;
         private AIPlayer parentPlayer;
 
         private List<ResourceDef> criticalResources = new List<ResourceDef>();
-        private int LowResourceDecider=30;
-        private int HighResourceDecider = 50;
+        private List<ResourceDef> excessResoures = new List<ResourceDef>();
+        private List<ResourceDef> lowResources = new List<ResourceDef>();
+
+        public List<ResourceDef> ExcessResources
+        {
+            get { return excessResoures; }
+        }
+
+        public List<ResourceDef> LowResources
+        {
+            get { return lowResources; }
+        }
 
         public bool HasCriticalResource
         {
@@ -27,13 +38,14 @@ namespace Empire_Rewritten.AI
 
         public AIResourceManager(AIPlayer player) : base(player)
         {
+            parentPlayer = player;
         }
 
-        private List<ResourceDef> FindAllResourceDefs
+        private IEnumerable<ResourceDef> FindAllResourceDefs
         {
             get
             {
-                if (cachedDefs.NullOrEmpty())
+                if (cachedDefs.EnumerableNullOrEmpty())
                 {
                     cachedDefs = DefDatabase<ResourceDef>.AllDefsListForReading;
                 }
@@ -62,11 +74,11 @@ namespace Empire_Rewritten.AI
             {
                 if (producedknown.ContainsKey(def))
                 {
-                    if (producedknown[def] <= LowResourceDecider)
+                    if (producedknown[def] <= def.desiredAIMinimum)
                     {
                         result.Add(def);
                         resourceBelowDecider = true;
-                        if (producedknown[def] < LowResourceDecider / 2)
+                        if (producedknown[def] < def.desiredAIMinimum / 2)
                         {
                             criticalResources.Add(def);
                         }
@@ -103,6 +115,7 @@ namespace Empire_Rewritten.AI
 
 
 
+
         /// <summary>
         /// Figure out what resources are "excess" in production based on the amount being produced.
         /// HighResourceDecider changes the excess value.
@@ -115,15 +128,7 @@ namespace Empire_Rewritten.AI
 
             foreach (ResourceDef def in producedknown.Keys)
             {
-                if (producedknown.ContainsKey(def))
-                {
-                    if (producedknown[def] >= HighResourceDecider)
-                    {
-                        result.Add(def);
-                    }
-                }
-                //If the def is not produced at all, add it!
-                else
+                if (producedknown.ContainsKey(def) && producedknown[def] >= def.desiredAIMaximum)
                 {
                     result.Add(def);
                 }
@@ -152,21 +157,73 @@ namespace Empire_Rewritten.AI
         {
             Dictionary<ResourceDef, ResourceModifier> modifiers = parentPlayer.Manager.ResourceModifiersFromAllFacilities();
             Dictionary<ResourceDef, float> result = new Dictionary<ResourceDef, float>();
-            foreach (ResourceDef def in modifiers.Keys)
+            foreach (ResourceDef def in this.FindAllResourceDefs)
             {
-                ResourceModifier resourceModifier = modifiers[def];
-                result.Add(def, resourceModifier.TotalProduced());
+                if (modifiers.ContainsKey(def)) {
+                    ResourceModifier resourceModifier = modifiers[def];
+                    result.Add(def, resourceModifier.TotalProduced());
+                }
+                else
+                {
+                    result.Add(def, 0);
+                }
             }
             return result;
         }
 
         public override void DoModuleAction()
         {
+            
+        }
+
+        /// <summary>
+        /// Search for tiles to build settlements on based off weights;
+        /// Weights:
+        /// - Resources
+        /// - Border distance
+        /// 
+        /// Resources AI wants = higher weight
+        /// Resources AI has excess of = lower weight
+        /// </summary>
+        /// <returns></returns>
+        public float GetTileResourceWeight(Tile tile)
+        {
+            //temp test
+            //todo when bordermanager is implimented:
+            //only pull from owned tiles.
+            List<ResourceDef> lowResources = LowResources;
+            List<ResourceDef> highResources = ExcessResources;
+
+ 
+
+            float weight = 0;
+            foreach (ResourceDef resourceDef in lowResources)
+            {
+                weight +=  resourceDef.GetTileModifier(tile).TotalProduced();
+           
+            }
+            foreach (ResourceDef resourceDef in criticalResources)
+            {
+                weight += resourceDef.GetTileModifier(tile).TotalProduced() * 5;
+            }
+            foreach (ResourceDef resourceDef in highResources)
+            {
+                weight -= resourceDef.GetTileModifier(tile).TotalProduced() * 3;
+            }
+            return weight;
+        }
+
+        public override void DoThreadableAction()
+        {
             if (!criticalResources.EnumerableNullOrEmpty())
             {
                 Dictionary<ResourceDef, float> resourcesProduced = AllResourcesProduced();
-                criticalResources.RemoveAll(x => resourcesProduced.ContainsKey(x) && resourcesProduced[x] > LowResourceDecider / 2);
+                criticalResources.RemoveAll(x => resourcesProduced.ContainsKey(x) && resourcesProduced[x] > x.desiredAIMinimum / 2);
             }
+            lowResources.Clear();
+            lowResources=FindLowResources();
+            excessResoures.Clear();
+            FindExcessResources();
         }
     }
 }

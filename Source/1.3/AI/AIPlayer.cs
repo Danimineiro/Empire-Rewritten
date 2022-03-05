@@ -12,22 +12,44 @@ namespace Empire_Rewritten.AI
         private AIFacilityManager facilityManager;
         private AISettlementManager settlementManager;
         private AIResourceManager resourceManager;
-        private SettlementManager cachedManager;
+        private AITileManager tileManager;
+        private Empire cachedManager;
         private bool ManagerIsDirty = true;
 
-        public SettlementManager Manager
+        public AITileManager TileManager
+        {
+            get
+            {
+                if(tileManager == null)
+                {
+                    tileManager = new AITileManager(this);
+                }
+                return tileManager;
+            }
+        }
+
+        public Empire Manager
         {
             get
             {
                 if (cachedManager== null || ManagerIsDirty)
                 {
-                    ManagerIsDirty = true;
+                  
+                    ManagerIsDirty = false;
                     UpdateController updateController = UpdateController.GetUpdateController;
                     FactionController factionController = updateController.FactionController;
 
                     cachedManager = factionController.GetOwnedSettlementManager(Faction);
                 }
                 return cachedManager;
+            }
+        }
+
+        public AISettlementManager AISettlementManager
+        {
+            get
+            {
+                return settlementManager;
             }
         }
 
@@ -62,9 +84,45 @@ namespace Empire_Rewritten.AI
             }
         }
 
-        public override void MakeMove()
+
+
+
+        public override void MakeMove(FactionController factionController)
         {
-            throw new NotImplementedException();
+            ResourceManager.DoModuleAction();
+            FacilityManager.DoModuleAction();
+            AISettlementManager.DoModuleAction();
+            TileManager.DoModuleAction();
+
+        }
+
+        int tick = 0;
+        public override bool ShouldExecute()
+        {
+            if (tick == 120)
+            {
+                tick = 0;
+                return true;
+            }
+            tick++;
+            return false;
+        }
+
+        public override void MakeThreadedMove(FactionController factionController)
+        {
+            Task.Run(AISettlementManager.DoThreadableAction);
+        }
+
+        int threadTick = 0;
+        public override bool ShouldExecuteThreaded()
+        {
+            if (threadTick == 2)
+            {
+                threadTick = 0;
+                return true;
+            }
+            threadTick++;
+            return false;
         }
     }
 }

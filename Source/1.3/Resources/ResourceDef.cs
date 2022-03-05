@@ -55,6 +55,16 @@ namespace Empire_Rewritten.Resources
 
         private bool hasCachedThingDefs = false;
 
+        /// <summary>
+        /// The AI will focus more on this resource if it's income is below this amount.
+        /// </summary>
+        public int desiredAIMinimum = 30;
+
+        /// <summary>
+        /// The AI will start trying to get rid of facilities and this resource if it produces more then this number.
+        /// </summary>
+        public int desiredAIMaximum = 50;
+
         public Graphic Graphic => iconData.Graphic;
 
         /// <summary>
