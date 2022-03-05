@@ -8,6 +8,8 @@ using Empire_Rewritten.Utils;
 using Verse;
 using Verse.Sound;
 using Empire_Rewritten.Resources;
+using Empire_Rewritten.Windows;
+using Empire_Rewritten.Utils.Misc;
 
 namespace Empire_Rewritten
 {
@@ -15,15 +17,23 @@ namespace Empire_Rewritten
     {
         [DebugAction("Empire", "Resource info window", false, false, allowedGameStates = AllowedGameStates.Entry)]
         public static void PatchNotesDisplayWindow() => Find.WindowStack.Add(new ResourceInfoWindow());
+
+        [DebugAction("Empire", "Facility info window", false, false, allowedGameStates = AllowedGameStates.Entry)]
+        public static void FacilityInfoWindow() => Find.WindowStack.Add(new FacilityInfoWindow());
     }
 
     public class ResourceInfoWindow : Window
     {
+        public ResourceInfoWindow()
+        {
+            resourceDefs = DefDatabase<ResourceDef>.AllDefsListForReading;
+        }
+
         //GUI.Group that can move everything
         private readonly static Rect rect_fullRect = new Rect(22f, 22f, 1202f, 592f);
 
         private readonly static Rect rect_DefIcon = new Rect(2f, 2f, 64f, 64f);
-        private readonly static Rect rect_DefSelector = new Rect(68f, 2f, 514f, 64f);
+        private readonly static Rect rect_DefSelector = new Rect(66f, 0f, 518f, 68f);
         private readonly static Rect rect_FullDefDesc = new Rect(2f, 86f, 580f, 240f);
         private readonly static Rect rect_DefDescValue = new Rect(0f, 0f, 570f, 24f);
 
@@ -44,7 +54,7 @@ namespace Empire_Rewritten
 
         private readonly static int borderSize = 2;
 
-        private List<ResourceDef> resources = null;
+        private List<ResourceDef> resourceDefs = null;
         private List<FloatMenuOption> cachedOptions = null;
         private Vector2 defDescScrollVector = new Vector2();
         private Vector2 scrollRectVector = new Vector2();
@@ -275,17 +285,7 @@ namespace Empire_Rewritten
         /// </summary>
         private void DrawDefSelectorButton()
         {
-            Text.Anchor = TextAnchor.MiddleCenter;
-            Text.Font = GameFont.Medium;
-
-            Widgets.DrawLightHighlight(rect_DefSelector);
-            Widgets.DrawHighlightIfMouseover(rect_DefSelector);
-            Widgets.Label(rect_DefSelector, defSelected?.label ?? "Empire_ResourceInfoWindowSelector".Translate());
-            rect_DefSelector.DrawBorderAroundRect(borderSize);
-
-            WindowHelper.ResetTextAndColor();
-
-            if (Widgets.ButtonInvisible(rect_DefSelector))
+            if (WindowHelper.DrawInfoScreenSelectorButton(rect_DefSelector, defSelected?.label ?? "Empire_ResourceInfoWindowSelector".Translate()))
             {
                 Find.WindowStack.Add(new FloatMenu(DefOptions));
             }
@@ -302,19 +302,7 @@ namespace Empire_Rewritten
         /// <returns>the list</returns>
         private List<FloatMenuOption> CreateFloatMenuOptions()
         {
-            resources = resources ?? (resources = DefDatabase<ResourceDef>.AllDefsListForReading);
-
-            List<FloatMenuOption> floatMenuOptions = new List<FloatMenuOption>();
-
-            foreach (ResourceDef def in resources)
-            {
-                floatMenuOptions.Add(new FloatMenuOption(def.label, delegate
-                {
-                    defSelected = def;
-                }));
-            }
-
-            return floatMenuOptions;
+            return FloatMenuOptionCreator.CreateFloatMenuOptions(resourceDefs, (def) => defSelected = def);
         }
     }
 }
