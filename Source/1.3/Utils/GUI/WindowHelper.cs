@@ -39,5 +39,27 @@ namespace Empire_Rewritten.Utils
             Text.Anchor = TextAnchor.UpperLeft;
             GUI.color = Color.white;
         }
+
+        /// <summary>
+        ///     Creates a <see cref="Widgets.ButtonInvisible(Rect, bool)"/> using a <paramref name="label"/>
+        ///     inside the given <paramref name="inRect"/>
+        /// </summary>
+        /// <param name="inRect"></param>
+        /// <param name="label"></param>
+        /// <returns><c>true</c> if the button is pressed, false otherwise</returns>
+        public static bool DrawInfoScreenSelectorButton(Rect inRect, string label)
+        {
+            Text.Anchor = TextAnchor.MiddleCenter;
+            Text.Font = GameFont.Medium;
+
+            Widgets.DrawLightHighlight(inRect);
+            Widgets.DrawHighlightIfMouseover(inRect);
+            Widgets.Label(inRect, label);
+            Widgets.DrawBox(inRect, 2);
+
+            ResetTextAndColor();
+
+            return Widgets.ButtonInvisible(inRect);
+        }
     }
 }
