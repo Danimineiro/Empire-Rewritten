@@ -44,10 +44,6 @@ namespace Empire_Rewritten
 
         private readonly static int borderSize = 2;
 
-        private static readonly GameFont prevFont = Text.Font;
-        private static readonly TextAnchor prevAnchor = Text.Anchor;
-        private static readonly Color prevColor = GUI.color;
-
         private List<ResourceDef> resources = null;
         private List<FloatMenuOption> cachedOptions = null;
         private Vector2 defDescScrollVector = new Vector2();
@@ -68,6 +64,7 @@ namespace Empire_Rewritten
             DrawDefSelectorButton();
             DrawDefContent();
             GUI.EndGroup();
+            WindowHelper.ResetTextAndColor();
         }
 
         /// <summary>
@@ -109,7 +106,7 @@ namespace Empire_Rewritten
             {
                 GUI.color = Color.red + Color.yellow;
                 Widgets.Label(rect, "Empire_ResourceInfoWindowCurveMissing".Translate());
-                ResetTextAndColor();
+                WindowHelper.ResetTextAndColor();
 
                 Widgets.DrawBoxSolid(rect, Color.black);
                 rect.DrawBorderAroundRect(borderSize);
@@ -148,7 +145,7 @@ namespace Empire_Rewritten
 
             Text.Anchor = TextAnchor.LowerLeft;
             Widgets.Label(tempLabelRect, $" {"Empire_ResourceInfoWindowEfficiency".Translate()} ");
-            ResetTextAndColor();
+            WindowHelper.ResetTextAndColor();
         }
 
         /// <summary>
@@ -188,7 +185,7 @@ namespace Empire_Rewritten
             }
 
             Widgets.EndScrollView();
-            ResetTextAndColor();
+            WindowHelper.ResetTextAndColor();
         }
 
         /// <summary>
@@ -221,7 +218,7 @@ namespace Empire_Rewritten
             DrawResourceValues(tempValuesRect, tempTex);
             rect_FullDefDesc.DrawBorderAroundRect(borderSize);
 
-            ResetTextAndColor();
+            WindowHelper.ResetTextAndColor();
         }
 
         /// <summary>
@@ -286,7 +283,7 @@ namespace Empire_Rewritten
             Widgets.Label(rect_DefSelector, defSelected?.label ?? "Empire_ResourceInfoWindowSelector".Translate());
             rect_DefSelector.DrawBorderAroundRect(borderSize);
 
-            ResetTextAndColor();
+            WindowHelper.ResetTextAndColor();
 
             if (Widgets.ButtonInvisible(rect_DefSelector))
             {
@@ -318,16 +315,6 @@ namespace Empire_Rewritten
             }
 
             return floatMenuOptions;
-        }
-
-        /// <summary>
-        /// Resets the Text.Font, Text.Anchor and GUI.color setting
-        /// </summary>
-        private static void ResetTextAndColor()
-        {
-            Text.Font = prevFont;
-            Text.Anchor = prevAnchor;
-            GUI.color = prevColor;
         }
     }
 }

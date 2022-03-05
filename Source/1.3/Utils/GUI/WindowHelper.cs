@@ -21,13 +21,23 @@ namespace Empire_Rewritten.Utils
         /// <param name="color"></param>
         public static void DrawBorderAroundRect(this Rect rect, int width = 1, Color? color = null)
         {
-            if (!(color is Color temp)) temp = GUI.color;
+            Color temp = color ?? GUI.color;
 
             Rect tempRect = rect.ExpandedBy(width);
             Color prev = GUI.color;
             GUI.color = temp;
             Widgets.DrawBox(tempRect, width);
             GUI.color = prev;
+        }
+
+        /// <summary>
+        ///     Resets the Text.Font, Text.Anchor and GUI.color setting
+        /// </summary>
+        public static void ResetTextAndColor()
+        {
+            Text.Font = GameFont.Small;
+            Text.Anchor = TextAnchor.UpperLeft;
+            GUI.color = Color.white;
         }
     }
 }
