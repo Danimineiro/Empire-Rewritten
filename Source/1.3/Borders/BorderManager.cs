@@ -48,10 +48,11 @@ namespace Empire_Rewritten.Borders
 
         public void ClaimTile(int id)
         {
-            
-            if(!BorderManager.GetBorderManager.AnyFactionOwnsTile(id)){
+
+            if (!BorderManager.GetBorderManager.AnyFactionOwnsTile(id))
+            {
                 tiles.Add(id);
-                Find.World.renderer.SetDirty<BorderDrawer>();
+                BorderDrawer.dirty = true;
             }
             
         }

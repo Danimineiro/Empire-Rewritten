@@ -8,9 +8,8 @@ namespace Empire_Rewritten.Borders
 {
     public class BorderDrawer : WorldLayer
     {
-        private bool dirty = true;
+        public static bool dirty = true;
         private Dictionary<Border,List<int>> tilesDrawnOn =new Dictionary<Border, List<int>>();
-        public new void SetDirty()=>dirty=true;
         protected override int Layer => base.Layer;
 
         public override IEnumerable Regenerate()

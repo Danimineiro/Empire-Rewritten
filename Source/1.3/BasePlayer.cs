@@ -59,7 +59,7 @@ namespace Empire_Rewritten {
         private static int tick = 0;
         private static bool DoPlayerTick()
         {
-            if (tick == 60)
+            if (tick == 2)
             {
                 tick = 0;
                 return true;
