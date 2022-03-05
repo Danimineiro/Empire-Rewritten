@@ -27,9 +27,7 @@ namespace Empire_Rewritten.Facilities
         }
 
         [UsedImplicitly]
-        public FacilityManager()
-        {
-        }
+        public FacilityManager() { }
 
 
         /// <summary>

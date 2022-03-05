@@ -18,9 +18,7 @@ namespace Empire_Rewritten.AI
         private bool updateCache = true;
         private bool updateDefCache = true;
 
-        public AIFacilityManager(AIPlayer player) : base(player)
-        {
-        }
+        public AIFacilityManager(AIPlayer player) : base(player) { }
 
         public bool CanMakeFacilities { get; private set; }
 

@@ -14,9 +14,7 @@ namespace Empire_Rewritten.Controllers
         ///     For saving/loading
         /// </summary>
         [UsedImplicitly]
-        public FactionCivicAndEthicData()
-        {
-        }
+        public FactionCivicAndEthicData() { }
 
         public FactionCivicAndEthicData(Faction faction, IEnumerable<CivicDef> civics, IEnumerable<EthicDef> ethics)
         {

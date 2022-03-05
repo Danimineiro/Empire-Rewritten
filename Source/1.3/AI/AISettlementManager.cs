@@ -11,9 +11,7 @@ namespace Empire_Rewritten.AI
 {
     public class AISettlementManager : AIModule
     {
-        public AISettlementManager(AIPlayer player) : base(player)
-        {
-        }
+        public AISettlementManager(AIPlayer player) : base(player) { }
 
         public bool CanUpgradeOrBuild { get; private set; }
 
@@ -116,8 +114,6 @@ namespace Empire_Rewritten.AI
             return t;
         }
 
-        public override void DoModuleAction()
-        {
-        }
+        public override void DoModuleAction() { }
     }
 }

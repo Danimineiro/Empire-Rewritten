@@ -23,9 +23,7 @@ namespace Empire_Rewritten.Facilities
         }
 
         [UsedImplicitly]
-        public Facility()
-        {
-        }
+        public Facility() { }
 
         public int FacilitiesInstalled => amount;
 

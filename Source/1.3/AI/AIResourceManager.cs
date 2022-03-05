@@ -15,9 +15,7 @@ namespace Empire_Rewritten.AI
         private readonly List<ResourceDef> criticalResources = new List<ResourceDef>();
         private AIPlayer parentPlayer;
 
-        public AIResourceManager(AIPlayer player) : base(player)
-        {
-        }
+        public AIResourceManager(AIPlayer player) : base(player) { }
 
         public bool HasCriticalResource => criticalResources.Count > 0;
 

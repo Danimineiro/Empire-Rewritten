@@ -7,9 +7,7 @@ namespace Empire_Rewritten.Resources.ResourceWorkers
     [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
     public class ResourceWorker_Rancher : ResourceWorker
     {
-        public ResourceWorker_Rancher(ThingFilter filter) : base(filter)
-        {
-        }
+        public ResourceWorker_Rancher(ThingFilter filter) : base(filter) { }
 
         /// <summary>
         ///     Allows all animals marked as <see cref="RaceProperties.Roamer" /> to be produced through ranching

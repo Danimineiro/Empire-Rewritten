@@ -22,9 +22,7 @@ namespace Empire_Rewritten.Controllers
         ///     Used for saving/loading
         /// </summary>
         [UsedImplicitly]
-        public FactionSettlementData()
-        {
-        }
+        public FactionSettlementData() { }
 
         /// <summary>
         ///     Supposed to be called when a <see cref="Faction" /> is created
