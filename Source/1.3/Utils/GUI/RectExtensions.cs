@@ -12,7 +12,7 @@ namespace Empire_Rewritten.Utils.GUI
         /// <returns>A copy of <paramref name="rect" />, moved by the distance specified in <paramref name="vec" /></returns>
         public static Rect MoveRect(this Rect rect, Vector2 vec)
         {
-            var newRect = new Rect(rect);
+            Rect newRect = new Rect(rect);
             newRect.position += vec;
             return newRect;
         }
@@ -26,7 +26,7 @@ namespace Empire_Rewritten.Utils.GUI
         /// <returns>A copy of <paramref name="rect" /> with its left edge moved to the left by <paramref name="scaleBy" /> units</returns>
         public static Rect ScaleX(this Rect rect, float scaleBy)
         {
-            var newRect = new Rect(rect);
+            Rect newRect = new Rect(rect);
             newRect.xMin -= scaleBy;
             return newRect;
         }

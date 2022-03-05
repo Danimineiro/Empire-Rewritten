@@ -78,7 +78,7 @@ namespace Empire_Rewritten.AI
             List<ResourceDef> lowResources = aIResourceManager.FindLowResources();
             List<ResourceDef> highResources = aIResourceManager.FindExcessResources();
 
-            var tileWeights = new Dictionary<float, List<Tile>>();
+            Dictionary<float, List<Tile>> tileWeights = new Dictionary<float, List<Tile>>();
             foreach (Tile tile in tiles)
             {
                 float weight = 0;

@@ -137,7 +137,7 @@ namespace Empire_Rewritten.Windows
 
             Rect tempLabelRect = rect.BottomPartPixels(rect.height / 12f);
 
-            var style = new SimpleCurveDrawerStyle
+            SimpleCurveDrawerStyle style = new SimpleCurveDrawerStyle
             {
                 DrawBackground = false,
                 DrawBackgroundLines = true,
@@ -184,7 +184,7 @@ namespace Empire_Rewritten.Windows
 
             for (int i = 0; i < thingDefs.Count; i++)
             {
-                var temp = new Rect(RectThingDefContainer);
+                Rect temp = new Rect(RectThingDefContainer);
                 temp.y += temp.height * i;
                 ThingDef current = thingDefs[i];
 
@@ -234,7 +234,7 @@ namespace Empire_Rewritten.Windows
             Rect tempDescRect = tempFullHeight.TopPartPixels(descHeight);
             Rect tempValuesRect = tempFullHeight.BottomPartPixels(tempFullHeight.height - descHeight - 5f);
 
-            var tempTex = new Rect(tempValuesRect.x, tempValuesRect.y, tempValuesRect.width - 17f, 15f * RectDefDescValue.height);
+            Rect tempTex = new Rect(tempValuesRect.x, tempValuesRect.y, tempValuesRect.width - 17f, 15f * RectDefDescValue.height);
 
             Widgets.Label(tempDescRect, $"{defSelected.description}");
 
@@ -336,7 +336,7 @@ namespace Empire_Rewritten.Windows
         {
             resources = resources ?? (resources = DefDatabase<ResourceDef>.AllDefsListForReading);
 
-            var floatMenuOptions = new List<FloatMenuOption>();
+            List<FloatMenuOption> floatMenuOptions = new List<FloatMenuOption>();
 
             foreach (ResourceDef def in resources)
             {

@@ -36,7 +36,7 @@ namespace Empire_Rewritten.AI
         /// <returns>Any resource below LowResourceDecider, or the lowest resource.</returns>
         public List<ResourceDef> FindLowResources()
         {
-            var result = new List<ResourceDef>();
+            List<ResourceDef> result = new List<ResourceDef>();
             Dictionary<ResourceDef, float> producedKnown = AllResourcesProduced();
             bool resourceBelowDecider = false;
             /* 
@@ -93,7 +93,7 @@ namespace Empire_Rewritten.AI
         /// <returns>Any resource below HighResourceDecider.</returns>
         public List<ResourceDef> FindExcessResources()
         {
-            var result = new List<ResourceDef>();
+            List<ResourceDef> result = new List<ResourceDef>();
             Dictionary<ResourceDef, float> producedknown = AllResourcesProduced();
 
             foreach (ResourceDef def in producedknown.Keys)
@@ -131,7 +131,7 @@ namespace Empire_Rewritten.AI
         public Dictionary<ResourceDef, float> AllResourcesProduced()
         {
             Dictionary<ResourceDef, ResourceModifier> modifiers = parentPlayer.Manager.ResourceModifiersFromAllFacilities();
-            var result = new Dictionary<ResourceDef, float>();
+            Dictionary<ResourceDef, float> result = new Dictionary<ResourceDef, float>();
             foreach (ResourceDef def in modifiers.Keys)
             {
                 ResourceModifier resourceModifier = modifiers[def];

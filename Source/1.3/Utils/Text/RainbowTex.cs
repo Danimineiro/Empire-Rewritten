@@ -28,7 +28,7 @@ namespace Empire_Rewritten.Utils.Text
         public static string Rainbowify(this string[] words, int change = 17, string joiner = " ", int maxLength = 1000)
         {
             if (joiner is null) joiner = string.Empty;
-            var final = new StringBuilder();
+            StringBuilder final = new StringBuilder();
 
             for (int i = 0; i < words.Length; i++)
             {

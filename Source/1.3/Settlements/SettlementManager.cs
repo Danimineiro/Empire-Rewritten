@@ -43,7 +43,7 @@ namespace Empire_Rewritten.Settlements
         /// </returns>
         public Dictionary<ResourceDef, ResourceModifier> ResourceModifiersFromAllFacilities()
         {
-            var resourceModifiers = new Dictionary<ResourceDef, ResourceModifier>();
+            Dictionary<ResourceDef, ResourceModifier> resourceModifiers = new Dictionary<ResourceDef, ResourceModifier>();
 
             foreach (ResourceModifier resourceModifier in settlements.Values.SelectMany(facilityManager => facilityManager.Modifiers))
             {
@@ -67,7 +67,7 @@ namespace Empire_Rewritten.Settlements
         /// <param name="settlement">The <see cref="Settlement" /> to add</param>
         public void AddSettlement(Settlement settlement)
         {
-            var tracker = new FacilityManager(settlement);
+            FacilityManager tracker = new FacilityManager(settlement);
             settlements.Add(settlement, tracker);
         }
 

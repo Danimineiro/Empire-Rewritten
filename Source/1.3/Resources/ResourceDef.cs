@@ -109,7 +109,7 @@ namespace Empire_Rewritten.Resources
             ResourceModifier biomeModifier = GetBiomeModifier(tile);
             result *= tempVal * heightVal * biomeModifier.multiplier * swampinessVal * rainfallVal;
 
-            var modifer = new ResourceModifier(this, biomeModifier.offset, result);
+            ResourceModifier modifer = new ResourceModifier(this, biomeModifier.offset, result);
 
 
             return modifer;
@@ -155,13 +155,13 @@ namespace Empire_Rewritten.Resources
             if (!biomeModifiers.NullOrEmpty() && biomeModifiers.Any(x => x.biome == biome))
             {
                 BiomeModifier biomeModifier = biomeModifiers.Find(x => x.biome == biome);
-                var modifier = new ResourceModifier(this, biomeModifier.offset, biomeModifier.multiplier);
+                ResourceModifier modifier = new ResourceModifier(this, biomeModifier.offset, biomeModifier.multiplier);
                 cachedBiomeModifiers.Add(biome, modifier);
                 return modifier;
             }
             else
             {
-                var modifier = new ResourceModifier(this);
+                ResourceModifier modifier = new ResourceModifier(this);
                 cachedBiomeModifiers.Add(biome, modifier);
                 return modifier;
             }

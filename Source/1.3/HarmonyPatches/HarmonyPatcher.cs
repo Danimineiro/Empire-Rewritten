@@ -11,7 +11,7 @@ namespace Empire_Rewritten.HarmonyPatches
         /// </summary>
         public static void DoPatches()
         {
-            var harmony = new Harmony("EmpireRewritten.HarmonyPatches");
+            Harmony harmony = new Harmony("EmpireRewritten.HarmonyPatches");
 
             harmony.Patch(typeof(Settlement).GetMethod(nameof(Settlement.GetGizmos)), null, new HarmonyMethod(typeof(SettlementGizmoPatch), nameof(SettlementGizmoPatch.GizmoPatch)));
 

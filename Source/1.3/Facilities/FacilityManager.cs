@@ -80,7 +80,7 @@ namespace Empire_Rewritten.Facilities
         /// </summary>
         private void UpdateModiferCache()
         {
-            var calculatedModifiers = new Dictionary<ResourceDef, ResourceModifier>();
+            Dictionary<ResourceDef, ResourceModifier> calculatedModifiers = new Dictionary<ResourceDef, ResourceModifier>();
 
             foreach (ResourceModifier modifier in installedFacilities.Values.SelectMany(facility => facility.ResourceModifiers))
             {

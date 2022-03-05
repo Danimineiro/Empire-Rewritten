@@ -25,7 +25,7 @@ namespace Empire_Rewritten.AI
                 if (cachedManager == null || ManagerIsDirty)
                 {
                     ManagerIsDirty = true;
-                    var updateController = UpdateController.CurrentWorldInstance;
+                    UpdateController updateController = UpdateController.CurrentWorldInstance;
                     FactionController factionController = updateController.FactionController;
 
                     cachedManager = factionController.GetOwnedSettlementManager(Faction);
