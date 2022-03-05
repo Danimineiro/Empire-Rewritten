@@ -22,9 +22,7 @@ namespace Empire_Rewritten.Controllers
         ///     Needed for loading
         /// </summary>
         [UsedImplicitly]
-        public FactionController()
-        {
-        }
+        public FactionController() { }
 
         /// <summary>
         ///     Creates a new <see cref="FactionController" />, telling it which <see cref="FactionSettlementData" /> it is

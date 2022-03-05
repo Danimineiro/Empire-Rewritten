@@ -12,9 +12,8 @@ namespace Empire_Rewritten.Controllers
     [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
     public class UpdateController : WorldComponent
     {
-        private readonly List<UpdateControllerAction> Actions = new List<UpdateControllerAction>();
-
         private static readonly List<Action<FactionController>> FinalizeInitHooks = new List<Action<FactionController>>();
+        private readonly List<UpdateControllerAction> Actions = new List<UpdateControllerAction>();
 
         private FactionController factionController;
 

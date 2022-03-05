@@ -1,5 +1,5 @@
-﻿using JetBrains.Annotations;
-using System;
+﻿using System;
+using JetBrains.Annotations;
 using Verse;
 
 namespace Empire_Rewritten.Controllers
@@ -11,7 +11,7 @@ namespace Empire_Rewritten.Controllers
         /// <summary>
         ///     How often this <see cref="UpdateControllerAction" /> has been executed so far.
         /// </summary>
-        public int useCounter = 0;
+        public int useCounter;
 
         /// <summary>
         ///     Constructs a new <see cref="UpdateControllerAction" /> that executes a given <see cref="Action{T}" /> if conditions
@@ -98,7 +98,7 @@ namespace Empire_Rewritten.Controllers
 
         /// <summary>
         ///     Decides if the <seealso cref="UpdateControllerAction.action" /> can be discarded
-        ///     Uses <see cref="UpdateControllerAction.shouldDiscard"/> if available
+        ///     Uses <see cref="UpdateControllerAction.shouldDiscard" /> if available
         /// </summary>
         private Func<bool> ShouldDiscard { get; }
 
@@ -108,9 +108,15 @@ namespace Empire_Rewritten.Controllers
         /// </summary>
         private Func<bool> ShouldExecute { get; }
 
-        private Func<bool> ShouldDiscardDefault(int maxExecutions) => () => maxExecutions > 0 && useCounter >= maxExecutions;
+        private Func<bool> ShouldDiscardDefault(int maxExecutions)
+        {
+            return () => maxExecutions > 0 && useCounter >= maxExecutions;
+        }
 
-        private Func<bool> ShouldExecuteDefault(int tickInterval) => () => Find.TickManager.TicksGame % tickInterval == 0;
+        private Func<bool> ShouldExecuteDefault(int tickInterval)
+        {
+            return () => Find.TickManager.TicksGame % tickInterval == 0;
+        }
 
         /// <summary>
         ///     Tries to run the <see cref="UpdateControllerAction.action" /> if conditions are met.
