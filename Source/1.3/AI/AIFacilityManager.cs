@@ -76,7 +76,7 @@ namespace Empire_Rewritten.AI
         /// <returns></returns>
         public bool BuildNewFacility(FacilityDef facilityDef)
         {
-            var hasRemovedAll = true;
+            bool hasRemovedAll = true;
             KeyValuePair<Settlement, FacilityManager> settlementAndManager = player.Manager.Settlements.First(x => x.Value.CanBuildAt(facilityDef));
 
             FacilityManager manager = settlementAndManager.Value;

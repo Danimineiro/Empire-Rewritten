@@ -50,7 +50,7 @@ namespace Empire_Rewritten.AI
             Settlement settlement = settlementAndManager.Key;
             FacilityManager facilityManager = settlementAndManager.Value;
             bool UpgradedSettlement = AttemptToUpgradeSettlement(facilityManager);
-            var BuiltSettlement = false;
+            bool BuiltSettlement = false;
             if (!UpgradedSettlement) BuiltSettlement = AttemptBuildNewSettlement();
 
             CanUpgradeOrBuild = UpgradedSettlement || BuiltSettlement;

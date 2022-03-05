@@ -182,7 +182,7 @@ namespace Empire_Rewritten.Windows
             rectScrollView.height = thingDefs.Count * RectThingDefContainer.height;
             Widgets.BeginScrollView(RectScrollRect, ref scrollRectVector, rectScrollView);
 
-            for (var i = 0; i < thingDefs.Count; i++)
+            for (int i = 0; i < thingDefs.Count; i++)
             {
                 var temp = new Rect(RectThingDefContainer);
                 temp.y += temp.height * i;
@@ -276,7 +276,7 @@ namespace Empire_Rewritten.Windows
         /// <param name="valueOffset">offsets the block</param>
         private void DrawResourceValueBlock(bool isOffset, int valueOffset = 0)
         {
-            for (var i = 0; i < 7; i++)
+            for (int i = 0; i < 7; i++)
             {
                 string addOrMultiply = $"Empire_ResourceInfoWindow{(isOffset ? "Additively" : "Multiplicatively")}".TranslateSimple();
 

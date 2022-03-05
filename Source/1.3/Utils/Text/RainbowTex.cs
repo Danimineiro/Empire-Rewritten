@@ -30,7 +30,7 @@ namespace Empire_Rewritten.Utils.Text
             if (joiner is null) joiner = string.Empty;
             var final = new StringBuilder();
 
-            for (var i = 0; i < words.Length; i++)
+            for (int i = 0; i < words.Length; i++)
             {
                 string word = words[i];
                 // If word would overflow maxLength, stop
@@ -95,10 +95,10 @@ namespace Empire_Rewritten.Utils.Text
         /// </returns>
         private static string[] SplitString(string str, int splitSize = 1)
         {
-            var splitArray = new string[str.Length / splitSize + 1];
+            string[] splitArray = new string[str.Length / splitSize + 1];
             splitSize = Math.Max(splitSize, 1);
 
-            for (var i = 0; i < splitArray.Length; i++)
+            for (int i = 0; i < splitArray.Length; i++)
             {
                 if ((i + 1) * splitSize > str.Length)
                 {

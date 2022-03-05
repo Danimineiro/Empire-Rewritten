@@ -38,7 +38,7 @@ namespace Empire_Rewritten.AI
         {
             var result = new List<ResourceDef>();
             Dictionary<ResourceDef, float> producedKnown = AllResourcesProduced();
-            var resourceBelowDecider = false;
+            bool resourceBelowDecider = false;
             /* 
              Since producedknown is only useful if the AI produces the def
             the calculation checks against all ResourceDefs in the database
@@ -70,7 +70,7 @@ namespace Empire_Rewritten.AI
                 This isn't perfect, however it should catch most things.
                  */
                 float lowest = 0;
-                var first = true;
+                bool first = true;
                 foreach (ResourceDef def in producedKnown.Keys)
                 {
                     if (producedKnown[def] <= lowest || lowest == 0 && first)
