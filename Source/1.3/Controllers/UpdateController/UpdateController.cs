@@ -1,121 +1,128 @@
-﻿using RimWorld.Planet;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
+using RimWorld.Planet;
 using Verse;
 
-namespace Empire_Rewritten
+namespace Empire_Rewritten.Controllers
 {
     /// <summary>
-    /// The "Main" function of the mod, updates other modules and components occasionally
+    ///     The "Main" function of the mod, updates other modules and components occasionally
     /// </summary>
+    [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
     public class UpdateController : WorldComponent
     {
-        private FactionController factionController;
-        private readonly List<UpdateControllerAction> actions = new List<UpdateControllerAction>();
-        private static readonly List<Action<FactionController>> finalizeInitHooks = new List<Action<FactionController>>();
-        private static UpdateController updateControllerCached;
+        private static readonly List<Action<FactionController>> FinalizeInitHooks = new List<Action<FactionController>>();
+        private readonly List<UpdateControllerAction> Actions = new List<UpdateControllerAction>();
 
-        /// <summary>
-        /// Required Constructor
-        /// </summary>
-        /// <param name="world"></param>
-        public UpdateController(World world) : base(world) 
+        private FactionController factionController;
+
+        public UpdateController(World world) : base(world)
         {
-            updateControllerCached = this;
+            // TODO: Cry if someone installs SoS2
+            CurrentWorldInstance = this;
         }
 
         /// <summary>
-        /// Returns true if there is a FactionController, false otherwise
+        ///     Whether <see cref="UpdateController.factionController" /> is set
         /// </summary>
         internal bool HasFactionController => factionController != null;
 
         /// <summary>
-        /// Sets the FactionController, if it doesn't exist already
+        ///     Sets the <see cref="UpdateController.factionController" />, if it doesn't exist already
         /// </summary>
-        internal FactionController FactionController 
+        internal FactionController FactionController
         {
             set
             {
                 if (HasFactionController)
                 {
-                    Log.Error("factionController is already set, skipping assignment");
+                    Log.Warning("factionController is already set, skipping assignment");
                     return;
                 }
 
                 factionController = value;
             }
-            get
-            {
-                return factionController;
-            }
-        }
-
-        public static UpdateController GetUpdateController => updateControllerCached;
-
-        /// <summary>
-        /// Registers an <paramref name="updateCall"/> to be called whenever <paramref name="shouldExecute"/> is true
-        /// </summary>
-        /// <param name="updateCall"></param>
-        /// <param name="shouldExecute"></param>
-        public void AddUpdateCall(Action<FactionController> updateCall, Func<bool> shouldExecute)
-        {
-            actions.Add(new UpdateControllerAction(updateCall, shouldExecute));
+            get => factionController;
         }
 
         /// <summary>
-        /// Registers an <paramref name="action"/> to be called as determined by its internal functions
+        ///     Static instance of <see cref="UpdateController" />
         /// </summary>
-        /// <param name="action"></param>
-        public void AddUpdateCall(UpdateControllerAction action)
+        public static UpdateController CurrentWorldInstance { get; private set; }
+
+        /// <summary>
+        ///     Registers a new <see cref="UpdateControllerAction" />
+        /// </summary>
+        /// <param name="updateCall">
+        ///     An <see cref="Action{T}" /> that gets called when the <see cref="UpdateControllerAction" /> should be executed.
+        ///     Takes a single <see cref="FactionController" /> as parameter.
+        /// </param>
+        /// <param name="shouldExecute">
+        ///     A <see cref="Func{T}" /> that returns whether the <see cref="UpdateControllerAction" />
+        ///     should be executed.
+        /// </param>
+        public void AddUpdateCall([NotNull] Action<FactionController> updateCall, [NotNull] Func<bool> shouldExecute)
         {
-            actions.Add(action);
+            Actions.Add(new UpdateControllerAction(updateCall, shouldExecute));
         }
 
         /// <summary>
-        /// Registers an <paramref name="action"/> to be called after world generation
+        ///     Registers an <see cref="UpdateControllerAction" /> to be called as determined by its
+        ///     <see cref="UpdateControllerAction.ShouldExecute" /> method
         /// </summary>
-        /// <param name="action"></param>
-        public static void AddFinalizeInitHook(Action<FactionController> action)
+        /// <param name="action">The <see cref="UpdateControllerAction" /> to be added</param>
+        public void AddUpdateCall([NotNull] UpdateControllerAction action)
         {
-            if (GetUpdateController != null)
+            Actions.Add(action);
+        }
+
+        /// <summary>
+        ///     Registers an <see cref="Action{T}" /> to be called after world generation
+        /// </summary>
+        /// <param name="action">
+        ///     The <see cref="Action{T}" /> to call after world gen; takes a single
+        ///     <see cref="FactionController" /> as parameter
+        /// </param>
+        public static void AddFinalizeInitHook([NotNull] Action<FactionController> action)
+        {
+            if (CurrentWorldInstance != null)
             {
                 Log.Warning("Tried to add a FinalizeInitHook after WorldComp was already created! Skipping...");
                 return;
             }
 
-            finalizeInitHooks.Add(action);
+            FinalizeInitHooks.Add(action);
         }
 
         /// <summary>
-        /// Registers <paramref name="actions"/> to be called after world generation
+        ///     Registers multiple <see cref="Action{T}" /> to be called after world generation
         /// </summary>
-        /// <param name="actions"></param>
-        public static void AddFinalizeInitHooks(IEnumerable<Action<FactionController>> actions)
+        /// <param name="actions">
+        ///     An <see cref="IEnumerable{T}" /> of <see cref="Action{T}" /> to call after world gen;
+        ///     The actions take a single <see cref="FactionController" /> as parameter
+        /// </param>
+        public static void AddFinalizeInitHooks([NotNull] IEnumerable<Action<FactionController>> actions)
         {
-            foreach (var action in actions) AddFinalizeInitHook(action);
+            FinalizeInitHooks.AddRange(actions);
         }
 
         /// <summary>
-        /// Calls each registered Action when the current game tick is devisible by the int it was saved with
+        ///     Calls each registered <see cref="UpdateControllerAction" />, removing the ones that
+        ///     <see cref="UpdateControllerAction.ShouldDiscard">should be discarded</see> afterwards
         /// </summary>
         public override void WorldComponentTick()
         {
-            for (int i = 0; i < actions.Count; i++)
+            Actions.RemoveAll(updateControllerAction =>
             {
-                UpdateControllerAction action = actions[i];
-                if (action.ShouldExecute.Invoke())
-                {
-                    action.Action.Invoke(factionController);
-                    Log.Message(action.ToString());
-                }
-            }
-
-            actions.RemoveAll(action => action.ShouldDiscard);
+                updateControllerAction.TryExecute(factionController, out bool shouldDiscard);
+                return shouldDiscard;
+            });
         }
 
         public override void FinalizeInit()
         {
-            finalizeInitHooks.ForEach(action => action.Invoke(factionController));
+            FinalizeInitHooks.ForEach(action => action(factionController));
         }
 
         public override void ExposeData()

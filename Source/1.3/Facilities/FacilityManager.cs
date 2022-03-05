@@ -1,101 +1,55 @@
-﻿using Empire_Rewritten.Resources;
-using RimWorld.Planet;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Empire_Rewritten.Resources;
+using JetBrains.Annotations;
+using RimWorld.Planet;
 using Verse;
 
-namespace Empire_Rewritten
+namespace Empire_Rewritten.Facilities
 {
     /// <summary>
-    /// This manages all the facilities for a settlement.
-    /// It also manages the resource modifiers from each facility.
+    ///     This manages all the <see cref="Facility">Facilities</see> for a <see cref="Settlement" />.
+    ///     It also manages the <see cref="ResourceModifier">ResourceModifiers</see> from each <see cref="Facility" />.
     /// </summary>
     public class FacilityManager : IExposable
     {
-        private Dictionary<FacilityDef,Facility> installedFacilities = new Dictionary<FacilityDef, Facility>();
-        private Settlement settlement;
+        private readonly List<Gizmo> gizmos = new List<Gizmo>();
         private List<ResourceModifier> cachedModifiers = new List<ResourceModifier>();
-        bool RefreshModifiers = true;
-        bool RefreshGizmos = true;
-        List<Gizmo> gizmos = new List<Gizmo>();
+        private Dictionary<FacilityDef, Facility> installedFacilities = new Dictionary<FacilityDef, Facility>();
+        private bool refreshGizmos = true;
+        private bool refreshModifiers = true;
+        private Settlement settlement;
 
         public FacilityManager(Settlement settlement)
         {
             this.settlement = settlement;
         }
 
-        public FacilityManager()
-        {
-          
-        }
-
-        /// <summary>
-        /// Get gizmos from all facilities in the settlement.
-        /// </summary>
-        public IEnumerable<Gizmo> GetGizmos()
-        {
-            if (RefreshModifiers)
-            {
-                RefreshModifiers = false;
-                foreach(FacilityDef facilityDef in installedFacilities.Keys.ToList())
-                {
-                    if(facilityDef.facilityWorker!= null )
-                    {
-                        FacilityWorker worker = (FacilityWorker)Activator.CreateInstance(facilityDef.facilityWorker);
-                        List<Gizmo> newGizmos = (List<Gizmo>)worker.GetGizmos();
-                        foreach(Gizmo gizmo in newGizmos)
-                        {
-                            gizmos.Add(gizmo);
-                        }
-                    }
-                }
-            }
-            return gizmos;
-        }
-
-        /// <summary>
-        /// Update the ResourceModifierCache when called.
-        /// </summary>
-        private void UpdateModiferCache()
-        {
-            Dictionary<ResourceDef, ResourceModifier> calculatedModifers = new Dictionary<ResourceDef, ResourceModifier>();
-            foreach (Facility facility in installedFacilities.Values.ToList())
-            {
-                foreach (ResourceModifier modifier in facility.ResourceModifiers)
-                {
-                    if (calculatedModifers.ContainsKey(modifier.def))
-                    {
-                        ResourceModifier newModifier = calculatedModifers[modifier.def].MergeWithModifier(modifier);
-                        calculatedModifers[modifier.def] = newModifier;
-                    }
-                    else
-                    {
-                        calculatedModifers.Add(modifier.def, modifier);
-                    }
-                }
-            }
-            cachedModifiers = calculatedModifers.Values.ToList();
-        }
+        [UsedImplicitly]
+        public FacilityManager() { }
 
 
         /// <summary>
-        /// Get all ResourceModifiers from installed facilities.
+        ///     All <see cref="ResourceModifier">ResourceModifiers</see> from installed <see cref="Facility">Facilities</see>.
         /// </summary>
-        public List<ResourceModifier> modifiers
+        public IEnumerable<ResourceModifier> Modifiers
         {
             get
             {
-                if (RefreshModifiers)
-                {
-                    UpdateModiferCache();
-                    RefreshModifiers = false;
-                }
+                if (!refreshModifiers) return cachedModifiers;
+
+                UpdateModiferCache();
+                refreshModifiers = false;
+
                 return cachedModifiers;
             }
         }
+
+        /// <summary>
+        ///     Installed <see cref="FacilityDef">FacilityDefs</see>
+        /// </summary>
+        public IEnumerable<FacilityDef> FacilityDefsInstalled => installedFacilities.Keys;
 
 
         public void ExposeData()
@@ -105,81 +59,114 @@ namespace Empire_Rewritten
         }
 
         /// <summary>
-        /// Set gizmos and resourcemodifiers to be refreshed when called for.
+        ///     Gets the <see cref="Gizmo">Gizmos</see> for all active <see cref="Facility">Facilities</see> in this
+        ///     <see cref="FacilityManager" />
         /// </summary>
-        /// <param name="refreshGizmos">Refresh gizmos alongside resourcemodifiers</param>
-        public void SetDataDirty(bool refreshGizmos = false)
+        /// <returns>Every <see cref="Facility" />'s <see cref="Gizmo">Gizmos</see></returns>
+        public IEnumerable<Gizmo> GetGizmos()
         {
-            RefreshGizmos = refreshGizmos;
-            RefreshModifiers = true;
+            if (!refreshModifiers) return gizmos;
+            refreshModifiers = false;
+
+            gizmos.Clear();
+            gizmos.AddRange(installedFacilities.Keys.Where(facilityDef => facilityDef.facilityWorker != null)
+                                               .SelectMany(facilityDef => ((FacilityWorker)Activator.CreateInstance(facilityDef.facilityWorker)).GetGizmos()));
+
+            return gizmos;
         }
-        
-        
-        
-        
+
         /// <summary>
-        /// Used for building a new facility on the settlement.
+        ///     Refreshes the <see cref="ResourceModifier" /> cache.
         /// </summary>
-        /// <param name="facilityDef"></param>
+        private void UpdateModiferCache()
+        {
+            Dictionary<ResourceDef, ResourceModifier> calculatedModifiers = new Dictionary<ResourceDef, ResourceModifier>();
+
+            foreach (ResourceModifier modifier in installedFacilities.Values.SelectMany(facility => facility.ResourceModifiers))
+            {
+                if (calculatedModifiers.ContainsKey(modifier.def))
+                {
+                    ResourceModifier newModifier = calculatedModifiers[modifier.def].MergeWithModifier(modifier);
+                    calculatedModifiers[modifier.def] = newModifier;
+                }
+                else
+                {
+                    calculatedModifiers.Add(modifier.def, modifier);
+                }
+            }
+
+            cachedModifiers = calculatedModifiers.Values.ToList();
+        }
+
+        /// <summary>
+        ///     Invalidates cached <see cref="Gizmo">Gizmos</see> and <see cref="ResourceModifier">ResourceModifiers</see>
+        /// </summary>
+        /// <param name="shouldRefreshGizmos">
+        ///     Refresh <see cref="FacilityManager.gizmos" /> alongside
+        ///     <see cref="FacilityManager.cachedModifiers" />
+        /// </param>
+        public void SetDataDirty(bool shouldRefreshGizmos = false)
+        {
+            refreshGizmos = shouldRefreshGizmos;
+            refreshModifiers = true;
+        }
+
+
+        /// <summary>
+        ///     Adds a new <see cref="Facility" /> of a given <see cref="FacilityDef" /> to this <see cref="FacilityManager" />'s
+        ///     <see cref="FacilityManager.settlement" />
+        /// </summary>
+        /// <param name="facilityDef">The <see cref="FacilityDef" /> to add</param>
         public void AddFacility(FacilityDef facilityDef)
         {
-            bool facilityChange = false;
             if (installedFacilities.ContainsKey(facilityDef))
             {
                 installedFacilities[facilityDef].AddFacility();
             }
             else
             {
-                facilityChange = true;
                 installedFacilities.Add(facilityDef, new Facility(facilityDef, settlement));
+                SetDataDirty(true);
             }
-            SetDataDirty(facilityChange);
-          
         }
 
+        /// <summary>
+        ///     Removes a new <see cref="Facility" /> of a given <see cref="FacilityDef" /> from this
+        ///     <see cref="FacilityManager" />'s <see cref="FacilityManager.settlement" />
+        /// </summary>
+        /// <param name="facilityDef">The <see cref="FacilityDef" /> to remove</param>
         public void RemoveFacility(FacilityDef facilityDef)
         {
-            bool facilityChange = false;
-            if (installedFacilities.ContainsKey(facilityDef))
+            if (!installedFacilities.ContainsKey(facilityDef)) return;
+
+            installedFacilities[facilityDef].RemoveFacility();
+            if (installedFacilities[facilityDef].FacilitiesInstalled <= 0)
             {
-                installedFacilities[facilityDef].RemoveFacility();
-                if (installedFacilities[facilityDef].FacilitiesInstalled <= 0)
-                {
-                    facilityChange=true;
-                    installedFacilities.Remove(facilityDef);
-                }
-                SetDataDirty(facilityChange);
+                installedFacilities.Remove(facilityDef);
+                SetDataDirty(true);
             }
         }
-       
+
         /// <summary>
-        /// Can this be built here?
+        ///     Checks whether a given <see cref="FacilityDef" /> can be built at this <see cref="FacilityManager" />
         /// </summary>
-        /// <returns></returns>
+        /// <param name="facilityDef">The <see cref="FacilityDef" /> to check</param>
+        /// <returns>Whether <paramref name="facilityDef" /> can be built here</returns>
         public bool CanBuildAt(FacilityDef facilityDef)
         {
+            // TODO: Add proper logic here.
             return true;
         }
 
         /// <summary>
-        /// Has a facility of facilityDef
+        ///     Checks whether this <see cref="FacilityManager" /> has a <see cref="Facility" /> of a given
+        ///     <see cref="FacilityDef" />
         /// </summary>
-        /// <param name="facilityDef"></param>
-        /// <returns></returns>
+        /// <param name="facilityDef">The <see cref="FacilityDef" /> to check for</param>
+        /// <returns>Whether <paramref name="facilityDef" /> is installed here</returns>
         public bool HasFacility(FacilityDef facilityDef)
         {
             return installedFacilities.ContainsKey(facilityDef);
-        }
-
-        /// <summary>
-        /// Installed facilitydefs
-        /// </summary>
-        public IEnumerable<FacilityDef> FacilityDefsInsalled
-        {
-            get
-            {
-                return installedFacilities.Keys;
-            }
         }
     }
 }

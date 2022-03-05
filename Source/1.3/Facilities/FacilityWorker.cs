@@ -1,20 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Verse;
 
-namespace Empire_Rewritten
+namespace Empire_Rewritten.Facilities
 {
     /// <summary>
-    /// Used to define actions for facility types.
+    ///     Used to define actions for facility types.
     /// </summary>
-    public class FacilityWorker
+    public abstract class FacilityWorker
     {
         public virtual IEnumerable<Gizmo> GetGizmos()
         {
-            yield return null;
+            return Enumerable.Empty<Gizmo>();
         }
     }
 }

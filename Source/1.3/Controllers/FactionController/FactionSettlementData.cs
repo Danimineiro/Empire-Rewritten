@@ -1,72 +1,66 @@
-﻿using RimWorld;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Empire_Rewritten.Settlements;
+using JetBrains.Annotations;
+using RimWorld;
 using Verse;
 
-namespace Empire_Rewritten
+namespace Empire_Rewritten.Controllers
 {
     /// <summary>
-    /// This class links a Faction and it's settlements through a SettlementManager 
+    ///     Links a <see cref="Faction" /> and its <see cref="RimWorld.Planet.Settlement" /> through a
+    ///     <see cref="SettlementManager" />
     /// </summary>
     public class FactionSettlementData : IExposable
     {
-        /// <summary>
-        /// Used for saving/loading
-        /// </summary>
-        public FactionSettlementData() { }
-
-        /// <summary>
-        /// Creates a new <c>FactionSettlementData</c> struct.
-        /// Saves <paramref name="owner"/> into the <code>owner</code> and <code>originalOwner</code> field; saves <paramref name="settlementManager"/> into the <code>settlementManager field</code>
-        /// Supposed to be called when a faction is created
-        /// </summary>
-        /// <param name="owner"></param>
-        /// <param name="settlementManager"></param>
-        public FactionSettlementData(Faction owner, SettlementManager settlementManager)
-        {
-            this.owner = owner;
-            this.originalOwner = owner; 
-            this.settlementManager = settlementManager;
-        }
+        private Faction originalOwner;
 
         public Faction owner;
-        private Faction originalOwner;
         private SettlementManager settlementManager;
 
         /// <summary>
-        /// Returns the original Owner, shouldn't ever be changed
+        ///     Used for saving/loading
+        /// </summary>
+        [UsedImplicitly]
+        public FactionSettlementData() { }
+
+        /// <summary>
+        ///     Supposed to be called when a <see cref="Faction" /> is created
+        /// </summary>
+        /// <param name="owner">The <see cref="Faction" /> that this <see cref="FactionSettlementData" /> belongs to</param>
+        /// <param name="settlementManager">
+        ///     The <see cref="SettlementManager" /> of this <see cref="FactionSettlementData" />
+        /// </param>
+        public FactionSettlementData(Faction owner, SettlementManager settlementManager)
+        {
+            this.owner = owner;
+            originalOwner = owner;
+            this.settlementManager = settlementManager;
+        }
+
+        /// <summary>
+        ///     The <see cref="Faction" /> that originally created this <see cref="FactionSettlementData" />
+        ///     Should never change
         /// </summary>
         public Faction OriginalOwner => originalOwner;
 
-        /// <summary>
-        /// Returns the SettlementManager, shouldn't ever be changed
-        /// </summary>
         public SettlementManager SettlementManager => settlementManager;
-
-
-        /// <summary>
-        /// Creates all required FactionSettlementDatas
-        /// </summary>
-        /// <returns>the FactionSettlementDatas</returns>
-        internal static List<FactionSettlementData> CreateFactionSettlementDatas()
-        {
-            List<FactionSettlementData> factionSettlementDatas = new List<FactionSettlementData>();
-            foreach (Faction faction in Find.FactionManager.AllFactionsListForReading)
-            {
-                factionSettlementDatas.Add(new FactionSettlementData(faction, new SettlementManager()));
-            }
-
-            return factionSettlementDatas;
-        }
 
         public void ExposeData()
         {
-            Scribe_References.Look(ref owner, "Owner");
+            Scribe_References.Look(ref owner, "owner");
             Scribe_References.Look(ref originalOwner, "originalOwner");
             Scribe_Deep.Look(ref settlementManager, "settlementManager");
+        }
+
+
+        /// <summary>
+        ///     Creates all required instances of <see cref="FactionSettlementData" />
+        /// </summary>
+        /// <returns>A <see cref="List{T}" /> of the newly created <see cref="FactionSettlementData" /> instances</returns>
+        internal static List<FactionSettlementData> CreateFactionSettlementData()
+        {
+            return Find.FactionManager.AllFactionsListForReading.Select(faction => new FactionSettlementData(faction, new SettlementManager())).ToList();
         }
 
         public override string ToString()

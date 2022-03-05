@@ -1,75 +1,57 @@
-﻿using Empire_Rewritten.Resources;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Empire_Rewritten.Resources;
 using Verse;
+
+// Also looks very "TODO", document later
 
 namespace Empire_Rewritten.AI
 {
     public class AIResourceManager : AIModule
     {
-        private static List<ResourceDef> cachedDefs = new List<ResourceDef>();
+        private const int HighResourceDecider = 50;
+        private const int LowResourceDecider = 30;
+        private static List<ResourceDef> _cachedDefs = new List<ResourceDef>();
+
+        private readonly List<ResourceDef> criticalResources = new List<ResourceDef>();
         private AIPlayer parentPlayer;
 
-        private List<ResourceDef> criticalResources = new List<ResourceDef>();
-        private int LowResourceDecider=30;
-        private int HighResourceDecider = 50;
+        public AIResourceManager(AIPlayer player) : base(player) { }
 
-        public bool HasCriticalResource
+        public bool HasCriticalResource => criticalResources.Count > 0;
+
+        private static List<ResourceDef> AllResourceDefs
         {
             get
             {
-                return criticalResources.Count > 0;
+                if (_cachedDefs.NullOrEmpty()) _cachedDefs = DefDatabase<ResourceDef>.AllDefsListForReading;
+                return _cachedDefs;
             }
         }
-
-        public AIResourceManager(AIPlayer player) : base(player)
-        {
-        }
-
-        private List<ResourceDef> FindAllResourceDefs
-        {
-            get
-            {
-                if (cachedDefs.NullOrEmpty())
-                {
-                    cachedDefs = DefDatabase<ResourceDef>.AllDefsListForReading;
-                }
-                return cachedDefs;
-            }
-        }
-
-        
 
 
         /// <summary>
-        /// Figure out what resources are "low" in production based on the amount being produced.
-        /// LowResourceDecider changes the low value.
+        ///     Figure out what resources are "low" in production based on the amount being produced.
+        ///     LowResourceDecider changes the low value.
         /// </summary>
         /// <returns>Any resource below LowResourceDecider, or the lowest resource.</returns>
         public List<ResourceDef> FindLowResources()
         {
             List<ResourceDef> result = new List<ResourceDef>();
-            Dictionary<ResourceDef, float> producedknown = AllResourcesProduced();
+            Dictionary<ResourceDef, float> producedKnown = AllResourcesProduced();
             bool resourceBelowDecider = false;
-           /* 
-            Since producedknown is only useful if the AI produces the def
-           the calculation checks against all ResourceDefs in the database
-            */
-            foreach(ResourceDef def in FindAllResourceDefs)
+            /* 
+             Since producedknown is only useful if the AI produces the def
+            the calculation checks against all ResourceDefs in the database
+             */
+            foreach (ResourceDef def in AllResourceDefs)
             {
-                if (producedknown.ContainsKey(def))
+                if (producedKnown.ContainsKey(def))
                 {
-                    if (producedknown[def] <= LowResourceDecider)
+                    if (producedKnown[def] <= LowResourceDecider)
                     {
                         result.Add(def);
                         resourceBelowDecider = true;
-                        if (producedknown[def] < LowResourceDecider / 2)
-                        {
-                            criticalResources.Add(def);
-                        }
+                        if (producedKnown[def] < LowResourceDecider / 2f) criticalResources.Add(def);
                     }
                 }
                 //If the def is not produced at all, add it!
@@ -80,32 +62,33 @@ namespace Empire_Rewritten.AI
                     criticalResources.Add(def);
                 }
             }
+
             if (!resourceBelowDecider)
             {
                 /*
                  Find the lowest defs produced, and adds them to a list.
                 This isn't perfect, however it should catch most things.
                  */
-                float lowest=0;
+                float lowest = 0;
                 bool first = true;
-                foreach(ResourceDef def in producedknown.Keys)
+                foreach (ResourceDef def in producedKnown.Keys)
                 {
-                    if (producedknown[def] <=lowest || (lowest == 0 && first))
+                    if (producedKnown[def] <= lowest || lowest == 0 && first)
                     {
                         first = false;
-                        lowest = producedknown[def];
+                        lowest = producedKnown[def];
                         result.Add(def);
                     }
                 }
             }
+
             return result;
         }
 
 
-
         /// <summary>
-        /// Figure out what resources are "excess" in production based on the amount being produced.
-        /// HighResourceDecider changes the excess value.
+        ///     Figure out what resources are "excess" in production based on the amount being produced.
+        ///     HighResourceDecider changes the excess value.
         /// </summary>
         /// <returns>Any resource below HighResourceDecider.</returns>
         public List<ResourceDef> FindExcessResources()
@@ -117,10 +100,7 @@ namespace Empire_Rewritten.AI
             {
                 if (producedknown.ContainsKey(def))
                 {
-                    if (producedknown[def] >= HighResourceDecider)
-                    {
-                        result.Add(def);
-                    }
+                    if (producedknown[def] >= HighResourceDecider) result.Add(def);
                 }
                 //If the def is not produced at all, add it!
                 else
@@ -128,24 +108,24 @@ namespace Empire_Rewritten.AI
                     result.Add(def);
                 }
             }
-          
+
             return result;
         }
 
         /// <summary>
-        /// Get amount of a resource produced
+        ///     Get amount of a resource produced
         /// </summary>
         /// <param name="def"></param>
         /// <returns></returns>
         public float GetAmountProduced(ResourceDef def)
         {
             Dictionary<ResourceDef, float> knownResources = AllResourcesProduced();
-            float result = knownResources.ContainsKey(def) ? knownResources[def]: 0;
+            float result = knownResources.ContainsKey(def) ? knownResources[def] : 0;
             return result;
         }
 
         /// <summary>
-        /// Find all resources produced.
+        ///     Find all resources produced.
         /// </summary>
         /// <returns></returns>
         public Dictionary<ResourceDef, float> AllResourcesProduced()
@@ -157,6 +137,7 @@ namespace Empire_Rewritten.AI
                 ResourceModifier resourceModifier = modifiers[def];
                 result.Add(def, resourceModifier.TotalProduced());
             }
+
             return result;
         }
 
@@ -165,7 +146,7 @@ namespace Empire_Rewritten.AI
             if (!criticalResources.EnumerableNullOrEmpty())
             {
                 Dictionary<ResourceDef, float> resourcesProduced = AllResourcesProduced();
-                criticalResources.RemoveAll(x => resourcesProduced.ContainsKey(x) && resourcesProduced[x] > LowResourceDecider / 2);
+                criticalResources.RemoveAll(x => resourcesProduced.ContainsKey(x) && resourcesProduced[x] > LowResourceDecider / 2f);
             }
         }
     }

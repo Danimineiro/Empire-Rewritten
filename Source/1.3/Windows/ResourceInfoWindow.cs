@@ -1,81 +1,92 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Empire_Rewritten.Resources;
+using Empire_Rewritten.Resources.Stats;
+using Empire_Rewritten.Utils.GUI;
+using JetBrains.Annotations;
 using UnityEngine;
-using Empire_Rewritten.Utils;
 using Verse;
 using Verse.Sound;
-using Empire_Rewritten.Resources;
 
-namespace Empire_Rewritten
+namespace Empire_Rewritten.Windows
 {
     public static class DebugActionsMisc
     {
-        [DebugAction("Empire", "Resource info window", false, false, allowedGameStates = AllowedGameStates.Entry)]
-        public static void PatchNotesDisplayWindow() => Find.WindowStack.Add(new ResourceInfoWindow());
+        [PublicAPI]
+        [DebugAction("Empire", "Resource info window", allowedGameStates = AllowedGameStates.Entry)]
+        public static void DisplayResourceInfoWindow()
+        {
+            Find.WindowStack.Add(new ResourceInfoWindow());
+        }
     }
 
     public class ResourceInfoWindow : Window
     {
-        //GUI.Group that can move everything
-        private readonly static Rect rect_fullRect = new Rect(22f, 22f, 1202f, 592f);
+        private const int BorderSize = 2;
 
-        private readonly static Rect rect_DefIcon = new Rect(2f, 2f, 64f, 64f);
-        private readonly static Rect rect_DefSelector = new Rect(68f, 2f, 514f, 64f);
-        private readonly static Rect rect_FullDefDesc = new Rect(2f, 86f, 580f, 240f);
-        private readonly static Rect rect_DefDescValue = new Rect(0f, 0f, 570f, 24f);
+        //GUI.Group that can move everything
+        private static readonly Rect RectFull = new Rect(22f, 22f, 1202f, 592f);
+
+        private static readonly Rect RectDefIcon = new Rect(2f, 2f, 64f, 64f);
+        private static readonly Rect RectDefSelector = new Rect(68f, 2f, 514f, 64f);
+        private static readonly Rect RectFullDefDesc = new Rect(2f, 86f, 580f, 240f);
+        private static readonly Rect RectDefDescValue = new Rect(0f, 0f, 570f, 24f);
 
         //In GUI.Group managed by container
-        private readonly static Rect rect_ThingDefContainer = new Rect(602f, 2f, 580f, 29f);
-        private readonly static Rect rect_ThingDefIcons = new Rect(2f, 2f, 25f, 25f);
-        private readonly static Rect rect_ThingDefs = new Rect(47f, 2f, 513f, 25f);
-        private readonly static Rect rect_ThingDefsHighlight = new Rect(0f, 0f, 569f, 29f);
+        private static readonly Rect RectThingDefContainer = new Rect(602f, 2f, 580f, 29f);
+        private static readonly Rect RectThingDefIcons = new Rect(2f, 2f, 25f, 25f);
+        private static readonly Rect RectThingDefs = new Rect(47f, 2f, 513f, 25f);
+        private static readonly Rect RectThingDefsHighlight = new Rect(0f, 0f, 569f, 29f);
 
-        private readonly static Rect rect_CurveContainer = new Rect(0f, 346f, 1184f, 224f);
-        private readonly static Rect rect_Curve = new Rect(2f, 2f, 291f, 220f);
+        private static readonly Rect RectCurveContainer = new Rect(0f, 346f, 1184f, 224f);
+        private static readonly Rect RectCurve = new Rect(2f, 2f, 291f, 220f);
 
-        private readonly static Rect rect_ScrollRect = new Rect(602f, 2f, 580f, 324f);
+        private static readonly Rect RectScrollRect = new Rect(602f, 2f, 580f, 324f);
 
-        private readonly static Vector2 curveOffset = new Vector2(296f, 0f);
+        private static readonly Vector2 CurveOffset = new Vector2(296f, 0f);
 
-        private readonly static Color transGray = new Color(0f, 0f, 0f, 0.5f);
+        private static readonly Color TransparentGray = new Color(0f, 0f, 0f, 0.5f);
 
-        private readonly static int borderSize = 2;
+        private static readonly GameFont PreviousFont = Text.Font;
+        private static readonly TextAnchor PreviousAnchor = Text.Anchor;
+        private static readonly Color PreviousColor = GUI.color;
 
-        private static readonly GameFont prevFont = Text.Font;
-        private static readonly TextAnchor prevAnchor = Text.Anchor;
-        private static readonly Color prevColor = GUI.color;
+        private List<FloatMenuOption> cachedOptions;
+        private Vector2 defDescScrollVector;
 
-        private List<ResourceDef> resources = null;
-        private List<FloatMenuOption> cachedOptions = null;
-        private Vector2 defDescScrollVector = new Vector2();
-        private Vector2 scrollRectVector = new Vector2();
-        private Rect rect_ScrollViewRect = new Rect(602f, 2f, 563f, 324f);
-        
         private ResourceDef defSelected;
+        private Rect rectScrollView = new Rect(602f, 2f, 563f, 324f);
+
+        private List<ResourceDef> resources;
+        private Vector2 scrollRectVector;
 
         public override Vector2 InitialSize => new Vector2(1229f, 619f);
-        
+
         protected override float Margin => 0f;
+
+        /// <summary>
+        ///     A <see cref="List{T}" /> of <see cref="FloatMenuOption">FloatMenuOptions</see> that set
+        ///     <see cref="ResourceInfoWindow.defSelected" /> to a specific <see cref="ResourceDef">ResourceDefs</see>.
+        /// </summary>
+        private List<FloatMenuOption> DefOptions => cachedOptions ?? (cachedOptions = CreateFloatMenuOptions());
 
         public override void DoWindowContents(Rect inRect)
         {
             if (Widgets.CloseButtonFor(inRect)) Close();
 
-            GUI.BeginGroup(rect_fullRect);
+            GUI.BeginGroup(RectFull);
             DrawDefSelectorButton();
             DrawDefContent();
             GUI.EndGroup();
         }
 
         /// <summary>
-        /// Draws the contents of the selected def if available
+        ///     Draws the contents of <see cref="defSelected" />, if it is not <c>null</c>
         /// </summary>
         private void DrawDefContent()
         {
-            if (defSelected == null) return;
+            if (defSelected is null) return;
 
             DrawDescriptionAndIcon();
             DrawItems();
@@ -83,27 +94,35 @@ namespace Empire_Rewritten
         }
 
         /// <summary>
-        /// Draws the defs curves
+        ///     Draws <see cref="ResourceInfoWindow.defSelected" />'s <see cref="ResourceDef.temperatureCurve" />,
+        ///     <see cref="ResourceDef.heightCurve" />, <see cref="ResourceDef.swampinessCurve" />, and
+        ///     <see cref="ResourceDef.rainfallCurve" />
         /// </summary>
         private void DrawCurves()
         {
-            GUI.BeginGroup(rect_CurveContainer);
-            DrawLabeledCurve(rect_Curve, defSelected.temperatureCurve, "Empire_ResourceInfoWindowTempCurve".Translate(), "Empire_ResourceInfoWindowTempCurveLabelX".Translate(), new FloatRange(-50f, 50f));
-            DrawLabeledCurve(rect_Curve.MoveRect(curveOffset), defSelected.rainfallCurve, "Empire_ResourceInfoWindowRainfallCurve".Translate(), "Empire_ResourceInfoWindowRainfallCurveLabelX".Translate(), new FloatRange(0f, 7500f));
-            DrawLabeledCurve(rect_Curve.MoveRect(curveOffset * 2), defSelected.heightCurve, "Empire_ResourceInfoWindowHeightCurve".Translate(), "Empire_ResourceInfoWindowHeightCurveLabelX".Translate(), new FloatRange(0f, 2500f));
-            DrawLabeledCurve(rect_Curve.MoveRect(curveOffset * 3), defSelected.swampinessCurve, "Empire_ResourceInfoWindowSwampinessCurve".Translate(), "Empire_ResourceInfoWindowSwampinessCurveLabelX".Translate(), new FloatRange(0f, 1f));
+            GUI.BeginGroup(RectCurveContainer);
+            DrawLabeledCurve(RectCurve, defSelected.temperatureCurve, "Empire_ResourceInfoWindowTempCurve".Translate(), "Empire_ResourceInfoWindowTempCurveLabelX".Translate(),
+                             new FloatRange(-50f, 50f));
+            DrawLabeledCurve(RectCurve.MoveRect(CurveOffset), defSelected.rainfallCurve, "Empire_ResourceInfoWindowRainfallCurve".Translate(),
+                             "Empire_ResourceInfoWindowRainfallCurveLabelX".Translate(), new FloatRange(0f, 7500f));
+            DrawLabeledCurve(RectCurve.MoveRect(CurveOffset * 2), defSelected.heightCurve, "Empire_ResourceInfoWindowHeightCurve".Translate(), "Empire_ResourceInfoWindowHeightCurveLabelX".Translate(),
+                             new FloatRange(0f, 2500f));
+            DrawLabeledCurve(RectCurve.MoveRect(CurveOffset * 3), defSelected.swampinessCurve, "Empire_ResourceInfoWindowSwampinessCurve".Translate(),
+                             "Empire_ResourceInfoWindowSwampinessCurveLabelX".Translate(), new FloatRange(0f, 1f));
             GUI.EndGroup();
         }
 
         /// <summary>
-        /// Draws a <paramref name="curve"/> with a <paramref name="labelRight"/> into a <paramref name="rect"/>
+        ///     Draws a <see cref="SimpleCurve" /> with a given <see cref="string">label</see> into a <see cref="Rect" />
         /// </summary>
-        /// <param name="rect"></param>
-        /// <param name="curve"></param>
-        /// <param name="labelRight"></param>
-        /// <param name="labelX"></param>
-        /// <param name="range">
-        private void DrawLabeledCurve(Rect rect, SimpleCurve curve, string labelRight, string labelX, FloatRange range)
+        /// <param name="rect">The <see cref="Rect" /> to draw into</param>
+        /// <param name="curve">The <see cref="SimpleCurve" /> to draw</param>
+        /// <param name="labelRight">
+        ///     A <see cref="string" /> to draw in the bottom-right corner of the <paramref name="rect" />
+        /// </param>
+        /// <param name="labelX">The <see cref="SimpleCurveDrawerStyle.LabelX" /></param>
+        /// <param name="range">The <see cref="SimpleCurveDrawerStyle.FixedSection" /></param>
+        private static void DrawLabeledCurve(Rect rect, SimpleCurve curve, string labelRight, string labelX, FloatRange range)
         {
             if (curve == null)
             {
@@ -112,14 +131,13 @@ namespace Empire_Rewritten
                 ResetTextAndColor();
 
                 Widgets.DrawBoxSolid(rect, Color.black);
-                rect.DrawBorderAroundRect(borderSize);
+                rect.DrawBorderAroundRect(BorderSize);
                 return;
             }
 
-
             Rect tempLabelRect = rect.BottomPartPixels(rect.height / 12f);
 
-            SimpleCurveDrawerStyle style = new SimpleCurveDrawerStyle()
+            SimpleCurveDrawerStyle style = new SimpleCurveDrawerStyle
             {
                 DrawBackground = false,
                 DrawBackgroundLines = true,
@@ -140,11 +158,11 @@ namespace Empire_Rewritten
             };
 
             SimpleCurveDrawer.DrawCurve(rect, curve, style);
-            Widgets.DrawBoxSolid(tempLabelRect, transGray);
-            rect.DrawBorderAroundRect(borderSize);
+            Widgets.DrawBoxSolid(tempLabelRect, TransparentGray);
+            rect.DrawBorderAroundRect(BorderSize);
 
             Text.Anchor = TextAnchor.LowerRight;
-            Widgets.Label(tempLabelRect, $"{labelRight} ");
+            Widgets.Label(tempLabelRect, labelRight + ' ');
 
             Text.Anchor = TextAnchor.LowerLeft;
             Widgets.Label(tempLabelRect, $" {"Empire_ResourceInfoWindowEfficiency".Translate()} ");
@@ -152,37 +170,41 @@ namespace Empire_Rewritten
         }
 
         /// <summary>
-        /// Draws all the items allowed in the ResourceDef
+        ///     Draws all the <see cref="ThingDef">ThingDefs</see> allowed in <see cref="ResourceInfoWindow.defSelected" />
         /// </summary>
         private void DrawItems()
         {
-            if (!(defSelected.ResourcesCreated.AllowedThingDefs.ToList() is List<ThingDef> thingDefs)) return;
+            List<ThingDef> thingDefs = defSelected.ResourcesCreated.AllowedThingDefs.ToList();
 
             Text.Anchor = TextAnchor.MiddleLeft;
             Text.Font = GameFont.Small;
-            rect_ScrollRect.DrawBorderAroundRect(borderSize);
-            rect_ScrollViewRect.height = thingDefs.Count * rect_ThingDefContainer.height;
-            Widgets.BeginScrollView(rect_ScrollRect, ref scrollRectVector, rect_ScrollViewRect);
+            RectScrollRect.DrawBorderAroundRect(BorderSize);
+            rectScrollView.height = thingDefs.Count * RectThingDefContainer.height;
+            Widgets.BeginScrollView(RectScrollRect, ref scrollRectVector, rectScrollView);
 
             for (int i = 0; i < thingDefs.Count; i++)
             {
-                Rect temp = new Rect(rect_ThingDefContainer);
+                Rect temp = new Rect(RectThingDefContainer);
                 temp.y += temp.height * i;
                 ThingDef current = thingDefs[i];
 
                 GUI.BeginGroup(temp);
 
-                if (i % 2 != 0)
-                    Widgets.DrawHighlight(rect_ThingDefsHighlight);
+                if (i % 2 == 1)
+                {
+                    Widgets.DrawHighlight(RectThingDefsHighlight);
+                }
                 else
-                    Widgets.DrawLightHighlight(rect_ThingDefsHighlight);
+                {
+                    Widgets.DrawLightHighlight(RectThingDefsHighlight);
+                }
 
-                MouseoverSounds.DoRegion(rect_ThingDefsHighlight);
-                Widgets.DrawHighlightIfMouseover(rect_ThingDefsHighlight);
-                TooltipHandler.TipRegion(rect_ThingDefsHighlight, current.description);
-                Widgets.ThingIcon(rect_ThingDefIcons, current);
-                Widgets.Label(rect_ThingDefs, current.LabelCap);
-                Widgets.InfoCardButton(rect_ThingDefs.RightPartPixels(rect_ThingDefs.height), current);
+                MouseoverSounds.DoRegion(RectThingDefsHighlight);
+                Widgets.DrawHighlightIfMouseover(RectThingDefsHighlight);
+                TooltipHandler.TipRegion(RectThingDefsHighlight, current.description);
+                Widgets.ThingIcon(RectThingDefIcons, current);
+                Widgets.Label(RectThingDefs, current.LabelCap);
+                Widgets.InfoCardButton(RectThingDefs.RightPartPixels(RectThingDefs.height), current);
 
                 GUI.EndGroup();
             }
@@ -192,26 +214,27 @@ namespace Empire_Rewritten
         }
 
         /// <summary>
-        /// Draws the ResourceIcon and it's description
+        ///     Draws the current <see cref="ResourceInfoWindow.RectDefIcon" /> as well as
+        ///     <see cref="ResourceInfoWindow.defSelected" />'s <see cref="ResourceDef.description" />
         /// </summary>
         private void DrawDescriptionAndIcon()
         {
             Text.Font = GameFont.Small;
 
             //Def Icon
-            GUI.DrawTexture(rect_DefIcon, ContentFinder<Texture2D>.Get(defSelected.iconData.texPath));
-            Widgets.DrawLightHighlight(rect_DefIcon);
-            rect_DefIcon.DrawBorderAroundRect(borderSize);
+            GUI.DrawTexture(RectDefIcon, ContentFinder<Texture2D>.Get(defSelected.iconData.texPath));
+            Widgets.DrawLightHighlight(RectDefIcon);
+            RectDefIcon.DrawBorderAroundRect(BorderSize);
 
             //Def Description
-            Rect tempFullHeight = rect_FullDefDesc.ContractedBy(5f);
+            Rect tempFullHeight = RectFullDefDesc.ContractedBy(5f);
 
             float descHeight = Text.CalcHeight(defSelected.description, tempFullHeight.width);
 
             Rect tempDescRect = tempFullHeight.TopPartPixels(descHeight);
             Rect tempValuesRect = tempFullHeight.BottomPartPixels(tempFullHeight.height - descHeight - 5f);
 
-            Rect tempTex = new Rect(tempValuesRect.x, tempValuesRect.y, tempValuesRect.width - 17f, 15f * rect_DefDescValue.height);
+            Rect tempTex = new Rect(tempValuesRect.x, tempValuesRect.y, tempValuesRect.width - 17f, 15f * RectDefDescValue.height);
 
             Widgets.Label(tempDescRect, $"{defSelected.description}");
 
@@ -219,13 +242,14 @@ namespace Empire_Rewritten
             Widgets.DrawLineHorizontal(tempDescRect.x, tempDescRect.y + tempDescRect.height, tempDescRect.width);
             GUI.color = Color.white;
             DrawResourceValues(tempValuesRect, tempTex);
-            rect_FullDefDesc.DrawBorderAroundRect(borderSize);
+            RectFullDefDesc.DrawBorderAroundRect(BorderSize);
 
             ResetTextAndColor();
         }
 
         /// <summary>
-        /// Draws the resource values
+        ///     TODO: Document parameters
+        ///     Draws the resource values
         /// </summary>
         /// <param name="tempValuesRect"></param>
         /// <param name="tempTex"></param>
@@ -235,7 +259,7 @@ namespace Empire_Rewritten
             GUI.BeginGroup(tempTex);
 
             DrawResourceValueBlock(true);
-            Widgets.DrawLightHighlight(rect_DefDescValue.MoveRect(new Vector2(0f, rect_DefDescValue.height * 7)));
+            Widgets.DrawLightHighlight(RectDefDescValue.MoveRect(new Vector2(0f, RectDefDescValue.height * 7)));
             DrawResourceValueBlock(false, 8);
 
             GUI.EndGroup();
@@ -243,66 +267,71 @@ namespace Empire_Rewritten
         }
 
         /// <summary>
-        /// Draws a resource value block <paramref name="isOffset"/> says if it is in percent or not, <paramref name="valueOffset"/> offsets the block
+        ///     Draws a resource value block.
         /// </summary>
-        /// <param name="isOffset"></param>
-        /// <param name="valueOffset"></param>
+        /// <param name="isOffset">
+        ///     If <paramref name="isOffset" /> is <c>true</c>, the content is formatted as a percentage,
+        ///     otherwise as a normal decimal number.
+        /// </param>
+        /// <param name="valueOffset">offsets the block</param>
         private void DrawResourceValueBlock(bool isOffset, int valueOffset = 0)
         {
             for (int i = 0; i < 7; i++)
             {
-                string addOrMult = $"Empire_ResourceInfoWindow{(isOffset ? "Additively" : "Multiplicatively")}".Translate();
+                string addOrMultiply = $"Empire_ResourceInfoWindow{(isOffset ? "Additively" : "Multiplicatively")}".TranslateSimple();
 
-                Rect tempRect = rect_DefDescValue.MoveRect(new Vector2(0f, rect_DefDescValue.height * (i + valueOffset)));
+                Rect tempRect = RectDefDescValue.MoveRect(new Vector2(0f, RectDefDescValue.height * (i + valueOffset)));
 
                 if (i % 2 == 0)
+                {
                     Widgets.DrawHighlight(tempRect);
+                }
                 else
+                {
                     Widgets.DrawLightHighlight(tempRect);
+                }
 
-                Widgets.Label(tempRect.ScaleXByPixel(-5f), ((ResourceStat)i).Translate(isOffset).CapitalizeFirst());
+                Widgets.Label(tempRect.ScaleX(-5f), ((ResourceStat)i).Translate(isOffset).CapitalizeFirst());
 
-                if (isOffset)
-                    Widgets.Label(tempRect.ScaleXByPixel(-5f).RightHalf(), defSelected.GetBonus((ResourceStat)i, isOffset).ToString());
-                else
-                    Widgets.Label(tempRect.ScaleXByPixel(-5f).RightHalf(), defSelected.GetBonus((ResourceStat)i, isOffset).ToStringPercent());
+                float bonus = defSelected.GetBonus((ResourceStat)i, isOffset);
+                // Without InvariantCulture, this would look different on e.g. German systems vs British ones (1,1 vs 1.1)
+                Widgets.Label(tempRect.ScaleX(-5f).RightHalf(), isOffset ? bonus.ToString(CultureInfo.InvariantCulture) : bonus.ToStringPercent());
 
                 MouseoverSounds.DoRegion(tempRect);
                 Widgets.DrawHighlightIfMouseover(tempRect);
-                TooltipHandler.TipRegion(tempRect, $"Empire_ResourceInfoWindowTip{((ResourceStat)i).ToString().CapitalizeFirst()}".Translate(addOrMult));
+                TooltipHandler.TipRegion(tempRect, $"Empire_ResourceInfoWindowTip{((ResourceStat)i).ToString().CapitalizeFirst()}".Translate(addOrMultiply));
             }
         }
 
         /// <summary>
-        /// Draws a button that allows the user to select a resource to look at
+        ///     Draws a button that allows the user to select a <see cref="ResourceDef" /> to look at.
         /// </summary>
         private void DrawDefSelectorButton()
         {
             Text.Anchor = TextAnchor.MiddleCenter;
             Text.Font = GameFont.Medium;
 
-            Widgets.DrawLightHighlight(rect_DefSelector);
-            Widgets.DrawHighlightIfMouseover(rect_DefSelector);
-            Widgets.Label(rect_DefSelector, defSelected?.label ?? "Empire_ResourceInfoWindowSelector".Translate());
-            rect_DefSelector.DrawBorderAroundRect(borderSize);
+            Widgets.DrawLightHighlight(RectDefSelector);
+            Widgets.DrawHighlightIfMouseover(RectDefSelector);
+            Widgets.Label(RectDefSelector, defSelected?.label ?? "Empire_ResourceInfoWindowSelector".Translate());
+            RectDefSelector.DrawBorderAroundRect(BorderSize);
 
             ResetTextAndColor();
 
-            if (Widgets.ButtonInvisible(rect_DefSelector))
+            if (Widgets.ButtonInvisible(RectDefSelector))
             {
                 Find.WindowStack.Add(new FloatMenu(DefOptions));
             }
         }
 
         /// <summary>
-        /// A list of defs to choose from
+        ///     Creates a <see cref="List{T}" /> of <see cref="FloatMenuOption">FloatMenuOptions</see> that set
+        ///     <see cref="ResourceInfoWindow.defSelected" /> to a specific <see cref="ResourceDef">ResourceDefs</see>.
         /// </summary>
-        private List<FloatMenuOption> DefOptions => cachedOptions ?? (cachedOptions = CreateFloatMenuOptions());
-
-        /// <summary>
-        /// Makes a list out of all ResourceDefs to select from
-        /// </summary>
-        /// <returns>the list</returns>
+        /// <returns>
+        ///     A <see cref="List{T}" /> of <see cref="FloatMenuOption">FloatMenuOptions</see> that can set
+        ///     <see cref="ResourceInfoWindow.defSelected" />
+        /// </returns>
         private List<FloatMenuOption> CreateFloatMenuOptions()
         {
             resources = resources ?? (resources = DefDatabase<ResourceDef>.AllDefsListForReading);
@@ -311,23 +340,21 @@ namespace Empire_Rewritten
 
             foreach (ResourceDef def in resources)
             {
-                floatMenuOptions.Add(new FloatMenuOption(def.label, delegate
-                {
-                    defSelected = def;
-                }));
+                floatMenuOptions.Add(new FloatMenuOption(def.label, delegate { defSelected = def; }));
             }
 
             return floatMenuOptions;
         }
 
         /// <summary>
-        /// Resets the Text.Font, Text.Anchor and GUI.color setting
+        ///     Resets <see cref="Text.Font" />, <see cref="Text.Anchor" />, and <see cref="GUI.color" /> to what they were
+        ///     previously.
         /// </summary>
         private static void ResetTextAndColor()
         {
-            Text.Font = prevFont;
-            Text.Anchor = prevAnchor;
-            GUI.color = prevColor;
+            Text.Font = PreviousFont;
+            Text.Anchor = PreviousAnchor;
+            GUI.color = PreviousColor;
         }
     }
 }
