@@ -21,19 +21,9 @@ namespace Empire_Rewritten.Utils
         public static void DrawBorderAroundRect(this Rect rect, int width = 1, Color? maybeColor = null)
         {
             Rect borderRect = rect.ExpandedBy(width);
-            if (maybeColor is Color color)
-            {
-                // Use passed color to draw border, then reset GUI color to what it was before
-                Color previousColor = GUI.color;
-                GUI.color = color;
-                Widgets.DrawBox(borderRect, width);
-                GUI.color = previousColor;
-            }
-            else
-            {
-                // Just use UnityEngine's color, no need to assign variables.
-                Widgets.DrawBox(borderRect, width);
-            }
+            GUI.color = maybeColor ?? Color.white;
+            Widgets.DrawBox(borderRect, width);
+            GUI.color = Color.white;
         }
 
         /// <summary>
