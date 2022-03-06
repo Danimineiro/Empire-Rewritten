@@ -18,10 +18,15 @@ namespace Empire_Rewritten.Borders
 
         public override IEnumerable Regenerate()
         {
+            dirty = false;
+            for (int i = 0; i < subMeshes.Count; i++)
+            {
+                subMeshes[i].Clear(MeshParts.All);
+            }
+
             WorldGrid worldGrid = Find.WorldGrid;
             DrawAllBorders(worldGrid);
             FinalizeMesh(MeshParts.All);
-            dirty = false;
             yield break;
         }
 
