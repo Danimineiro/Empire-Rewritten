@@ -25,7 +25,6 @@ namespace Empire_Rewritten.Windows
         public FacilityInfoWindow()
         {
             facilityDefs = DefDatabase<FacilityDef>.AllDefsListForReading;
-            Log.Message("<color=orange>[Empire]</color> FacilityInfoWindow.facilityDefs: " + facilityDefs.Join(def => def.defName));
 
             rectContentMain = rectWindow.ContractedBy(25f);
 
