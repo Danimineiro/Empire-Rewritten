@@ -1,6 +1,6 @@
 ﻿using Empire_Rewritten.Controllers;
 using Empire_Rewritten.HarmonyPatches;
-using Empire_Rewritten.Utils.Text;
+using Empire_Rewritten.Utils;
 using JetBrains.Annotations;
 using RimWorld;
 using Verse;

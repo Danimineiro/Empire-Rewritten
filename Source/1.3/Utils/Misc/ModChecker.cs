@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Verse;
 
-namespace Empire_Rewritten.Utils.Misc
+namespace Empire_Rewritten.Utils
 {
     public static class ModChecker
     {

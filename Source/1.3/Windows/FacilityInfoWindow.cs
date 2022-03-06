@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Empire_Rewritten.Facilities;
-using Empire_Rewritten.Utils.GUI;
-using Empire_Rewritten.Utils.Misc;
+using Empire_Rewritten.Utils;
 using HarmonyLib;
 using UnityEngine;
 using Verse;

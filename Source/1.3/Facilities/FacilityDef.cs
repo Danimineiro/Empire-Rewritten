@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Empire_Rewritten.Resources;
-using Empire_Rewritten.Utils.Misc;
+using Empire_Rewritten.Utils;
 using JetBrains.Annotations;
 using Verse;
 

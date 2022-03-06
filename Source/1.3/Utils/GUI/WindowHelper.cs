@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Verse;
 
-namespace Empire_Rewritten.Utils.GUI
+namespace Empire_Rewritten.Utils
 {
     /// <summary>
     ///     This class provides some useful and often used basic window operations
@@ -41,8 +41,8 @@ namespace Empire_Rewritten.Utils.GUI
         /// </summary>
         public static void ResetTextAndColor()
         {
-            Verse.Text.Font = GameFont.Small;
-            Verse.Text.Anchor = TextAnchor.UpperLeft;
+            Text.Font = GameFont.Small;
+            Text.Anchor = TextAnchor.UpperLeft;
             UnityEngine.GUI.color = Color.white;
         }
 
@@ -55,8 +55,8 @@ namespace Empire_Rewritten.Utils.GUI
         /// <returns><c>true</c> if the button is pressed, <c>false</c> otherwise</returns>
         public static bool DrawInfoScreenSelectorButton(Rect inRect, string label)
         {
-            Verse.Text.Anchor = TextAnchor.MiddleCenter;
-            Verse.Text.Font = GameFont.Medium;
+            Text.Anchor = TextAnchor.MiddleCenter;
+            Text.Font = GameFont.Medium;
 
             Widgets.DrawLightHighlight(inRect);
             Widgets.DrawHighlightIfMouseover(inRect);
