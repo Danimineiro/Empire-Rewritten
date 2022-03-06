@@ -24,10 +24,10 @@ namespace Empire_Rewritten.Utils
             if (maybeColor is Color color)
             {
                 // Use passed color to draw border, then reset GUI color to what it was before
-                Color previousColor = UnityEngine.GUI.color;
-                UnityEngine.GUI.color = color;
+                Color previousColor = GUI.color;
+                GUI.color = color;
                 Widgets.DrawBox(borderRect, width);
-                UnityEngine.GUI.color = previousColor;
+                GUI.color = previousColor;
             }
             else
             {
@@ -43,7 +43,7 @@ namespace Empire_Rewritten.Utils
         {
             Text.Font = GameFont.Small;
             Text.Anchor = TextAnchor.UpperLeft;
-            UnityEngine.GUI.color = Color.white;
+            GUI.color = Color.white;
         }
 
         /// <summary>
