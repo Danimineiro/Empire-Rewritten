@@ -1,4 +1,4 @@
-﻿namespace Empire_Rewritten
+﻿namespace Empire_Rewritten.Controllers.CivicEthic
 {
     public struct EmpireStatModifier
     {

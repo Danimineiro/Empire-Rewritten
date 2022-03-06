@@ -1,48 +1,36 @@
-﻿using Empire_Rewritten.Resources;
-using RimWorld.Planet;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Verse;
 using Empire_Rewritten.Facilities;
+using Empire_Rewritten.Resources;
+using RimWorld.Planet;
+using Verse;
 
 namespace Empire_Rewritten.AI
 {
     public class AIFacilityManager : AIModule
     {
-
-        public AIFacilityManager(AIPlayer player) : base(player)
-        {
-          
-        }
-
+        private readonly HashSet<FacilityDef> cachedFacilitiesDef = new HashSet<FacilityDef>();
         private List<FacilityManager> cachedFacilities;
-        HashSet<FacilityDef> cachedFacilitiesDef = new HashSet<FacilityDef>();
+
         private bool updateCache = true;
         private bool updateDefCache = true;
-        
-        private bool canMakeFacilities = false;
 
-        public bool CanMakeFacilities
-        {
-            get
-            {
-                return canMakeFacilities;
-            }
-        }
+        public AIFacilityManager(AIPlayer player) : base(player) { }
+
+        public bool CanMakeFacilities { get; private set; }
 
         public List<FacilityManager> Facilities
         {
             get
             {
-                if (cachedFacilities.NullOrEmpty() ||updateCache)
+                if (cachedFacilities.NullOrEmpty() || updateCache)
                 {
-                    updateCache= false;
-                    cachedFacilities= (List<FacilityManager>)player.Manager.GetAllFacilityManagers();
+                    updateCache = false;
+                    cachedFacilities = player.Manager.AllFacilityManagers.ToList();
                     updateDefCache = true;
                 }
+
                 return cachedFacilities;
             }
         }
@@ -51,21 +39,21 @@ namespace Empire_Rewritten.AI
         {
             get
             {
-                if(cachedFacilitiesDef.EnumerableNullOrEmpty() || updateDefCache)
+                if (cachedFacilitiesDef.EnumerableNullOrEmpty() || updateDefCache)
                 {
-                    updateDefCache= false;
-                    foreach(FacilityManager manager in Facilities)
+                    updateDefCache = false;
+                    foreach (FacilityManager manager in Facilities)
                     {
-                        cachedFacilitiesDef.AddRange(manager.FacilityDefsInsalled);
+                        cachedFacilitiesDef.AddRange(manager.FacilityDefsInstalled);
                     }
                 }
+
                 return cachedFacilitiesDef;
             }
         }
 
-       
         /// <summary>
-        /// Select a facility to build, based on what the AI needs and what is produced on the tile.
+        ///     Select a facility to build, based on what the AI needs and what is produced on the tile.
         /// </summary>
         /// <param name="manager"></param>
         /// <returns></returns>
@@ -74,10 +62,10 @@ namespace Empire_Rewritten.AI
             Dictionary<float, List<FacilityDef>> facilityWeights = new Dictionary<float, List<FacilityDef>>();
             List<FacilityDef> defs = DefDatabase<FacilityDef>.AllDefsListForReading;
             List<Tile> tiles = Find.WorldGrid.tiles;
-            foreach(FacilityDef facilityDef in defs)
+            foreach (FacilityDef facilityDef in defs)
             {
                 float weight = 0;
-                weight += manager.FacilityDefsInsalled.Contains(facilityDef) ? 0.5f : -0.5f;
+                weight += manager.FacilityDefsInstalled.Contains(facilityDef) ? 0.5f : -0.5f;
                 weight += player.ResourceManager.GetTileResourceWeight(tiles[player.Manager.GetSettlement(manager).Tile]);
 
                 if (facilityWeights.ContainsKey(weight))
@@ -86,7 +74,7 @@ namespace Empire_Rewritten.AI
                 }
                 else
                 {
-                    facilityWeights.Add(weight, new List<FacilityDef>() { facilityDef});
+                    facilityWeights.Add(weight, new List<FacilityDef> {facilityDef});
                 }
             }
 
@@ -95,22 +83,23 @@ namespace Empire_Rewritten.AI
         }
 
         /// <summary>
-        /// Checks that the AI has the resources to build the <paramref name="facilityDef"/>.
+        ///     Checks that the AI has the resources to build the <paramref name="facilityDef" />.
         /// </summary>
         /// <param name="facilityDef"></param>
         /// <returns></returns>
         public bool CanBuildFacility(FacilityDef facilityDef)
         {
             bool allResourcesPullable = true;
-            foreach(ThingDefCountClass thingDefCountClass in facilityDef.costList)
+            foreach (ThingDefCountClass thingDefCountClass in facilityDef.costList)
             {
                 allResourcesPullable = allResourcesPullable && player.Manager.StorageTracker.CanRemoveThingsFromStorage(thingDefCountClass.thingDef, thingDefCountClass.count);
             }
+
             return allResourcesPullable;
         }
-     
+
         /// <summary>
-        /// Builds a facility in a settlement.
+        ///     Builds a facility in a settlement.
         /// </summary>
         /// <returns></returns>
         public bool BuildFacility(FacilityManager manager)
@@ -122,47 +111,46 @@ namespace Empire_Rewritten.AI
                 {
                     foreach (ThingDefCountClass thingDefCountClass in def.costList)
                     {
-                        player.Manager.StorageTracker.RemoveThingsFromStorage(thingDefCountClass.thingDef, thingDefCountClass.count);
+                        player.Manager.StorageTracker.TryRemoveThingsFromStorage(thingDefCountClass.thingDef, thingDefCountClass.count);
                     }
+
                     manager.AddFacility(def);
                     return true;
                 }
             }
+
             return false;
         }
 
-
         /// <summary>
-        /// Find a manager the AI can build on.
+        ///     Find a manager the AI can build on.
         /// </summary>
         /// <returns></returns>
         public FacilityManager FindManagerToBuildOn()
         {
             List<ResourceDef> resourceDefs = player.ResourceManager.LowResources;
-            IEnumerable<FacilityManager> managers = player.Manager.GetAllFacilityManagers().Where(x=>x.CanBuildNewFacilities());
+            IEnumerable<FacilityManager> managers = player.Manager.AllFacilityManagers.Where(x => x.CanBuildNewFacilities);
             List<FacilityManager> potentialResults = new List<FacilityManager>();
-            foreach (ResourceDef resourceDef in resourceDefs)
+            foreach (FacilityManager facilityManager in managers)
             {
-                foreach (FacilityManager facilityManager in managers)
+                IEnumerable<FacilityDef> facilityDefs = facilityManager.FacilityDefsInstalled.Where(x => x.ProducedResources.Any(y => resourceDefs.Contains(y)));
+                if (facilityDefs.Any())
                 {
-                    IEnumerable<FacilityDef> facilityDefs = facilityManager.FacilityDefsInsalled.Where(x => x.ProducedResources.Any(y => resourceDefs.Contains(y)));
-                    if (facilityDefs.Count() > 0)
-                    {
-                        potentialResults.Add(facilityManager);
-                    }
+                    potentialResults.Add(facilityManager);
                 }
             }
-            if (potentialResults.Count() > 0)
+
+            if (potentialResults.Any())
             {
                 return potentialResults.RandomElement();
             }
-            canMakeFacilities = false;
+
+            CanMakeFacilities = false;
             return null;
         }
 
-
         /// <summary>
-        /// If we have an excess of resources, the AI will uninstall potential facilities to allocate space for new ones.
+        ///     If we have an excess of resources, the AI will uninstall potential facilities to allocate space for new ones.
         /// </summary>
         /// <returns></returns>
         public bool UninstallResourceProducingFacility()
@@ -179,9 +167,9 @@ namespace Empire_Rewritten.AI
                     return RemoveFacility(facilityDef);
                 }
             }
+
             return false;
         }
-
 
         public bool RemoveFacility(FacilityDef facilityDef)
         {
@@ -189,10 +177,11 @@ namespace Empire_Rewritten.AI
             Settlement settlement = settlementAndManager.Key;
             FacilityManager facilityManager = settlementAndManager.Value;
 
-            if(settlement!=null&& facilityManager != null)
+            if (settlement != null && facilityManager != null)
             {
                 facilityManager.RemoveFacility(facilityDef);
             }
+
             return false;
         }
 
@@ -203,8 +192,8 @@ namespace Empire_Rewritten.AI
             if (manager != null)
             {
                 bool builtSomething = BuildFacility(manager);
-                bool uninstalledFacility = builtSomething ? false : UninstallResourceProducingFacility();
-                canMakeFacilities = !builtSomething && player.ResourceManager.HasCriticalResource && !uninstalledFacility;
+                bool uninstalledFacility = !builtSomething && UninstallResourceProducingFacility();
+                CanMakeFacilities = !builtSomething && player.ResourceManager.HasCriticalResource && !uninstalledFacility;
             }
         }
 

@@ -1,44 +1,54 @@
-﻿using Empire_Rewritten.Resources;
-using RimWorld.Planet;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Empire_Rewritten.Resources;
+using JetBrains.Annotations;
+using RimWorld.Planet;
 using Verse;
 
 namespace Empire_Rewritten.Facilities
 {
     public class Facility : IExposable, ILoadReferenceable
     {
-        int amount;
+        private readonly List<ResourceModifier> modifiers = new List<ResourceModifier>();
+        private int amount;
         public FacilityDef def;
-
-        private FacilityWorker worker;
-
-        public FacilityWorker FacilityWorker
-        {
-            get
-            {
-                return worker;
-            }
-        }
-        public int Amount
-        {
-            get
-            {
-                return amount;
-            }
-        }
-        private bool ShouldRecalculateModifiers = true;
-        private List<ResourceModifier> modifiers = new List<ResourceModifier>();
         private Settlement settlement;
+        private bool shouldRecalculateModifiers = true;
 
-        public int FacilitiesInstalled
+        public Facility(FacilityDef def, Settlement settlement)
+        {
+            this.def = def;
+            this.settlement = settlement;
+            amount = 1;
+
+            if (def.facilityWorker != null)
+            {
+                FacilityWorker = (FacilityWorker)Activator.CreateInstance(def.facilityWorker);
+                FacilityWorker.facilityDef = def;
+            }
+        }
+
+        [UsedImplicitly]
+        public Facility() { }
+
+        public FacilityWorker FacilityWorker { get; }
+
+        public int Amount => amount;
+
+        public int FacilitiesInstalled => amount;
+
+        public List<ResourceModifier> ResourceModifiers
         {
             get
             {
-                return amount;
+                if (shouldRecalculateModifiers)
+                {
+                    Recalculate();
+                    shouldRecalculateModifiers = false;
+                }
+
+                return modifiers;
             }
         }
 
@@ -54,36 +64,18 @@ namespace Empire_Rewritten.Facilities
             return $"Facility_{GetHashCode()}";
         }
 
-        public Facility(FacilityDef def,Settlement settlement)
-        {
-            this.def = def;
-            this.settlement = settlement;
-            amount=1;
-
-            if (def.facilityWorker != null)
-            {
-                worker = (FacilityWorker)Activator.CreateInstance(def.facilityWorker);
-                worker.facilityDef = def;
-            }
-        }
-
-        public Facility()
-        {
-
-        }
-        
         /// <summary>
-        /// Add X facilities to a settlement.
+        ///     Adds an amount of facilities to this <see cref="Facility" />'s settlement.
         /// </summary>
-        /// <param name="amountToAdd"></param>
+        /// <param name="amountToAdd">The <see cref="int">amount</see> of facilities to add</param>
         public void AddFacilities(int amountToAdd)
         {
             amount += amountToAdd;
-            ShouldRecalculateModifiers = true;
+            shouldRecalculateModifiers = true;
         }
 
         /// <summary>
-        /// Add a facility to a settlement.
+        ///     Adds a single facility to this <see cref="Facility" />'s settlement.
         /// </summary>
         public void AddFacility()
         {
@@ -91,63 +83,57 @@ namespace Empire_Rewritten.Facilities
         }
 
         /// <summary>
-        /// Remove X facilities from a settlement.
+        ///     Removes an amount of facilities to this <see cref="Facility" />'s settlement.
         /// </summary>
-        /// <param name="amountToRemove"></param>
+        /// <param name="amountToRemove">The <see cref="int">amount</see> of facilities to remove</param>
         public void RemoveFacilities(int amountToRemove)
         {
             amount -= amountToRemove;
-            if(amount < 0)
-            {
-                amount= 0;
-            }
-            ShouldRecalculateModifiers = true;
+            if (amount < 0) amount = 0;
+
+            shouldRecalculateModifiers = true;
         }
 
+        /// <summary>
+        ///     Removes a single facility to this <see cref="Facility" />'s settlement.
+        /// </summary>
         public void RemoveFacility()
         {
             RemoveFacilities(1);
         }
 
-        public List<ResourceModifier> ResourceModifiers
-        {
-            get
-            {
-                if(ShouldRecalculateModifiers)
-                {
-                    Recalculate();
-                    ShouldRecalculateModifiers = false;
-                }
-                return modifiers;
-            }
-        }
-
+        /// <summary>
+        ///     Recalculates the <see cref="ResourceModifiers" /> of this <see cref="Facility" />.
+        /// </summary>
         private void Recalculate()
         {
+            modifiers.Clear();
 
-            modifiers = new List<ResourceModifier>();
-            List<ResourceDef> defs = new List<ResourceDef>();
-            foreach(ResourceChange change in def.resourceMultipliers)
-            {
-                defs.Add(change.def);
-            }
-            foreach (ResourceChange change in def.resourceOffsets)
-            {
-                defs.Add(change.def);
-            }
+            IEnumerable<ResourceDef> defs = def.resourceMultipliers.Select(r => r.def).Concat(def.resourceOffsets.Select(r => r.def));
 
             foreach (ResourceDef resourceDef in defs)
             {
                 Tile tile = Find.WorldGrid.tiles[settlement.Tile];
                 ResourceModifier modifier = resourceDef.GetTileModifier(tile);
-                modifier.multiplier *= (amount *(def.resourceOffsets.Any(x => x.def == resourceDef) ? def.resourceMultipliers.Find(x=>x.def==resourceDef).amount : 1));
-                modifier.offset += (amount * (def.resourceOffsets.Any(x=>x.def==resourceDef) ? def.resourceOffsets.Find(x => x.def == resourceDef).amount : 0));
-                modifiers.Add(modifier);
 
+                ResourceChange multiplier = def.resourceMultipliers.FirstOrFallback(r => r.def == resourceDef);
+                if (multiplier is null)
+                {
+                    modifier.multiplier *= amount;
+                }
+                else
+                {
+                    modifier.multiplier *= amount * multiplier.amount;
+                }
+
+                ResourceChange offset = def.resourceOffsets.FirstOrFallback(r => r.def == resourceDef);
+                if (!(offset is null))
+                {
+                    modifier.offset += amount * offset.amount;
+                }
+
+                modifiers.Add(modifier);
             }
         }
-
-
-
     }
 }

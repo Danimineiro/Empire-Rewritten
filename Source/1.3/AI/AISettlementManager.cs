@@ -1,35 +1,18 @@
-﻿using Empire_Rewritten.Borders;
-using RimWorld;
-using Empire_Rewritten.Resources;
-using RimWorld.Planet;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Verse;
 using Empire_Rewritten.Facilities;
+using RimWorld.Planet;
+using Verse;
 
 namespace Empire_Rewritten.AI
 {
     public class AISettlementManager : AIModule
     {
-        public AISettlementManager(AIPlayer player) : base(player)
-        {
-            worldGrid = Find.WorldGrid;
-        }
+        private Tile tileToBuildOn;
 
-        private static WorldGrid worldGrid;
-        private bool canUpgradeOrBuild;
-        
-        public bool CanUpgradeOrBuild
-        {
-            get
-            {
-                return canUpgradeOrBuild;
-            }
-        }
+        public AISettlementManager(AIPlayer player) : base(player) { }
 
+        public bool CanUpgradeOrBuild { get; private set; }
 
         public bool AttemptToUpgradeSettlement(Settlement settlement)
         {
@@ -48,50 +31,46 @@ namespace Empire_Rewritten.AI
             return false;
         }
 
-
-
-
         public void BuildOrUpgradeNewSettlement()
         {
-            bool UpgradedSettlement = false;
+            bool upgradedSettlement = false;
             if (player.Manager.Settlements.Count > 0)
             {
-                KeyValuePair<Settlement, FacilityManager> settlementAndManager = player.Manager.Settlements.Where(x =>!x.Value.IsFullyUpgraded).RandomElement();
-                Settlement settlement = settlementAndManager.Key;
-                FacilityManager facilityManager = settlementAndManager.Value;
-                UpgradedSettlement = AttemptToUpgradeSettlement(facilityManager);
+                FacilityManager facilityManager = player.Manager.Settlements.Where(x => !x.Value.IsFullyUpgraded).RandomElement().Value;
+                upgradedSettlement = AttemptToUpgradeSettlement(facilityManager);
             }
-            bool BuiltSettlement = false;
-            if (!UpgradedSettlement)
+
+            // TODO: Add back this logic
+            bool builtSettlement = false;
+            if (!upgradedSettlement)
             {
+                // AttemptBuildNewSettlement();
                 SearchForTile();
             }
 
-            canUpgradeOrBuild = UpgradedSettlement || BuiltSettlement;
+            CanUpgradeOrBuild = upgradedSettlement || builtSettlement;
         }
 
-      
-
         /// <summary>
-        /// Search for tiles to build settlements on based off weights;
-        /// Weights:
-        /// - Resources
-        /// - Border distance
-        /// 
-        /// Resources AI wants = higher weight
-        /// Resources AI has excess of = lower weight
+        ///     Search for tiles to build settlements on based off weights;
+        ///     Weights:
+        ///     - Resources
+        ///     - Border distance
+        ///     Resources AI wants = higher weight
+        ///     Resources AI has excess of = lower weight
         /// </summary>
         /// <returns></returns>
         public void SearchForTile()
         {
+            // TODO: Pretty sure this can be improved...
 
             IEnumerable<int> tileOptions = player.TileManager.GetTiles;
 
-            //Default largestweight to -1000 so it's almost always initally overridden.
+            // Default largestWeight to -1000 so it's almost always initially overridden.
             float largestWeight = -1000;
 
-            int result=0;
-           foreach(int tileOption in tileOptions)
+            int result = 0;
+            foreach (int tileOption in tileOptions)
             {
                 float weight = player.TileManager.GetTileWeight(tileOption);
                 if (largestWeight < weight && TileFinder.IsValidTileForNewSettlement(tileOption))
@@ -100,10 +79,9 @@ namespace Empire_Rewritten.AI
                     result = tileOption;
                 }
             }
-            tileToBuildOn = worldGrid[result];
-        }
 
-        private Tile tileToBuildOn = null;
+            tileToBuildOn = Current.Game.World.grid[result];
+        }
 
         public void BuildSettlement()
         {
@@ -122,7 +100,7 @@ namespace Empire_Rewritten.AI
 
         public override void DoThreadableAction()
         {
-          // SearchForTile();
+            // SearchForTile();
         }
     }
 }

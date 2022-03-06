@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Empire_Rewritten.Settlements;
 
-namespace Empire_Rewritten
+// TODO: idk what this is supposed to do so I can't even pretend to document it -Toby
+
+namespace Empire_Rewritten.Controllers.CivicEthic
 {
     public class EthicAbilityWorker
     {

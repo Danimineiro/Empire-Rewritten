@@ -1,22 +1,19 @@
-﻿using Empire_Rewritten.Facilities;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Verse;
 
-namespace Empire_Rewritten
+namespace Empire_Rewritten.Facilities
 {
     /// <summary>
-    /// Used to define actions for facility types.
+    ///     Used to define actions for facility types.
     /// </summary>
-    public class FacilityWorker
+    public abstract class FacilityWorker
     {
         public FacilityDef facilityDef;
+
         public virtual IEnumerable<Gizmo> GetGizmos()
         {
-            return new List<Gizmo>();
+            return Enumerable.Empty<Gizmo>();
         }
 
         public virtual bool CanBuildAt(FacilityManager manager)

@@ -1,32 +1,25 @@
-﻿using Empire_Rewritten.Borders;
+﻿using System.Collections.Generic;
+using Empire_Rewritten.Borders;
 using RimWorld;
 using RimWorld.Planet;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using UnityEngine;
 using Verse;
 
 namespace Empire_Rewritten.AI
 {
     public class AITileManager : AIModule
     {
+        private static WorldGrid _worldGrid;
+
+        private readonly Dictionary<int, float> tileWeights = new Dictionary<int, float>();
+        private TechLevel cachedTechLevel = TechLevel.Undefined;
+
         public AITileManager(AIPlayer player) : base(player)
         {
-            worldGrid = Find.WorldGrid;
+            _worldGrid = Find.WorldGrid;
         }
 
-        public IEnumerable<int> GetTiles
-        {
-            get
-            {
-                return tileWeights.Keys;
-            }
-        }
-       
-        private static WorldGrid worldGrid;
-        private TechLevel cachedTechLevel = TechLevel.Undefined;
+        public IEnumerable<int> GetTiles => tileWeights.Keys;
 
         public TechLevel TechLevel
         {
@@ -36,17 +29,18 @@ namespace Empire_Rewritten.AI
                 {
                     cachedTechLevel = player.Faction.def.techLevel;
                 }
+
                 return cachedTechLevel;
             }
         }
 
-        private readonly Dictionary<int, float> tileWeights = new Dictionary<int, float>();
-
-
         public float GetTileWeight(int id)
         {
-            if(!tileWeights.ContainsKey(id))
-                tileWeights.Add(id,CalculateTileWeight(id));
+            if (!tileWeights.ContainsKey(id))
+            {
+                tileWeights.Add(id, CalculateTileWeight(id));
+            }
+
             return tileWeights[id];
         }
 
@@ -58,14 +52,13 @@ namespace Empire_Rewritten.AI
             float weight = aIResourceManager.GetTileResourceWeight(tile);
 
             //Neolithic AI should not have pin point actions, while spacer AI should be better at understanding resources.
-            float techWeight = (float)(TechLevel - 4) * UnityEngine.Random.Range(1, 10);
+            float techWeight = (float)(TechLevel - 4) * Random.Range(1, 10);
 
             //Make the AI more "Organic"
-            float randomOffsetWeight = UnityEngine.Random.Range(-2, 2);
+            float randomOffsetWeight = Random.Range(-2, 2);
 
             //Hills are hard to build on.
-            float hillinessOffsetWeight = (float)tile.hilliness * UnityEngine.Random.Range(-3, -2);
-
+            float hillinessOffsetWeight = (float)tile.hilliness * Random.Range(-3, -2);
 
             bool foundASettlement = false;
             int smallestDist = 0;
@@ -77,7 +70,7 @@ namespace Empire_Rewritten.AI
                 Settlement settlement = Find.WorldObjects.SettlementAt(other);
                 if (settlement != null)
                 {
-                    int dist = worldGrid.TraversalDistanceBetween(id, other);
+                    int dist = _worldGrid.TraversalDistanceBetween(id, other);
 
                     if (dist < smallestDist || !foundASettlement)
                     {
@@ -120,8 +113,11 @@ namespace Empire_Rewritten.AI
                     tileWeights.Add(tile, CalculateTileWeight(tile));
                     counter++;
                 }
+
                 if (counter == 10)
+                {
                     break;
+                }
             }
         }
 
@@ -130,9 +126,6 @@ namespace Empire_Rewritten.AI
             CalculateAllUnknownTiles();
         }
 
-        public override void DoThreadableAction()
-        {
-            
-        }
+        public override void DoThreadableAction() { }
     }
 }

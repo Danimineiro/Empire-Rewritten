@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Verse;
 
 namespace Empire_Rewritten.Utils.Misc
@@ -10,14 +7,15 @@ namespace Empire_Rewritten.Utils.Misc
     internal class FloatMenuOptionCreator
     {
         /// <summary>
-        ///     Creates a <c>List</c> of <see cref="FloatMenuOption"/>s of type <typeparamref name="T"/> that must be a <see cref="Def"/>
+        ///     Creates a <c>List</c> of <see cref="FloatMenuOption" />s of type <typeparamref name="T" /> that must be a
+        ///     <see cref="Def" />
         ///     Each FloatMenuOption will trigger the provided action
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="defs"></param>
         /// <param name="floatMenuAction"></param>
         /// <returns></returns>
-        public static List<FloatMenuOption> CreateFloatMenuOptions<T>(List<T> defs, Action<T> floatMenuAction ) where T : Def
+        public static List<FloatMenuOption> CreateFloatMenuOptions<T>(List<T> defs, Action<T> floatMenuAction) where T : Def
         {
             List<FloatMenuOption> floatMenuOptions = new List<FloatMenuOption>();
 

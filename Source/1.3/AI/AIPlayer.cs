@@ -1,102 +1,59 @@
-﻿using RimWorld;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Empire_Rewritten.Controllers;
+using Empire_Rewritten.Settlements;
+using RimWorld;
 
 namespace Empire_Rewritten.AI
 {
     public class AIPlayer : BasePlayer
     {
-        private AIFacilityManager facilityManager;
-        private AISettlementManager settlementManager;
-        private AIResourceManager resourceManager;
-        private AITileManager tileManager;
         private Empire cachedManager;
-        private bool ManagerIsDirty = true;
+        private bool managerIsDirty = true;
 
-        public AITileManager TileManager
+        private int threadTick;
+
+        private int tick;
+        private AITileManager tileManager;
+
+        public AIPlayer(Faction faction) : base(faction)
         {
-            get
-            {
-                if(tileManager == null)
-                {
-                    tileManager = new AITileManager(this);
-                }
-                return tileManager;
-            }
+            ResourceManager = new AIResourceManager(this);
+            SettlementManager = new AISettlementManager(this);
+            FacilityManager = new AIFacilityManager(this);
         }
+
+        public AITileManager TileManager => tileManager ?? (tileManager = new AITileManager(this));
 
         public Empire Manager
         {
             get
             {
-                if (cachedManager== null || ManagerIsDirty)
+                if (cachedManager == null || managerIsDirty)
                 {
-                  
-                    ManagerIsDirty = false;
-                    UpdateController updateController = UpdateController.GetUpdateController;
+                    managerIsDirty = false;
+                    UpdateController updateController = UpdateController.CurrentWorldInstance;
                     FactionController factionController = updateController.FactionController;
 
                     cachedManager = factionController.GetOwnedSettlementManager(Faction);
                 }
+
                 return cachedManager;
             }
         }
 
-        public AISettlementManager AISettlementManager
-        {
-            get
-            {
-                return settlementManager;
-            }
-        }
-
-        public AIFacilityManager FacilityManager
-        {
-            get
-            {
-                return facilityManager;
-            }
-        }
-
-        public Faction Faction
-        {
-            get
-            {
-                return faction;
-            }
-        }
-
-        public AIPlayer(Faction faction) : base(faction)
-        {
-            this.resourceManager = new AIResourceManager(this);
-            this.settlementManager = new AISettlementManager(this);
-            this.facilityManager = new AIFacilityManager(this);
-        }
-
-        public AIResourceManager ResourceManager
-        {
-            get
-            {
-                return resourceManager;
-            }
-        }
-
-
-
+        public AISettlementManager SettlementManager { get; }
+        public AIFacilityManager FacilityManager { get; }
+        public AIResourceManager ResourceManager { get; }
+        public Faction Faction => faction;
 
         public override void MakeMove(FactionController factionController)
         {
             ResourceManager.DoModuleAction();
             FacilityManager.DoModuleAction();
-            AISettlementManager.DoModuleAction();
+            SettlementManager.DoModuleAction();
             TileManager.DoModuleAction();
-
         }
 
-        int tick = 0;
         public override bool ShouldExecute()
         {
             if (tick == 120)
@@ -104,16 +61,16 @@ namespace Empire_Rewritten.AI
                 tick = 0;
                 return true;
             }
+
             tick++;
             return false;
         }
 
         public override void MakeThreadedMove(FactionController factionController)
         {
-            Task.Run(AISettlementManager.DoThreadableAction);
+            Task.Run(SettlementManager.DoThreadableAction);
         }
 
-        int threadTick = 0;
         public override bool ShouldExecuteThreaded()
         {
             if (threadTick == 2)
@@ -121,6 +78,7 @@ namespace Empire_Rewritten.AI
                 threadTick = 0;
                 return true;
             }
+
             threadTick++;
             return false;
         }

@@ -36,31 +36,31 @@
 		<temperatureCurve>
 			<points>
 				<li>-270, 1.0</li>
-				<li>   0, 1.0</li>
-				<li>  50, 1.0</li>
+				<li>0, 1.0</li>
+				<li>50, 1.0</li>
 			</points>
 		</temperatureCurve>
 
 		<rainfallCurve>
 			<points>
-				<li>   0,  1</li>
-				<li>7500,  1</li>
+				<li>0, 1</li>
+				<li>7500, 1</li>
 			</points>
 		</rainfallCurve>
 
 		<heightCurve>
 			<points>
-				<li>   0, 1</li>
+				<li>0, 1</li>
 				<li>2500, 1</li>
 			</points>
 		</heightCurve>
 
 		<swampinessCurve>
 			<points>
-				<li> 0.5, 1.0</li>
-				<li> 0.6, 0.98</li>
-				<li> 0.8, 0.9</li>
-				<li> 1.0, 0.80</li>
+				<li>0.5, 1.0</li>
+				<li>0.6, 0.98</li>
+				<li>0.8, 0.9</li>
+				<li>1.0, 0.80</li>
 			</points>
 		</swampinessCurve>
 	</Empire_Rewritten.Resources.ResourceDef>
@@ -113,34 +113,34 @@
 		<temperatureCurve Inherit="False">
 			<points>
 				<li>-270, 0.0</li>
-				<li>   0, 0.0</li>
-				<li>   2, 0.2</li>
-				<li>  10, 0.8</li>
-				<li>  15, 1.0</li>
-				<li>  20, 1.1</li>
-				<li>  21, 1.1</li>
-				<li>  27, 0.95</li>
-				<li>  33, 0.75</li>
-				<li>  45, 0.3</li>
-				<li>  50, 0.0</li>
-				<li>  50, 0.0</li>
+				<li>0, 0.0</li>
+				<li>2, 0.2</li>
+				<li>10, 0.8</li>
+				<li>15, 1.0</li>
+				<li>20, 1.1</li>
+				<li>21, 1.1</li>
+				<li>27, 0.95</li>
+				<li>33, 0.75</li>
+				<li>45, 0.3</li>
+				<li>50, 0.0</li>
+				<li>50, 0.0</li>
 			</points>
 		</temperatureCurve>
 
 		<rainfallCurve Inherit="False">
 			<points>
-				<li>   0,  0</li>
-				<li> 500,  0.8</li>
-				<li>2000,  1</li>
-				<li>5500,  1</li>
-				<li>7500,  0.6</li>
+				<li>0, 0</li>
+				<li>500, 0.8</li>
+				<li>2000, 1</li>
+				<li>5500, 1</li>
+				<li>7500, 0.6</li>
 			</points>
 		</rainfallCurve>
 
 		<heightCurve Inherit="False">
 			<points>
-				<li>   0, 0.8</li>
-				<li> 200, 1</li>
+				<li>0, 0.8</li>
+				<li>200, 1</li>
 				<li>1800, 1</li>
 				<li>2500, 0.9</li>
 			</points>
@@ -148,13 +148,13 @@
 
 		<swampinessCurve Inherit="False">
 			<points>
-				<li> 0.5, 0.95</li>
-				<li> 0.6, 1.0</li>
-				<li> 0.8, 1.05</li>
-				<li> 1.0, 1.1</li>
+				<li>0.5, 0.95</li>
+				<li>0.6, 1.0</li>
+				<li>0.8, 1.05</li>
+				<li>1.0, 1.1</li>
 			</points>
 		</swampinessCurve>
-		
+
 	</Empire_Rewritten.Resources.ResourceDef>
 
 	<Empire_Rewritten.Resources.ResourceDef ParentName="Empire_ResourceBase">
@@ -193,7 +193,7 @@
 		</waterBodyFactors>
 
 		<waterBodyOffsets>
-			<lake>0.2</lake>	<!-- Just more water -->
+			<lake>0.2</lake>    <!-- Just more water -->
 			<river>-0.2</river> <!-- Less growing space -->
 			<ocean>-0.5</ocean> <!-- Saltwater -->
 		</waterBodyOffsets>
@@ -202,51 +202,51 @@
 			<points>
 				<li>-270, 0.0</li>
 				<li>-100, 0.0</li>
-				<li> -50, 0.2</li>
-				<li> -25, 0.5</li>
-				<li>   0, 0.9</li>
-				<li>  12, 1</li>
-				<li>  27, 1</li>
-				<li>  38, 0.95</li>
+				<li>-50, 0.2</li>
+				<li>-25, 0.5</li>
+				<li>0, 0.9</li>
+				<li>12, 1</li>
+				<li>27, 1</li>
+				<li>38, 0.95</li>
 				<li>42.5, 0.75</li>
-				<li>  47, 0.25</li>
-				<li>  50, 0.125</li>
-				<li>  50, 0.125</li>
+				<li>47, 0.25</li>
+				<li>50, 0.125</li>
+				<li>50, 0.125</li>
 			</points>
 		</temperatureCurve>
 
 		<rainfallCurve Inherit="False">
 			<points>
-				<li>   0,  0</li>
-				<li> 500,  0.6</li>
-				<li>2500,  1</li>
-				<li>7500,  1.25</li>
+				<li>0, 0</li>
+				<li>500, 0.6</li>
+				<li>2500, 1</li>
+				<li>7500, 1.25</li>
 			</points>
 		</rainfallCurve>
 
 		<heightCurve Inherit="False">
 			<points>
-				<li>   0, 0.85</li>
-				<li> 200, 1</li> <!-- Avoid coasts -->
+				<li>0, 0.85</li>
+				<li>200, 1</li> <!-- Avoid coasts -->
 				<li>2500, 1</li>
 			</points>
 		</heightCurve>
 
 		<swampinessCurve Inherit="False">
 			<points>
-				<li> 0.5, 1.0</li>
-				<li> 0.6, 0.95</li>
-				<li> 0.8, 0.7</li>
-				<li> 1.0, 0.4</li>
+				<li>0.5, 1.0</li>
+				<li>0.6, 0.95</li>
+				<li>0.8, 0.7</li>
+				<li>1.0, 0.4</li>
 			</points>
 		</swampinessCurve>
-		
+
 	</Empire_Rewritten.Resources.ResourceDef>
 
 	<Empire_Rewritten.Resources.ResourceDef ParentName="Empire_ResourceBase">
 		<defName>Empire_Mining</defName>
 		<label>Mining</label>
-		
+
 		<iconData>
 			<texPath>Resources/Mining</texPath>
 		</iconData>
@@ -260,14 +260,14 @@
 		<allowedThingDefs>
 			<li>ComponentIndustrial</li>
 		</allowedThingDefs>
-		
+
 		<hillinessFactors>
 			<flat>0.8</flat>
 			<smallHills>1</smallHills>
 			<largeHills>1.1</largeHills>
 			<mountainous>1.2</mountainous>
 		</hillinessFactors>
-		
+
 		<hillinessOffsets>
 			<flat>-0.4</flat>
 			<smallHills>-0.2</smallHills>
@@ -280,41 +280,41 @@
 				<li>-270,0.0</li>
 				<li>-200,0.0</li>
 				<li>-10, 0.92</li>
-				<li>  0, 0.97</li>
-				<li> 15, 1.0</li>
-				<li> 35, 1.0</li>
-				<li> 40, 0.98</li>
-				<li> 45, 0.96</li>
-				<li> 50, 0.92</li>
-				<li> 50, 0.92</li> <!--Without this duplicated point this dumb curve just doesn't wanna work-->
+				<li>0, 0.97</li>
+				<li>15, 1.0</li>
+				<li>35, 1.0</li>
+				<li>40, 0.98</li>
+				<li>45, 0.96</li>
+				<li>50, 0.92</li>
+				<li>50, 0.92</li> <!--Without this duplicated point this dumb curve just doesn't wanna work-->
 			</points>
 		</temperatureCurve>
 
 		<rainfallCurve Inherit="False">
 			<points>
-				<li>   0,  1</li>
-				<li>3000,  1</li>
-				<li>7500,  0.95</li>
+				<li>0, 1</li>
+				<li>3000, 1</li>
+				<li>7500, 0.95</li>
 			</points>
 		</rainfallCurve>
 
 		<heightCurve Inherit="False">
 			<points>
-				<li>   0, 0.85</li>
-				<li> 250, 0.87</li>
-				<li> 450, 0.98</li>
-				<li> 500, 1.0</li>
-				<li> 750, 1.0</li>
+				<li>0, 0.85</li>
+				<li>250, 0.87</li>
+				<li>450, 0.98</li>
+				<li>500, 1.0</li>
+				<li>750, 1.0</li>
 				<li>2500, 0.95</li>
 			</points>
 		</heightCurve>
-	
+
 	</Empire_Rewritten.Resources.ResourceDef>
 
 	<Empire_Rewritten.Resources.ResourceDef ParentName="Empire_ResourceBase">
 		<defName>Empire_Ranching</defName>
 		<label>Ranching</label>
-		<resourceWorker>Empire_Rewritten.Resources.ResourceWorker_Rancher</resourceWorker>
+		<resourceWorker>Empire_Rewritten.Resources.ResourceWorkers.ResourceWorker_Rancher</resourceWorker>
 
 		<hillinessFactors>
 			<flat>1</flat>
@@ -345,33 +345,33 @@
 		<temperatureCurve Inherit="False">
 			<points>
 				<li>-270, 0.0</li>
-				<li>   2, 0.0</li>
-				<li>  10, 0.6</li>
-				<li>  15, 0.9</li>
-				<li>  20, 1.0</li>
-				<li>  21, 1.0</li>
-				<li>  27, 0.94</li>
-				<li>  33, 0.7</li>
-				<li>  45, 0.25</li>
-				<li>  50, 0.0</li>
-				<li>  50, 0.0</li>
+				<li>2, 0.0</li>
+				<li>10, 0.6</li>
+				<li>15, 0.9</li>
+				<li>20, 1.0</li>
+				<li>21, 1.0</li>
+				<li>27, 0.94</li>
+				<li>33, 0.7</li>
+				<li>45, 0.25</li>
+				<li>50, 0.0</li>
+				<li>50, 0.0</li>
 			</points>
 		</temperatureCurve>
 
 		<rainfallCurve Inherit="False">
 			<points>
-				<li>   0,  0</li>
-				<li> 500,  0.6</li>
-				<li>2200,  1</li>
-				<li>5000,  1</li>
-				<li>7500,  0.6</li>
+				<li>0, 0</li>
+				<li>500, 0.6</li>
+				<li>2200, 1</li>
+				<li>5000, 1</li>
+				<li>7500, 0.6</li>
 			</points>
 		</rainfallCurve>
 
 		<heightCurve Inherit="False">
 			<points>
-				<li>   0, 1</li>
-				<li> 200, 1</li>
+				<li>0, 1</li>
+				<li>200, 1</li>
 				<li>1800, 1</li>
 				<li>2500, 0.9</li>
 			</points>
@@ -379,10 +379,10 @@
 
 		<swampinessCurve Inherit="False">
 			<points>
-				<li> 0.5, 1</li>
-				<li> 0.6, 0.9</li>
-				<li> 0.8, 0.7</li>
-				<li> 1.0, 0.2</li>
+				<li>0.5, 1</li>
+				<li>0.6, 0.9</li>
+				<li>0.8, 0.7</li>
+				<li>1.0, 0.2</li>
 			</points>
 		</swampinessCurve>
 

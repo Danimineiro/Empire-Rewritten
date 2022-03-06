@@ -1,46 +1,42 @@
-﻿using RimWorld;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Empire_Rewritten.Controllers;
+using Empire_Rewritten.Settlements;
+using RimWorld;
 
 namespace Empire_Rewritten.Player
 {
     public class UserPlayer : BasePlayer
     {
-        public UserPlayer(Faction faction) : base(faction)
-        {
-
-        }
         private Empire cachedManager;
-        private bool ManagerIsDirty;
+        private bool managerIsDirty;
+
+        public UserPlayer(Faction faction) : base(faction) { }
 
         public Empire Manager
         {
             get
             {
-                if (cachedManager == null || ManagerIsDirty)
+                if (cachedManager == null || managerIsDirty)
                 {
-
-                    ManagerIsDirty = false;
-                    UpdateController updateController = UpdateController.GetUpdateController;
+                    managerIsDirty = false;
+                    UpdateController updateController = UpdateController.CurrentWorldInstance;
                     FactionController factionController = updateController.FactionController;
 
                     cachedManager = factionController.GetOwnedSettlementManager(faction);
                 }
+
                 return cachedManager;
             }
         }
 
         public override void MakeMove(FactionController factionController)
         {
-         //   throw new NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override void MakeThreadedMove(FactionController factionController)
         {
-         //   throw new NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override bool ShouldExecute()

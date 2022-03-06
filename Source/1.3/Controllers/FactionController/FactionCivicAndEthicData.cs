@@ -1,42 +1,44 @@
-﻿using RimWorld;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Empire_Rewritten.Controllers.CivicEthic;
+using JetBrains.Annotations;
+using RimWorld;
 using Verse;
 
-namespace Empire_Rewritten
+namespace Empire_Rewritten.Controllers
 {
     public class FactionCivicAndEthicData : IExposable
     {
-        private readonly Faction faction;
-        private readonly List<CivicDef> civics = new List<CivicDef>();
-        private readonly List<EthicDef> ethics = new List<EthicDef>();
-
+        /// <summary>
+        ///     For saving/loading
+        /// </summary>
+        [UsedImplicitly]
         public FactionCivicAndEthicData() { }
 
         public FactionCivicAndEthicData(Faction faction, IEnumerable<CivicDef> civics, IEnumerable<EthicDef> ethics)
         {
-            this.faction = faction;
-            this.civics = civics.ToList();
-            this.ethics = ethics.ToList(); 
+            Faction = faction;
+            Civics = civics.ToList();
+            Ethics = ethics.ToList();
         }
-        
-        /// <summary>
-        /// Provides the faction that this class saves data about
-        /// </summary>
-        public Faction Faction => faction;
 
         /// <summary>
-        /// Provides the civics of this faction that this class saves data about
+        ///     The <see cref="Faction" /> that this <see cref="FactionCivicAndEthicData" /> saves data about
         /// </summary>
-        public List<CivicDef> Civics => civics;
+        public Faction Faction { get; }
 
         /// <summary>
-        /// Provides the ethics of this faction that this class saves data about
+        ///     The <see cref="CivicDef">CivicDefs</see> of <see cref="FactionCivicAndEthicData" />'s
+        ///     <see cref="FactionCivicAndEthicData.Faction" />
         /// </summary>
-        public List<EthicDef> Ethics => ethics;
+        public List<CivicDef> Civics { get; } = new List<CivicDef>();
+
+        /// <summary>
+        ///     The <see cref="EthicDef">EthicDefs</see> of <see cref="FactionCivicAndEthicData" />'s
+        ///     <see cref="FactionCivicAndEthicData.Faction" />
+        /// </summary>
+        public List<EthicDef> Ethics { get; } = new List<EthicDef>();
 
         public void ExposeData()
         {

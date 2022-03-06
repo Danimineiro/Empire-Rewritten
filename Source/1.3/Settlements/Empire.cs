@@ -1,34 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using RimWorld;
-using Empire_Rewritten.Resources;
-using RimWorld.Planet;
-using Verse;
 using Empire_Rewritten.Borders;
 using Empire_Rewritten.Facilities;
+using Empire_Rewritten.Resources;
+using JetBrains.Annotations;
+using RimWorld;
+using RimWorld.Planet;
+using Verse;
 
-namespace Empire_Rewritten
+namespace Empire_Rewritten.Settlements
 {
     /// <summary>
-    /// Manages settlements, and storage.
+    ///     Manages settlements, and storage.
     /// </summary>
     public class Empire : IExposable, ILoadReferenceable
     {
+        private bool borderIsDirty;
+        private Border cachedBorder;
+        private List<FacilityManager> facilityManagersForLoading = new List<FacilityManager>();
+        private Faction faction;
 
         private Dictionary<Settlement, FacilityManager> settlements = new Dictionary<Settlement, FacilityManager>();
+
+        private List<Settlement> settlementsForLoading = new List<Settlement>();
         private StorageTracker storageTracker = new StorageTracker();
-        private Faction faction;
-        private Border cachedBorder;
-        private bool borderIsDirty= false;
-        
-        public void SetBorderDirty()
+
+        [UsedImplicitly]
+        public Empire() { }
+
+        public Empire([NotNull] Faction faction)
         {
-            borderIsDirty = true;
+            this.faction = faction ?? throw new ArgumentNullException(nameof(faction));
         }
 
+        public StorageTracker StorageTracker => storageTracker;
+        public Dictionary<Settlement, FacilityManager> Settlements => settlements;
+        public List<int> SettlementTiles { get; } = new List<int>();
 
         private Border Border
         {
@@ -39,12 +47,32 @@ namespace Empire_Rewritten
                     borderIsDirty = false;
                     cachedBorder = BorderManager.GetBorderManager.GetBorder(faction);
                 }
+
                 return cachedBorder;
             }
         }
 
+        public IEnumerable<FacilityManager> AllFacilityManagers => settlements.Values;
+
+        public void ExposeData()
+        {
+            Scribe_Collections.Look(ref settlements, "settlements", LookMode.Reference, LookMode.Deep, ref settlementsForLoading, ref facilityManagersForLoading);
+            Scribe_References.Look(ref faction, "faction");
+            Scribe_Deep.Look(ref storageTracker, "storageTracker");
+        }
+
+        public string GetUniqueLoadID()
+        {
+            return $"{nameof(Empire)}_{GetHashCode()}";
+        }
+
+        public void SetBorderDirty()
+        {
+            borderIsDirty = true;
+        }
+
         /// <summary>
-        /// Compiles a complete dictionary of all the resources a faction is producing and their modifiers.
+        ///     Compiles a complete dictionary of all the resources a faction is producing and their modifiers.
         /// </summary>
         /// <returns></returns>
         public Dictionary<ResourceDef, ResourceModifier> ResourceModifiersFromAllFacilities()
@@ -53,8 +81,7 @@ namespace Empire_Rewritten
             List<FacilityManager> facilities = settlements.Values.ToList();
             foreach (FacilityManager facilityManager in facilities)
             {
-                List<ResourceModifier> facilityMods = facilityManager.modifiers;
-                foreach (ResourceModifier resourceModifier in facilityMods)
+                foreach (ResourceModifier resourceModifier in facilityManager.Modifiers)
                 {
                     if (resourceModifiers.ContainsKey(resourceModifier.def))
                     {
@@ -67,43 +94,12 @@ namespace Empire_Rewritten
                     }
                 }
             }
+
             return resourceModifiers;
         }
 
-        private List<int> settlementTiles = new List<int>();
-
-        public List<int> SettlementTiles
-        {
-            get
-            {
-                return settlementTiles;
-            }
-        }
-
-        public StorageTracker StorageTracker
-        {
-            get
-            {
-                return storageTracker;
-            }
-        }
-        public Empire()
-        {
-
-        }
-
-        public Empire(Faction faction)
-        {
-            this.faction = faction;
-        }
-
-        public Dictionary<Settlement, FacilityManager> Settlements
-        {
-            get { return settlements; }
-        }
-
         /// <summary>
-        /// Place a settlement on a <paramref name="tile"/>.
+        ///     Place a settlement on a <paramref name="tile" />.
         /// </summary>
         /// <param name="tile"></param>
         /// <returns>If the settlement was built.</returns>
@@ -111,18 +107,16 @@ namespace Empire_Rewritten
         {
             if (tile != null)
             {
-                int tileID = Find.WorldGrid.tiles.IndexOf(tile);
-                if (TileFinder.IsValidTileForNewSettlement(tileID))
+                int tileId = Find.WorldGrid.tiles.IndexOf(tile);
+                if (TileFinder.IsValidTileForNewSettlement(tileId))
                 {
-                    Log.Message($"Tile is null: {tile == null}");
-                    Log.Message($"Faction is null: {faction == null}");
                     Settlement settlement = (Settlement)WorldObjectMaker.MakeWorldObject(WorldObjectDefOf.Settlement);
-                    settlement.Tile = tileID;
-                    settlement.SetFaction(this.faction);
+                    settlement.Tile = tileId;
+                    settlement.SetFaction(faction);
 
                     List<string> used = new List<string>();
-                    List<Settlement> settlements = Find.WorldObjects.Settlements;
-                    foreach (Settlement found in settlements)
+                    List<Settlement> worldSettlements = Find.WorldObjects.Settlements;
+                    foreach (Settlement found in worldSettlements)
                     {
                         used.Add(found.Name);
                     }
@@ -133,12 +127,12 @@ namespace Empire_Rewritten
                     return true;
                 }
             }
+
             return false;
         }
-        
 
         /// <summary>
-        /// Add a settlement to the tracker.
+        ///     Add a settlement to the tracker.
         /// </summary>
         /// <param name="settlement"></param>
         public void AddSettlement(Settlement settlement)
@@ -146,28 +140,19 @@ namespace Empire_Rewritten
             FacilityManager tracker = new FacilityManager(settlement);
             settlements.Add(settlement, tracker);
             Border.SettlementClaimTiles(settlement);
-            settlementTiles.Add(settlement.Tile);
-        }
-
-        private List<Settlement> settlementsForLoading = new List<Settlement>();
-        private List<FacilityManager> facilityManagersForLoading = new List<FacilityManager>();
-        public void ExposeData()
-        {
-            Scribe_Collections.Look<Settlement,FacilityManager>(ref settlements, "settlements", LookMode.Reference, LookMode.Deep,keysWorkingList:ref settlementsForLoading,valuesWorkingList:ref facilityManagersForLoading);
-            Scribe_References.Look(ref faction, "faction");
-            Scribe_Deep.Look(ref storageTracker, "storageTracker");
-
+            SettlementTiles.Add(settlement.Tile);
         }
 
         public Settlement GetSettlement(FacilityManager manager)
         {
-            foreach(Settlement settlement in settlements.Keys)
+            foreach (Settlement settlement in settlements.Keys)
             {
                 if (settlements[settlement] == manager)
                 {
                     return settlement;
                 }
             }
+
             return null;
         }
 
@@ -177,17 +162,9 @@ namespace Empire_Rewritten
             {
                 return settlements[settlement];
             }
+
             Log.Warning($"[Empire]: {settlement.Name} was not in the settlement manager! Returning null.");
             return null;
-        }
-
-        public IEnumerable<FacilityManager> GetAllFacilityManagers()
-        {
-            return settlements.Values;
-        }
-        public string GetUniqueLoadID()
-        {
-            return $"SettlementTracker_{GetHashCode()}";
         }
     }
 }

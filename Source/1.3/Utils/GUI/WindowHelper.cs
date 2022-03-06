@@ -1,33 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 using Verse;
 
-namespace Empire_Rewritten.Utils
+namespace Empire_Rewritten.Utils.GUI
 {
     /// <summary>
-    /// This class provides some useful and often used basic window operations
+    ///     This class provides some useful and often used basic window operations
     /// </summary>
     public static class WindowHelper
     {
         /// <summary>
-        /// This draws a border around any <paramref name="rect"/> using the given <paramref name="color"/> and <paramref name="width"/>
+        ///     This draws a border around a <see cref="Rect" />, using a given <see cref="int">border width</see> and
+        ///     <see cref="Color" />
         /// </summary>
-        /// <param name="rect"></param>
-        /// <param name="width"></param>
-        /// <param name="color"></param>
-        public static void DrawBorderAroundRect(this Rect rect, int width = 1, Color? color = null)
+        /// <param name="rect">The <see cref="Rect" /> to draw a border around</param>
+        /// <param name="width">The width of the border</param>
+        /// <param name="maybeColor">
+        ///     The <see cref="Color">Color?</see> of the border to draw. If null, Defaults to
+        ///     <see cref="UnityEngine.GUI.color">UnityEngine's GUI color</see>
+        /// </param>
+        public static void DrawBorderAroundRect(this Rect rect, int width = 1, Color? maybeColor = null)
         {
-            Color temp = color ?? GUI.color;
-
-            Rect tempRect = rect.ExpandedBy(width);
-            Color prev = GUI.color;
-            GUI.color = temp;
-            Widgets.DrawBox(tempRect, width);
-            GUI.color = prev;
+            Rect borderRect = rect.ExpandedBy(width);
+            if (maybeColor is Color color)
+            {
+                // Use passed color to draw border, then reset GUI color to what it was before
+                Color previousColor = UnityEngine.GUI.color;
+                UnityEngine.GUI.color = color;
+                Widgets.DrawBox(borderRect, width);
+                UnityEngine.GUI.color = previousColor;
+            }
+            else
+            {
+                // Just use UnityEngine's color, no need to assign variables.
+                Widgets.DrawBox(borderRect, width);
+            }
         }
 
         /// <summary>
@@ -35,22 +41,22 @@ namespace Empire_Rewritten.Utils
         /// </summary>
         public static void ResetTextAndColor()
         {
-            Text.Font = GameFont.Small;
-            Text.Anchor = TextAnchor.UpperLeft;
-            GUI.color = Color.white;
+            Verse.Text.Font = GameFont.Small;
+            Verse.Text.Anchor = TextAnchor.UpperLeft;
+            UnityEngine.GUI.color = Color.white;
         }
 
         /// <summary>
-        ///     Creates a <see cref="Widgets.ButtonInvisible(Rect, bool)"/> using a <paramref name="label"/>
-        ///     inside the given <paramref name="inRect"/>
+        ///     Creates a <see cref="Widgets.ButtonInvisible(Rect, bool)" /> using a given <see cref="string" /> as label, inside a
+        ///     given <see cref="Rect" />
         /// </summary>
-        /// <param name="inRect"></param>
-        /// <param name="label"></param>
-        /// <returns><c>true</c> if the button is pressed, false otherwise</returns>
+        /// <param name="inRect">The <see cref="Rect" /> to draw in</param>
+        /// <param name="label">The <see cref="string" /> that should be used as label</param>
+        /// <returns><c>true</c> if the button is pressed, <c>false</c> otherwise</returns>
         public static bool DrawInfoScreenSelectorButton(Rect inRect, string label)
         {
-            Text.Anchor = TextAnchor.MiddleCenter;
-            Text.Font = GameFont.Medium;
+            Verse.Text.Anchor = TextAnchor.MiddleCenter;
+            Verse.Text.Font = GameFont.Medium;
 
             Widgets.DrawLightHighlight(inRect);
             Widgets.DrawHighlightIfMouseover(inRect);

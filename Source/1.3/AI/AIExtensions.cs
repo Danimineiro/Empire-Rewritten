@@ -1,17 +1,18 @@
-﻿using Empire_Rewritten.AI;
+﻿using Empire_Rewritten.Controllers;
 using RimWorld;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Empire_Rewritten
+namespace Empire_Rewritten.AI
 {
     public static class AIExtensions
     {
-        public static bool IsAIPlayer(this Faction faction)=>GetAIPlayer(faction)!=null;
+        public static bool IsAIPlayer(this Faction faction)
+        {
+            return GetAIPlayer(faction) != null;
+        }
 
-        public static AIPlayer GetAIPlayer(this Faction faction) => UpdateController.GetUpdateController.FactionController.GetAIPlayer(faction);
+        public static AIPlayer GetAIPlayer(this Faction faction)
+        {
+            return UpdateController.CurrentWorldInstance.FactionController.GetAIPlayer(faction);
+        }
     }
 }

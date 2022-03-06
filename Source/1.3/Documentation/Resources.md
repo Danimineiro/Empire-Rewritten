@@ -5,39 +5,48 @@ A resource is a collection of ThingDefs that gets produced by workers in a settl
 The amount of resources collected is determined by 1 \* TileModifiers \* \[Modifiers from the Settlement\]
 
 ## How to create a ResourceDef
+
 ### Create a new Defs file
+
 - Go into your mods folder structure and create a "Defs" folder, if it doesn't exist yet
 - Enter it and create an .xml file with any name you want
 - Start it with this format:
+
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
 </Defs>
 ```
+
 - Start working on a new ResourceDef by opening up a ResourceDef bracket thingy: (We recommend using our Empire_ResourceBase as parent, as it will fill in missing fields with base values)
+
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
-	<Empire_Rewritten.ResourceDef ParentName="Empire_ResourceBase">
-	</Empire_Rewritten.ResourceDef>
+	<Empire_Rewritten.Resources.ResourceDef ParentName="Empire_ResourceBase">
+	</Empire_Rewritten.Resources.ResourceDef>
 </Defs>
 ```
-- Fill in the `defName`, `Label`  and `description` fields. We recommend prefixing your `defName` with the name of your mod or a common prefix your mod uses. If needed or wanted, you can also define a `Empire_Rewritten.ResourceWorker` using the optional `resourceWorker` field. It can modify the internal `Verse.ThingFilter` using C#
+
+- Fill in the `defName`, `Label`  and `description` fields. We recommend prefixing your `defName` with the name of your mod or a common prefix your mod uses. If needed or wanted, you can also define a `Empire_Rewritten.Resources.ResourceWorker` using the optional `resourceWorker` field. It can modify the internal `Verse.ThingFilter` using C#
+
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
-	<Empire_Rewritten.ResourceDef ParentName="Empire_ResourceBase">
+	<Empire_Rewritten.Resources.ResourceDef ParentName="Empire_ResourceBase">
 		<defName>Empire_Example</defName>
 		<label>Example</label>
 		<description>This is a description resource. Don't let workers touch it</description>
-	</Empire_Rewritten.ResourceDef>
+	</Empire_Rewritten.Resources.ResourceDef>
 </Defs>
 ```
+
 - Give your resource an Icon by defining an `iconData` field containing a `texPath` field
+
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
-	<Empire_Rewritten.ResourceDef ParentName="Empire_ResourceBase">
+	<Empire_Rewritten.Resources.ResourceDef ParentName="Empire_ResourceBase">
 		<defName>Empire_Example</defName>
 		<label>Example</label>
 		<description>This is a description resource. Don't let workers touch it</description>
@@ -45,14 +54,16 @@ The amount of resources collected is determined by 1 \* TileModifiers \* \[Modif
 		<iconData>
 			<texPath>Resources/Example</texPath> <!-- This would point to YourMod/Textures/Resources/Example -->
 		</iconData>
-	</Empire_Rewritten.ResourceDef>
+	</Empire_Rewritten.Resources.ResourceDef>
 </Defs>
 ```
-- Define the `ThingDefs` that can be gathered from the Resource using the `stuffCategories`, `thingCategoryDefs` and `allowedThingDefs` fields. You can remove `Thingdefs` using the `removeStuffCategoryDefs`, `removeThingCategoryDefs` and  `postRemoveThingDefs`  fields. (Order: `stuffCategoryDefs` => `removeStuffCategoryDefs` => `thingCategoryDefs` => `removeThingCategoryDefs` => `allowedThingDefs` => `postRemoveThingDefs` => `ResourceWorker`) 
+
+- Define the `ThingDefs` that can be gathered from the Resource using the `stuffCategories`, `thingCategoryDefs` and `allowedThingDefs` fields. You can remove `Thingdefs` using the `removeStuffCategoryDefs`, `removeThingCategoryDefs` and  `postRemoveThingDefs`  fields. (Order: `stuffCategoryDefs` => `removeStuffCategoryDefs` => `thingCategoryDefs` => `removeThingCategoryDefs` => `allowedThingDefs` => `postRemoveThingDefs` => `ResourceWorker`)
+
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
-	<Empire_Rewritten.ResourceDef ParentName="Empire_ResourceBase">
+	<Empire_Rewritten.Resources.ResourceDef ParentName="Empire_ResourceBase">
 		<defName>Empire_Example</defName>
 		<label>Example</label>
 		<description>This is a description resource. Don't let workers touch it</description>
@@ -77,14 +88,16 @@ The amount of resources collected is determined by 1 \* TileModifiers \* \[Modif
 		<postRemoveThingDefs>
 			<li>Silver</li>
 		</postRemoveThingDefs>
-	</Empire_Rewritten.ResourceDef>
+	</Empire_Rewritten.Resources.ResourceDef>
 </Defs>
 ```
+
 - Next up are bonuses for the tile's "hilliness" and surrounding waterbodies. Here, factors are multipliers for the resource production and offsets are applied additively. Add them like so:
+
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
-	<Empire_Rewritten.ResourceDef ParentName="Empire_ResourceBase">
+	<Empire_Rewritten.Resources.ResourceDef ParentName="Empire_ResourceBase">
 		<defName>Empire_Example</defName>
 		<label>Example</label>
 		<description>This is a description resource. Don't let workers touch it</description>
@@ -138,14 +151,16 @@ The amount of resources collected is determined by 1 \* TileModifiers \* \[Modif
 			<ocean>0</ocean>
 		</waterBodyOffsets>
 
-	</Empire_Rewritten.ResourceDef>
+	</Empire_Rewritten.Resources.ResourceDef>
 </Defs>
 ```
+
 - As a last step, define the curves, offsetting the resource gain based on tile properties:
+
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
-	<Empire_Rewritten.ResourceDef ParentName="Empire_ResourceBase">
+	<Empire_Rewritten.Resources.ResourceDef ParentName="Empire_ResourceBase">
 		<defName>Empire_Example</defName>
 		<label>Example</label>
 		<description>This is a description resource. Don't let workers touch it</description>
@@ -233,6 +248,6 @@ The amount of resources collected is determined by 1 \* TileModifiers \* \[Modif
 				<li> 1.0, 0.80</li>
 			</points>
 		</swampinessCurve>
-	</Empire_Rewritten.ResourceDef>
+	</Empire_Rewritten.Resources.ResourceDef>
 </Defs>
 ```

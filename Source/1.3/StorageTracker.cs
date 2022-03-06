@@ -1,35 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Empire_Rewritten.Resources;
-using RimWorld;
 using Verse;
+
 namespace Empire_Rewritten
 {
     public class StorageTracker : IExposable, ILoadReferenceable
     {
+        // For AI use
         private Dictionary<ThingDef, int> storedThings = new Dictionary<ThingDef, int>();
 
-        //For AI use
-        private Dictionary<ResourceDef, int> approxResources = new Dictionary<ResourceDef, int>();
+        public Dictionary<ResourceDef, int> ApproximateResources { get; } = new Dictionary<ResourceDef, int>();
 
-        public Dictionary<ResourceDef, int> GetApproxResources
+        public Dictionary<ThingDef, int> StoredThings => storedThings;
+
+        public void ExposeData()
         {
-            get
-            {
-                return approxResources;
-            }
+            Scribe_Collections.Look(ref storedThings, "storedThings", LookMode.Def, LookMode.Value);
         }
 
-        public Dictionary<ThingDef,int> StoredThings { 
-            get 
-            { 
-                return storedThings; 
-            } 
+        public string GetUniqueLoadID()
+        {
+            return $"StorageTracker_{GetHashCode()}";
         }
 
+        /// <summary>
+        ///     Adds a given <see cref="int">amount</see> of a given <see cref="ThingDef" /> to this <see cref="StorageTracker" />
+        /// </summary>
+        /// <param name="def">The <see cref="ThingDef" /> to add</param>
+        /// <param name="count">The <see cref="int">amount</see> of <paramref name="def" /> to add</param>
         public void AddThingsToStorage(ThingDef def, int count)
         {
             if (storedThings.ContainsKey(def))
@@ -42,43 +40,64 @@ namespace Empire_Rewritten
             }
         }
 
-        public bool RemoveThingsFromStorage(ThingDef def, int count)
+        /// <summary>
+        ///     Tries to remove a given <see cref="int">amount</see> of a given <see cref="ThingDef" /> from this
+        ///     <see cref="StorageTracker" />
+        /// </summary>
+        /// <param name="def">The <see cref="ThingDef" /> to try and remove</param>
+        /// <param name="count">The <see cref="int">amount</see> of <paramref name="def" /> to try and remove</param>
+        /// <returns>Whether the given <paramref name="count" /> of <paramref name="def" /> could successfully be removed</returns>
+        public bool TryRemoveThingsFromStorage(ThingDef def, int count)
         {
-            if (CanRemoveThingsFromStorage(def, count))
+            if (!CanRemoveThingsFromStorage(def, count)) return false;
+
+            int newCount = storedThings[def] -= count;
+            if (newCount <= 0)
             {
-                storedThings[def] -= count;
-                if (storedThings[def] <= 0)
+                if (newCount < 0)
                 {
-                    storedThings.Remove(def);
+                    Log.Warning($"<color=orange>[Empire]</color> We had negative of {def.defName} after {nameof(TryRemoveThingsFromStorage)}, this shouldn't happen");
                 }
-                return true;
+
+                storedThings.Remove(def);
             }
-            return false;
+
+            return true;
         }
 
+        /// <summary>
+        ///     Checks whether you can remove a given <see cref="int">amount</see> of a given <see cref="ThingDef" /> from this
+        ///     <see cref="StorageTracker" />
+        /// </summary>
+        /// <param name="def">The <see cref="ThingDef" /> to check for</param>
+        /// <param name="count">The <see cref="int">amount</see> of <paramref name="def" /> to check for</param>
+        /// <returns>
+        ///     <c>true</c> if there's more than <paramref name="count" /> of <paramref name="def" /> contained in this
+        ///     <see cref="StorageTracker" />, false otherwise
+        /// </returns>
         public bool CanRemoveThingsFromStorage(ThingDef def, int count)
         {
-            return storedThings.ContainsKey(def) && storedThings[def] >=count;
+            return storedThings.ContainsKey(def) && storedThings[def] >= count;
         }
 
+        /// <summary>
+        ///     Checks how much a given <see cref="ThingDef" /> is contained in this <see cref="StorageTracker" />
+        /// </summary>
+        /// <param name="def">The <see cref="ThingDef" /> to look for</param>
+        /// <returns>How many of <paramref name="def" /> are contained in this <see cref="StorageTracker" />. 0 if not contained</returns>
         public int GetCountOfThing(ThingDef def)
         {
             return storedThings.ContainsKey(def) ? storedThings[def] : 0;
         }
-        
+
+        /// <summary>
+        ///     Checks whether a given <see cref="ThingDef" /> is contained in this <see cref="StorageTracker" />
+        /// </summary>
+        /// <param name="def">The <see cref="ThingDef" /> to look for</param>
+        /// <returns>Whether <paramref name="def" /> is contained in this <see cref="StorageTracker" /></returns>
         public bool ContainsThing(ThingDef def)
         {
-            return GetCountOfThing(def) > 0;
-        }
-
-        public void ExposeData()
-        {
-            Scribe_Collections.Look(ref storedThings, "storedThings",LookMode.Def,LookMode.Value);
-        }
-
-        public string GetUniqueLoadID()
-        {
-            return $"StorageTracker_{GetHashCode()}";
+            return storedThings.ContainsKey(def);
         }
     }
 }
