@@ -83,8 +83,7 @@ namespace Empire_Rewritten.Windows
 
         public override void DoWindowContents(Rect inRect)
         {
-            if (Widgets.CloseButtonFor(inRect)) Close();
-
+            DrawCloseButton(inRect);
             GUI.BeginGroup(RectFull);
             DrawDefSelectorButton();
             DrawDefContent();
@@ -146,6 +145,7 @@ namespace Empire_Rewritten.Windows
                 return;
             }
 
+            Text.Font = GameFont.Tiny;
             Rect tempLabelRect = rect.BottomPartPixels(rect.height / 12f);
 
             SimpleCurveDrawerStyle style = new SimpleCurveDrawerStyle
@@ -319,7 +319,7 @@ namespace Empire_Rewritten.Windows
         /// </summary>
         private void DrawDefSelectorButton()
         {
-            if (Widgets.ButtonInvisible(RectDefSelector))
+            if (WindowHelper.DrawInfoScreenSelectorButton(RectDefSelector, defSelected?.label ?? "Empire_ResourceInfoWindowSelector".Translate()))
             {
                 Find.WindowStack.Add(new FloatMenu(DefOptions));
             }
@@ -336,6 +336,11 @@ namespace Empire_Rewritten.Windows
         private List<FloatMenuOption> CreateFloatMenuOptions()
         {
             return FloatMenuOptionCreator.CreateFloatMenuOptions(resourceDefs, def => defSelected = def);
+        }
+
+        private void DrawCloseButton(Rect inRect)
+        {
+            if (Widgets.CloseButtonFor(inRect)) Close();
         }
     }
 }
