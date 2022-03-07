@@ -9,6 +9,9 @@
 		
 		<costList>
 			<Silver>87327832</Silver>
+			<MedicineHerbal>873</MedicineHerbal>
+			<MedicineIndustrial>8732</MedicineIndustrial>
+			<MedicineUltratech>8782</MedicineUltratech>
 		</costList>
 	</Empire_Rewritten.Facilities.FacilityDef>
 
