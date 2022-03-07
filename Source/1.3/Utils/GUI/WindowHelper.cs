@@ -13,10 +13,10 @@ namespace Empire_Rewritten.Utils
         ///     <see cref="Color" />
         /// </summary>
         /// <param name="rect">The <see cref="Rect" /> to draw a border around</param>
-        /// <param name="width">The width of the border</param>
+        /// <param name="width">The border width</param>
         /// <param name="maybeColor">
         ///     The <see cref="Color">Color?</see> of the border to draw. If null, Defaults to
-        ///     <see cref="UnityEngine.GUI.color">UnityEngine's GUI color</see>
+        ///     <see cref="Color.white">white</see>
         /// </param>
         public static void DrawBorderAroundRect(this Rect rect, int width = 1, Color? maybeColor = null)
         {
