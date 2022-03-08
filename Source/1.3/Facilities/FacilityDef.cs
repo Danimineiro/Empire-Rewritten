@@ -37,13 +37,8 @@ namespace Empire_Rewritten.Facilities
         {
             get
             {
-                if (worker == null)
-                {
-                    worker = (FacilityWorker)Activator.CreateInstance(facilityWorker);
-                    worker.facilityDef = this;
-                }
-
-                return worker;
+                if (facilityWorker == null) return null;
+                return worker ?? (worker = (FacilityWorker)Activator.CreateInstance(facilityWorker, this));
             }
         }
 

@@ -107,7 +107,7 @@ namespace Empire_Rewritten.AI
             if (manager != null)
             {
                 FacilityDef def = SelectFacilityToBuild(manager);
-                if (def.FacilityWorker.CanBuildAt(manager) && CanBuildFacility(def))
+                if (def.FacilityWorker is FacilityWorker worker && worker.CanBuildAt(manager) && CanBuildFacility(def))
                 {
                     foreach (ThingDefCountClass thingDefCountClass in def.costList)
                     {
