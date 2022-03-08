@@ -21,12 +21,7 @@ namespace Empire_Rewritten.Facilities
             this.def = def;
             this.settlement = settlement;
             amount = 1;
-
-            if (def.facilityWorker != null)
-            {
-                FacilityWorker = (FacilityWorker)Activator.CreateInstance(def.facilityWorker);
-                FacilityWorker.facilityDef = def;
-            }
+            FacilityWorker = def.FacilityWorker;
         }
 
         [UsedImplicitly]
@@ -72,6 +67,7 @@ namespace Empire_Rewritten.Facilities
         {
             amount += amountToAdd;
             shouldRecalculateModifiers = true;
+            FacilityWorker?.NotifyConstructed(this);
         }
 
         /// <summary>
@@ -90,6 +86,8 @@ namespace Empire_Rewritten.Facilities
         {
             amount -= amountToRemove;
             if (amount < 0) amount = 0;
+            
+            FacilityWorker?.NotifyDestroyed(this);
 
             shouldRecalculateModifiers = true;
         }
