@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Empire_Rewritten.Facilities;
 using Empire_Rewritten.Utils;
+using HarmonyLib;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
@@ -9,24 +10,25 @@ namespace Empire_Rewritten.Windows
 {
     public class FacilityInfoWindow : Window
     {
-        private const float ItemHeight = 29f;
-
         private readonly List<FacilityDef> facilityDefs;
         private readonly Rect rectContentMain;
         private readonly Rect rectContentMainLeft;
         private readonly Rect rectContentMainRight;
-        private readonly Rect rectFacilityDescriptionArea;
+        private readonly Rect rectSelectionArea;
         private readonly Rect rectSelectionAreaFacilityIcon;
         private readonly Rect rectSelectionAreaFacilityName;
+        private readonly Rect rectFacilityDescriptionArea;
         private readonly Rect rectWindow = new Rect(0f, 0f, 1200f, 600f);
 
-        private List<FloatMenuOption> cachedOptions;
+        private readonly float itemHeight = 29f;
 
         private Vector2 defDescScrollVector;
 
-        private FacilityDef defSelected;
-
         private Rect rectFacilityDescription;
+
+        private List<FloatMenuOption> cachedOptions;
+
+        private FacilityDef defSelected;
 
         public FacilityInfoWindow()
         {
@@ -41,7 +43,7 @@ namespace Empire_Rewritten.Windows
             rectContentMainRight.width -= 2f;
             rectContentMainRight.x += 2f;
 
-            Rect rectSelectionArea = rectContentMainLeft.TopPartPixels(66f);
+            rectSelectionArea = rectContentMainLeft.TopPartPixels(66f);
             rectSelectionAreaFacilityIcon = rectSelectionArea.LeftPartPixels(66f);
             rectSelectionAreaFacilityName = rectSelectionArea.RightPartPixels(rectSelectionArea.width - rectSelectionAreaFacilityIcon.width + 2f);
 
@@ -74,24 +76,34 @@ namespace Empire_Rewritten.Windows
             GUI.color = Color.white;
 
             if (defSelected == null) return;
+            DrawDescriptionBox();
+            DrawCostList();
 
+            DrawFacilityIcon();
+        }
+
+        private void DrawDescriptionBox()
+        {
             float descHeight = Text.CalcHeight(defSelected.description, rectFacilityDescription.width);
 
             rectFacilityDescription.height = descHeight;
 
             Widgets.DrawBox(rectFacilityDescriptionArea, 2);
             Widgets.Label(rectFacilityDescription, defSelected.description);
+        }
 
+        private void DrawCostList()
+        {
             GUI.color = Color.gray;
             Widgets.DrawLineHorizontal(rectFacilityDescription.x, rectFacilityDescription.y + rectFacilityDescription.height, rectFacilityDescription.width);
             GUI.color = Color.white;
 
             Rect rectScrollOuter = rectFacilityDescriptionArea.BottomPartPixels(rectFacilityDescriptionArea.height - rectFacilityDescription.height - 5f).ContractedBy(5f);
-            Rect rectScrollInner = new Rect(rectScrollOuter.x, rectScrollOuter.y, rectScrollOuter.width, ItemHeight * defSelected.costList.Count);
+            Rect rectScrollInner = new Rect(rectScrollOuter.x, rectScrollOuter.y, rectScrollOuter.width, itemHeight * defSelected.costList.Count);
 
             if (rectScrollInner.height > rectScrollOuter.height) rectScrollInner.width -= 17f;
 
-            Rect rectItemBase = new Rect(0f, 0f, rectScrollInner.width, ItemHeight);
+            Rect rectItemBase = new Rect(0f, 0f, rectScrollInner.width, itemHeight);
             Widgets.BeginScrollView(rectScrollOuter, ref defDescScrollVector, rectScrollInner);
 
             GUI.BeginGroup(rectScrollInner);
@@ -103,13 +115,9 @@ namespace Empire_Rewritten.Windows
                 int count = countClass.count;
 
                 if (i % 2 == 1)
-                {
                     Widgets.DrawHighlight(rectItemTemp);
-                }
                 else
-                {
                     Widgets.DrawLightHighlight(rectItemTemp);
-                }
 
                 MouseoverSounds.DoRegion(rectItemTemp);
                 Widgets.DrawHighlightIfMouseover(rectItemTemp);
@@ -121,16 +129,14 @@ namespace Empire_Rewritten.Windows
                 WindowHelper.ResetTextAndColor();
 
                 Widgets.InfoCardButton(rectItemTemp.RightPartPixels(rectItemTemp.height).ContractedBy(2).MoveRect(new Vector2(-3f, 0f)), thing);
-            }
 
+            }
             GUI.EndGroup();
             Widgets.EndScrollView();
 
             GUI.color = Color.gray;
             Widgets.DrawBox(rectScrollOuter);
             GUI.color = Color.white;
-
-            DrawFacilityIcon();
         }
 
         private void DrawFacilityIcon()
@@ -151,13 +157,9 @@ namespace Empire_Rewritten.Windows
         }
 
         /// <summary>
-        ///     Generates the <see cref="FloatMenuOption">FloatMenuOptions</see> for the
-        ///     <see cref="FacilityInfoWindow.facilityDefs" />
+        ///     Makes a list out of all FacilityDefs to select from
         /// </summary>
-        /// <returns>
-        ///     A <see cref="List{T}" /> of <see cref="FloatMenuOption">FloatMenuOptions</see> that set
-        ///     <see cref="FacilityInfoWindow.defSelected" /> to one of <see cref="FacilityInfoWindow.facilityDefs" />
-        /// </returns>
+        /// <returns>the list</returns>
         private List<FloatMenuOption> CreateFloatMenuOptions()
         {
             return FloatMenuOptionCreator.CreateFloatMenuOptions(facilityDefs, def => defSelected = def);
