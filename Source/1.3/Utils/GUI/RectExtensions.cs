@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Empire_Rewritten.Utils.GUI
+namespace Empire_Rewritten.Utils
 {
     public static class RectExtensions
     {

@@ -14,9 +14,7 @@ namespace Empire_Rewritten.HarmonyPatches
         /// </summary>
         public static void GizmoPatch(Settlement __instance, ref IEnumerable<Gizmo> __result)
         {
-            List<Gizmo> gizmos = __result.ToList();
-            gizmos.AddRange(__instance.GetExtendedGizmos());
-            __result = gizmos;
+            __result = __result.Concat(__instance.GetExtendedGizmos());
         }
     }
 }

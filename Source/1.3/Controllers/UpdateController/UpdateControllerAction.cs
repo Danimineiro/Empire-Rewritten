@@ -59,7 +59,6 @@ namespace Empire_Rewritten.Controllers
             ShouldDiscard = ShouldDiscardDefault(maxExecutions);
         }
 
-
         /// <summary>
         ///     Constructs a new <see cref="UpdateControllerAction" /> that controls when a given <paramref name="action" /> should
         ///     execute
@@ -78,7 +77,6 @@ namespace Empire_Rewritten.Controllers
             ShouldDiscard = shouldDiscard;
         }
 
-
         /// <summary>
         ///     Constructs a new <see cref="UpdateControllerAction" /> that controls when a given <paramref name="action" /> should
         ///     execute
@@ -95,10 +93,8 @@ namespace Empire_Rewritten.Controllers
             ShouldDiscard = ShouldDiscardDefault(maxExecutions);
         }
 
-
         /// <summary>
-        ///     Decides if the <seealso cref="UpdateControllerAction.action" /> can be discarded
-        ///     Uses <see cref="UpdateControllerAction.shouldDiscard" /> if available
+        ///     Whether the <seealso cref="UpdateControllerAction.action" /> can be discarded
         /// </summary>
         private Func<bool> ShouldDiscard { get; }
 

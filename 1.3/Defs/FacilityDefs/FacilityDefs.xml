@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+	<Empire_Rewritten.Facilities.FacilityDef Name="Empire_FacilityBase" Abstract="True">
+		<description>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</description>
+		
+		<iconData>
+			<texPath>Error/Missing</texPath>
+		</iconData>
+		
+		<costList>
+			<Silver>87327832</Silver>
+			<MedicineHerbal>873</MedicineHerbal>
+			<MedicineIndustrial>8732</MedicineIndustrial>
+			<MedicineUltratech>8782</MedicineUltratech>
+		</costList>
+	</Empire_Rewritten.Facilities.FacilityDef>
+
+	<Empire_Rewritten.Facilities.FacilityDef ParentName="Empire_FacilityBase">
+		<defName>Empire_TestFacility</defName>
+		<label>Test Facility</label>
+	</Empire_Rewritten.Facilities.FacilityDef>
+</Defs>

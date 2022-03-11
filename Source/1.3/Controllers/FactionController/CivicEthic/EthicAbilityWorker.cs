@@ -17,7 +17,7 @@ namespace Empire_Rewritten.Controllers.CivicEthic
             return "Empire_UnimplementedEthicActionDescription";
         }
 
-        public virtual Action<SettlementManager> ExecutedAction()
+        public virtual Action<Empire> ExecutedAction()
         {
             return null;
         }

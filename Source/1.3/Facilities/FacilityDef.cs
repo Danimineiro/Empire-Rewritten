@@ -1,12 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using Empire_Rewritten.Resources;
-using Empire_Rewritten.Utils.Misc;
+using Empire_Rewritten.Utils;
 using JetBrains.Annotations;
 using Verse;
 
 namespace Empire_Rewritten.Facilities
 {
+    public class ResourceChange
+    {
+        public float amount;
+        public ResourceDef def;
+    }
+
     [UsedImplicitly(ImplicitUseKindFlags.InstantiatedNoFixedConstructorSignature | ImplicitUseKindFlags.Assign, ImplicitUseTargetFlags.WithMembers)]
     public class FacilityDef : Def
     {
@@ -19,8 +25,22 @@ namespace Empire_Rewritten.Facilities
         public List<ThingDefCountClass> costList;
 
         public Type facilityWorker;
-        public Dictionary<ResourceDef, float> resourceMultipliers = new Dictionary<ResourceDef, float>();
-        public Dictionary<ResourceDef, int> resourceOffsets = new Dictionary<ResourceDef, int>();
+
+        public GraphicData iconData;
+        public List<ResourceChange> resourceMultipliers = new List<ResourceChange>();
+
+        public List<ResourceChange> resourceOffsets = new List<ResourceChange>();
+
+        private FacilityWorker worker;
+
+        public FacilityWorker FacilityWorker
+        {
+            get
+            {
+                if (facilityWorker == null) return null;
+                return worker ?? (worker = (FacilityWorker)Activator.CreateInstance(facilityWorker, this));
+            }
+        }
 
         /// <summary>
         ///     Maintains a cache of the <see cref="ResourceDef">ResourceDefs</see> that are produced by this
@@ -30,10 +50,18 @@ namespace Empire_Rewritten.Facilities
         {
             get
             {
-                if (producedResources.Any()) return producedResources;
+                if (producedResources.NullOrEmpty())
+                {
+                    foreach (ResourceChange change in resourceOffsets)
+                    {
+                        producedResources.Add(change.def);
+                    }
 
-                producedResources.AddRange(resourceMultipliers.Keys);
-                producedResources.AddRange(resourceOffsets.Keys);
+                    foreach (ResourceChange change in resourceMultipliers)
+                    {
+                        producedResources.Add(change.def);
+                    }
+                }
 
                 return producedResources;
             }
@@ -42,8 +70,7 @@ namespace Empire_Rewritten.Facilities
         /// <summary>
         ///     Whether or not all required mods and DLCs are installed and active.
         /// </summary>
-        public bool RequiredModsLoaded =>
-            ModChecker.RequiredModsLoaded(requiredModIDs, requiresRoyalty, requiresIdeology);
+        public bool RequiredModsLoaded => ModChecker.RequiredModsLoaded(requiredModIDs, requiresRoyalty, requiresIdeology);
 
         public override IEnumerable<string> ConfigErrors()
         {

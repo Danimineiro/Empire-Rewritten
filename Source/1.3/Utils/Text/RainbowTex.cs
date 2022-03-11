@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Empire_Rewritten.Utils.Text
+namespace Empire_Rewritten.Utils
 {
     internal static class RainbowTex
     {
@@ -70,7 +70,7 @@ namespace Empire_Rewritten.Utils.Text
         /// </returns>
         public static string Rainbowify(this string str, char? splitAt = ' ', int change = 17, int maxLength = 1000)
         {
-            return Rainbowify(SplitString(str, splitAt), change, splitAt?.ToString(), maxLength);
+            return SplitString(str, splitAt).Rainbowify(change, splitAt?.ToString(), maxLength);
         }
 
         /// <summary>

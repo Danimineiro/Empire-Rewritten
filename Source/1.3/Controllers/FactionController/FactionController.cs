@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Empire_Rewritten.AI;
+using Empire_Rewritten.Borders;
 using Empire_Rewritten.Controllers.CivicEthic;
+using Empire_Rewritten.Player;
 using Empire_Rewritten.Settlements;
 using JetBrains.Annotations;
 using RimWorld;
+using RimWorld.Planet;
 using Verse;
 
 namespace Empire_Rewritten.Controllers
@@ -14,8 +19,8 @@ namespace Empire_Rewritten.Controllers
     /// </summary>
     public class FactionController : IExposable
     {
+        private readonly Dictionary<Faction, AIPlayer> AIFactions = new Dictionary<Faction, AIPlayer>();
         private readonly List<FactionCivicAndEthicData> factionCivicAndEthicDataList = new List<FactionCivicAndEthicData>();
-
         private List<FactionSettlementData> factionSettlementDataList = new List<FactionSettlementData>();
 
         /// <summary>
@@ -34,8 +39,17 @@ namespace Empire_Rewritten.Controllers
         /// </param>
         public FactionController(List<FactionSettlementData> factionSettlementDataList)
         {
+            ShouldRefreshBorders = true;
+            BorderManager = new BorderManager();
             this.factionSettlementDataList = factionSettlementDataList;
         }
+
+        public BorderManager BorderManager { get; } = new BorderManager();
+
+        /// <summary>
+        ///     Meant for things that cache the borders to check.
+        /// </summary>
+        public bool ShouldRefreshBorders { get; } = true;
 
         public void ExposeData()
         {
@@ -43,8 +57,8 @@ namespace Empire_Rewritten.Controllers
         }
 
         /// <param name="faction"></param>
-        /// <returns>The <c>SettlementManager</c> owned by a given <paramref name="faction" /></returns>
-        public SettlementManager GetOwnedSettlementManager(Faction faction)
+        /// <returns>The <see cref="Empire" /> owned by a given <paramref name="faction" /></returns>
+        public Empire GetOwnedSettlementManager(Faction faction)
         {
             foreach (FactionSettlementData factionSettlementData in factionSettlementDataList)
             {
@@ -58,7 +72,54 @@ namespace Empire_Rewritten.Controllers
         }
 
         /// <summary>
-        ///     Adds a given <see cref="EthicDef" /> to a <see cref="Faction" />
+        ///     Gets the AIPlayer of a faction.
+        /// </summary>
+        /// <param name="faction"></param>
+        /// <returns></returns>
+        public AIPlayer GetAIPlayer(Faction faction)
+        {
+            return AIFactions.ContainsKey(faction) ? AIFactions[faction] : null;
+        }
+
+        public void CreatePlayer()
+        {
+            Faction faction = Faction.OfPlayer;
+            FactionSettlementData factionSettlementData = new FactionSettlementData(faction, new Empire(faction));
+            factionSettlementDataList.Add(factionSettlementData);
+            // NOTE: Why is this unused?
+            UserPlayer player = new UserPlayer(faction);
+            IEnumerable<WorldObject> settlements = Find.WorldObjects.Settlements.Where(x => x.Faction == faction);
+            BorderManager.GetBorder(faction).SettlementClaimTiles((Settlement)settlements.First());
+        }
+
+        public void CreateNewAIPlayer(Faction faction)
+        {
+            AIPlayer aiPlayer = new AIPlayer(faction);
+            AIFactions.Add(faction, aiPlayer);
+
+            //Find preexisting settlements.
+            List<Settlement> settlements = Find.WorldObjects.Settlements.Where(x => x.Faction == faction).ToList();
+            if (settlements.Any())
+            {
+                if (settlements[0] is null)
+                {
+                    Log.Error("<color=orange>[Empire]</color> settlements has null-entry");
+                }
+
+                aiPlayer.Manager.AddSettlement(settlements[0]);
+                settlements.RemoveAt(0);
+
+                foreach (Settlement item in settlements)
+                {
+                    item.Destroy();
+                }
+            }
+
+            Log.Message($"Created AI for: {faction.Name}");
+        }
+
+        /// <summary>
+        ///     Adds a given <see cref="CivicDef" /> to a <see cref="Faction" />
         /// </summary>
         /// <param name="faction">The <see cref="Faction" /> to modify</param>
         /// <param name="civic">The <see cref="CivicDef" /> to add to <paramref name="faction" /></param>
@@ -69,7 +130,7 @@ namespace Empire_Rewritten.Controllers
         }
 
         /// <summary>
-        ///     Adds multiple given <see cref="EthicDef">EthicDefs</see> to a <see cref="Faction" /> at once
+        ///     Adds multiple given <see cref="CivicDef">EthicDefs</see> to a <see cref="Faction" /> at once
         /// </summary>
         /// <param name="faction">The <see cref="Faction" /> to modify</param>
         /// <param name="civics">The <see cref="CivicDef">CivicDefs</see> to add to <paramref name="faction" /></param>
@@ -101,7 +162,7 @@ namespace Empire_Rewritten.Controllers
             NotifyCivicsOrEthicsChanged(GetOwnedSettlementManager(faction));
         }
 
-        public void NotifyCivicsOrEthicsChanged(SettlementManager settlementManager)
+        public void NotifyCivicsOrEthicsChanged(Empire settlementManager)
         {
             throw new NotImplementedException();
         }

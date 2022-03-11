@@ -1,7 +1,8 @@
 ﻿using Empire_Rewritten.Controllers;
 using Empire_Rewritten.HarmonyPatches;
-using Empire_Rewritten.Utils.Text;
+using Empire_Rewritten.Utils;
 using JetBrains.Annotations;
+using RimWorld;
 using Verse;
 
 namespace Empire_Rewritten
@@ -30,6 +31,8 @@ namespace Empire_Rewritten
         {
             Log.Message("<color=orange>[Empire]</color> Attaching actions to world start");
             UpdateController.AddFinalizeInitHook(AddFactionControllerIfMissing);
+            UpdateController.AddFinalizeInitHook(InitPlayerHandler);
+            UpdateController.AddFinalizeInitHook(AddAIToNonPlayers);
         }
 
         /// <summary>
@@ -45,6 +48,26 @@ namespace Empire_Rewritten
             if (UpdateController.CurrentWorldInstance.HasFactionController) return;
 
             UpdateController.CurrentWorldInstance.FactionController = new FactionController(FactionSettlementData.CreateFactionSettlementData());
+        }
+
+        /// <summary>
+        ///     Add AI to non-player factions
+        /// </summary>
+        private static void AddAIToNonPlayers(FactionController factionController)
+        {
+            foreach (Faction faction in Find.World.factionManager.AllFactions)
+            {
+                if (!faction.IsPlayer && !faction.Hidden)
+                {
+                    Log.Message("<color=orange>[Empire]</color> Creating AI for faction: '" + faction.NameColored.Formatted());
+                    factionController.CreateNewAIPlayer(faction);
+                }
+            }
+        }
+
+        private static void InitPlayerHandler(FactionController factionController)
+        {
+            PlayerHandler.Initialize(factionController);
         }
     }
 }

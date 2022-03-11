@@ -9,9 +9,25 @@ namespace Empire_Rewritten.Facilities
     /// </summary>
     public abstract class FacilityWorker
     {
+        public readonly FacilityDef facilityDef;
+
+        public FacilityWorker(FacilityDef facilityDef)
+        {
+            this.facilityDef = facilityDef;
+        }
+
         public virtual IEnumerable<Gizmo> GetGizmos()
         {
             return Enumerable.Empty<Gizmo>();
         }
+
+        public virtual bool CanBuildAt(FacilityManager manager)
+        {
+            return false;
+        }
+
+        public virtual void NotifyConstructed(Facility facility) { }
+
+        public virtual void NotifyDestroyed(Facility facility) { }
     }
 }

@@ -11,11 +11,11 @@ namespace Empire_Rewritten.Settlements
     public static class SettlementExtensions
     {
         /// <summary>
-        ///     Gets the <see cref="SettlementManager" /> of a given <see cref="Settlement" />.
+        ///     Gets the <see cref="Empire" /> of a given <see cref="Settlement" />.
         /// </summary>
-        /// <param name="settlement">The <see cref="Settlement" /> to get the <see cref="SettlementManager" /> of</param>
-        /// <returns>The <see cref="SettlementManager" /> of <paramref name="settlement" /></returns>
-        public static SettlementManager GetManager(this Settlement settlement)
+        /// <param name="settlement">The <see cref="Settlement" /> to get the <see cref="Empire" /> of</param>
+        /// <returns>The <see cref="Empire" /> of <paramref name="settlement" /></returns>
+        public static Empire GetManager(this Settlement settlement)
         {
             return UpdateController.CurrentWorldInstance.FactionController.GetOwnedSettlementManager(settlement.Faction);
         }

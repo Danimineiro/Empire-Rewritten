@@ -19,10 +19,10 @@ namespace Empire_Rewritten.Resources
     public struct ResourceModifier
     {
         public readonly ResourceDef def;
-        public int offset;
+        public float offset;
         public float multiplier;
 
-        public ResourceModifier(ResourceDef resourceDef, int offsetValue = 0, float multiplierValue = 1)
+        public ResourceModifier(ResourceDef resourceDef, float offsetValue = 0, float multiplierValue = 1)
         {
             def = resourceDef;
             offset = offsetValue;
@@ -49,7 +49,6 @@ namespace Empire_Rewritten.Resources
             // Log.Error("[Empire]: Trying to merge two modifiers of separate resource def types!");
             // return this;
         }
-
 
         // TODO: NEEDS math changes. I know this is incorrect, but for some reason I (Nesi) cannot think of a correct way.
         // Either <c>(1 + offset) * multiplier</c> or <c>(1 * multiplier) + offset</c> (<c>multiplier + offset</c>), based solely on the names? -Toby

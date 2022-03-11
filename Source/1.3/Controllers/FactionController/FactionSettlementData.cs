@@ -16,7 +16,7 @@ namespace Empire_Rewritten.Controllers
         private Faction originalOwner;
 
         public Faction owner;
-        private SettlementManager settlementManager;
+        private Empire settlementManager;
 
         /// <summary>
         ///     Used for saving/loading
@@ -31,7 +31,7 @@ namespace Empire_Rewritten.Controllers
         /// <param name="settlementManager">
         ///     The <see cref="SettlementManager" /> of this <see cref="FactionSettlementData" />
         /// </param>
-        public FactionSettlementData(Faction owner, SettlementManager settlementManager)
+        public FactionSettlementData(Faction owner, Empire settlementManager)
         {
             this.owner = owner;
             originalOwner = owner;
@@ -44,7 +44,10 @@ namespace Empire_Rewritten.Controllers
         /// </summary>
         public Faction OriginalOwner => originalOwner;
 
-        public SettlementManager SettlementManager => settlementManager;
+        /// <summary>
+        ///     Returns the SettlementManager, shouldn't ever be changed
+        /// </summary>
+        public Empire SettlementManager => settlementManager;
 
         public void ExposeData()
         {
@@ -53,6 +56,20 @@ namespace Empire_Rewritten.Controllers
             Scribe_Deep.Look(ref settlementManager, "settlementManager");
         }
 
+        /// <summary>
+        ///     Creates all required FactionSettlementDatas
+        /// </summary>
+        /// <returns>the FactionSettlementDatas</returns>
+        internal static List<FactionSettlementData> CreateFactionSettlementDatas()
+        {
+            List<FactionSettlementData> factionSettlementDatas = new List<FactionSettlementData>();
+            foreach (Faction faction in Find.FactionManager.AllFactionsListForReading)
+            {
+                factionSettlementDatas.Add(new FactionSettlementData(faction, new Empire(faction)));
+            }
+
+            return factionSettlementDatas;
+        }
 
         /// <summary>
         ///     Creates all required instances of <see cref="FactionSettlementData" />
@@ -60,7 +77,7 @@ namespace Empire_Rewritten.Controllers
         /// <returns>A <see cref="List{T}" /> of the newly created <see cref="FactionSettlementData" /> instances</returns>
         internal static List<FactionSettlementData> CreateFactionSettlementData()
         {
-            return Find.FactionManager.AllFactionsListForReading.Select(faction => new FactionSettlementData(faction, new SettlementManager())).ToList();
+            return Find.FactionManager.AllFactionsListForReading.Select(faction => new FactionSettlementData(faction, new Empire(faction))).ToList();
         }
 
         public override string ToString()

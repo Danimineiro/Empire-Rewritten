@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Empire_Rewritten.Resources;
 using JetBrains.Annotations;
@@ -15,11 +14,14 @@ namespace Empire_Rewritten.Facilities
     public class FacilityManager : IExposable
     {
         private readonly List<Gizmo> gizmos = new List<Gizmo>();
+        private readonly bool refreshFacilityCount = true;
         private List<ResourceModifier> cachedModifiers = new List<ResourceModifier>();
+        private int facilityCount;
         private Dictionary<FacilityDef, Facility> installedFacilities = new Dictionary<FacilityDef, Facility>();
         private bool refreshGizmos = true;
         private bool refreshModifiers = true;
         private Settlement settlement;
+        private int stage = 1;
 
         public FacilityManager(Settlement settlement)
         {
@@ -28,7 +30,6 @@ namespace Empire_Rewritten.Facilities
 
         [UsedImplicitly]
         public FacilityManager() { }
-
 
         /// <summary>
         ///     All <see cref="ResourceModifier">ResourceModifiers</see> from installed <see cref="Facility">Facilities</see>.
@@ -51,47 +52,75 @@ namespace Empire_Rewritten.Facilities
         /// </summary>
         public IEnumerable<FacilityDef> FacilityDefsInstalled => installedFacilities.Keys;
 
+        public bool IsFullyUpgraded => stage >= 10;
+
+        public int MaxFacilities => stage;
+
+        public int FacilityCount
+        {
+            get
+            {
+                if (refreshFacilityCount)
+                {
+                    int count = 0;
+                    foreach (Facility facility in installedFacilities.Values)
+                    {
+                        count += facility.Amount;
+                    }
+
+                    facilityCount = count;
+                }
+
+                return facilityCount;
+            }
+        }
+
+        public bool CanBuildNewFacilities => FacilityCount < MaxFacilities;
 
         public void ExposeData()
         {
-            Scribe_Collections.Look(ref installedFacilities, "installedFacilities", LookMode.Deep);
-            Scribe_Values.Look(ref settlement, "settlement");
+            Scribe_Collections.Look(ref installedFacilities, "installedFacilities", LookMode.Deep, LookMode.Deep);
+            Scribe_References.Look(ref settlement, "settlement");
+            Scribe_Values.Look(ref stage, "stage");
         }
 
         /// <summary>
-        ///     Gets the <see cref="Gizmo">Gizmos</see> for all active <see cref="Facility">Facilities</see> in this
-        ///     <see cref="FacilityManager" />
+        ///     Get gizmos from all facilities in the settlement.
         /// </summary>
-        /// <returns>Every <see cref="Facility" />'s <see cref="Gizmo">Gizmos</see></returns>
         public IEnumerable<Gizmo> GetGizmos()
         {
-            if (!refreshModifiers) return gizmos;
-            refreshModifiers = false;
+            if (!refreshGizmos) return gizmos;
 
             gizmos.Clear();
-            gizmos.AddRange(installedFacilities.Keys.Where(facilityDef => facilityDef.facilityWorker != null)
-                                               .SelectMany(facilityDef => ((FacilityWorker)Activator.CreateInstance(facilityDef.facilityWorker)).GetGizmos()));
+            refreshGizmos = false;
+            foreach (Facility facility in installedFacilities.Values)
+            {
+                gizmos.AddRange(facility.FacilityWorker.GetGizmos());
+            }
 
             return gizmos;
         }
 
         /// <summary>
-        ///     Refreshes the <see cref="ResourceModifier" /> cache.
+        ///     Refreshes the <see cref="FacilityManager.cachedModifiers" />.
         /// </summary>
         private void UpdateModiferCache()
         {
             Dictionary<ResourceDef, ResourceModifier> calculatedModifiers = new Dictionary<ResourceDef, ResourceModifier>();
 
-            foreach (ResourceModifier modifier in installedFacilities.Values.SelectMany(facility => facility.ResourceModifiers))
+            foreach (Facility facility in installedFacilities.Values)
             {
-                if (calculatedModifiers.ContainsKey(modifier.def))
+                foreach (ResourceModifier modifier in facility.ResourceModifiers)
                 {
-                    ResourceModifier newModifier = calculatedModifiers[modifier.def].MergeWithModifier(modifier);
-                    calculatedModifiers[modifier.def] = newModifier;
-                }
-                else
-                {
-                    calculatedModifiers.Add(modifier.def, modifier);
+                    if (calculatedModifiers.ContainsKey(modifier.def))
+                    {
+                        ResourceModifier newModifier = calculatedModifiers[modifier.def].MergeWithModifier(modifier);
+                        calculatedModifiers[modifier.def] = newModifier;
+                    }
+                    else
+                    {
+                        calculatedModifiers.Add(modifier.def, modifier);
+                    }
                 }
             }
 
@@ -102,15 +131,13 @@ namespace Empire_Rewritten.Facilities
         ///     Invalidates cached <see cref="Gizmo">Gizmos</see> and <see cref="ResourceModifier">ResourceModifiers</see>
         /// </summary>
         /// <param name="shouldRefreshGizmos">
-        ///     Refresh <see cref="FacilityManager.gizmos" /> alongside
-        ///     <see cref="FacilityManager.cachedModifiers" />
+        ///     Whether to refresh <see cref="FacilityManager.gizmos" /> alongside <see cref="FacilityManager.cachedModifiers" />
         /// </param>
         public void SetDataDirty(bool shouldRefreshGizmos = false)
         {
             refreshGizmos = shouldRefreshGizmos;
             refreshModifiers = true;
         }
-
 
         /// <summary>
         ///     Adds a new <see cref="Facility" /> of a given <see cref="FacilityDef" /> to this <see cref="FacilityManager" />'s
@@ -145,17 +172,6 @@ namespace Empire_Rewritten.Facilities
                 installedFacilities.Remove(facilityDef);
                 SetDataDirty(true);
             }
-        }
-
-        /// <summary>
-        ///     Checks whether a given <see cref="FacilityDef" /> can be built at this <see cref="FacilityManager" />
-        /// </summary>
-        /// <param name="facilityDef">The <see cref="FacilityDef" /> to check</param>
-        /// <returns>Whether <paramref name="facilityDef" /> can be built here</returns>
-        public bool CanBuildAt(FacilityDef facilityDef)
-        {
-            // TODO: Add proper logic here.
-            return true;
         }
 
         /// <summary>

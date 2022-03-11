@@ -1,19 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Empire_Rewritten.Facilities;
 using Empire_Rewritten.Resources;
-using JetBrains.Annotations;
 using RimWorld.Planet;
 using Verse;
-
-// TODO: Document
 
 namespace Empire_Rewritten.AI
 {
     public class AIFacilityManager : AIModule
     {
+        private readonly HashSet<FacilityDef> cachedFacilitiesDef = new HashSet<FacilityDef>();
         private List<FacilityManager> cachedFacilities;
-        private HashSet<FacilityDef> cachedFacilityDefs;
 
         private bool updateCache = true;
         private bool updateDefCache = true;
@@ -41,63 +39,82 @@ namespace Empire_Rewritten.AI
         {
             get
             {
-                if (cachedFacilityDefs.EnumerableNullOrEmpty() || updateDefCache)
+                if (cachedFacilitiesDef.EnumerableNullOrEmpty() || updateDefCache)
                 {
                     updateDefCache = false;
                     foreach (FacilityManager manager in Facilities)
                     {
-                        cachedFacilityDefs.AddRange(manager.FacilityDefsInstalled);
+                        cachedFacilitiesDef.AddRange(manager.FacilityDefsInstalled);
                     }
                 }
 
-                return cachedFacilityDefs;
+                return cachedFacilitiesDef;
             }
         }
 
         /// <summary>
-        ///     Find a low resource and attempt to build a facility for it.
+        ///     Select a facility to build, based on what the AI needs and what is produced on the tile.
         /// </summary>
-        /// <returns>Whether a <see cref="Facility" /> was successfully built</returns>
-        public bool BuildResourceFacility()
+        /// <param name="manager"></param>
+        /// <returns></returns>
+        public FacilityDef SelectFacilityToBuild(FacilityManager manager)
         {
-            List<ResourceDef> resourceDefs = player.ResourceManager.FindLowResources();
-            ResourceDef def = resourceDefs.RandomElement();
+            Dictionary<float, List<FacilityDef>> facilityWeights = new Dictionary<float, List<FacilityDef>>();
+            List<FacilityDef> defs = DefDatabase<FacilityDef>.AllDefsListForReading;
+            List<Tile> tiles = Find.WorldGrid.tiles;
+            foreach (FacilityDef facilityDef in defs)
+            {
+                float weight = 0;
+                weight += manager.FacilityDefsInstalled.Contains(facilityDef) ? 0.5f : -0.5f;
+                weight += player.ResourceManager.GetTileResourceWeight(tiles[player.Manager.GetSettlement(manager).Tile]);
 
-            FacilityDef facilityDef = FacilityDefsInstalled.Where(facility => facility.ProducedResources.Contains(def)).RandomElementWithFallback();
+                if (facilityWeights.ContainsKey(weight))
+                {
+                    facilityWeights[weight].Add(facilityDef);
+                }
+                else
+                {
+                    facilityWeights.Add(weight, new List<FacilityDef> {facilityDef});
+                }
+            }
 
-            return facilityDef != null && BuildNewFacility(facilityDef);
+            float key = facilityWeights.Keys.Max();
+            return facilityWeights[key].RandomElement();
         }
 
-
         /// <summary>
-        ///     Attempt to build a facility
+        ///     Checks that the AI has the resources to build the <paramref name="facilityDef" />.
         /// </summary>
         /// <param name="facilityDef"></param>
         /// <returns></returns>
-        public bool BuildNewFacility(FacilityDef facilityDef)
+        public bool CanBuildFacility(FacilityDef facilityDef)
         {
-            bool hasRemovedAll = true;
-            KeyValuePair<Settlement, FacilityManager> settlementAndManager = player.Manager.Settlements.First(x => x.Value.CanBuildAt(facilityDef));
-
-            FacilityManager manager = settlementAndManager.Value;
-            Settlement settlement = settlementAndManager.Key;
-
-            if (settlement != null && manager != null)
+            bool allResourcesPullable = true;
+            foreach (ThingDefCountClass thingDefCountClass in facilityDef.costList)
             {
-                StorageTracker storageTracker = player.Manager.StorageTracker;
-                foreach (ThingDefCountClass thingDefCount in facilityDef.costList)
-                {
-                    hasRemovedAll = hasRemovedAll && storageTracker.CanRemoveThingsFromStorage(thingDefCount.thingDef, thingDefCount.count);
-                }
+                allResourcesPullable = allResourcesPullable && player.Manager.StorageTracker.CanRemoveThingsFromStorage(thingDefCountClass.thingDef, thingDefCountClass.count);
+            }
 
-                if (hasRemovedAll)
+            return allResourcesPullable;
+        }
+
+        /// <summary>
+        ///     Builds a facility in a settlement.
+        /// </summary>
+        /// <returns></returns>
+        public bool BuildFacility(FacilityManager manager)
+        {
+            if (manager != null)
+            {
+                FacilityDef def = SelectFacilityToBuild(manager);
+                if (def.FacilityWorker is FacilityWorker worker && worker.CanBuildAt(manager) && CanBuildFacility(def))
                 {
-                    foreach (ThingDefCountClass thingDefCountClass in facilityDef.costList)
+                    foreach (ThingDefCountClass thingDefCountClass in def.costList)
                     {
-                        storageTracker.TryRemoveThingsFromStorage(thingDefCountClass.thingDef, thingDefCountClass.count);
+                        player.Manager.StorageTracker.TryRemoveThingsFromStorage(thingDefCountClass.thingDef, thingDefCountClass.count);
                     }
 
-                    manager.AddFacility(facilityDef);
+                    manager.AddFacility(def);
                     return true;
                 }
             }
@@ -106,37 +123,83 @@ namespace Empire_Rewritten.AI
         }
 
         /// <summary>
+        ///     Find a manager the AI can build on.
+        /// </summary>
+        /// <returns></returns>
+        public FacilityManager FindManagerToBuildOn()
+        {
+            List<ResourceDef> resourceDefs = player.ResourceManager.LowResources;
+            IEnumerable<FacilityManager> managers = player.Manager.AllFacilityManagers.Where(x => x.CanBuildNewFacilities);
+            List<FacilityManager> potentialResults = new List<FacilityManager>();
+            foreach (FacilityManager facilityManager in managers)
+            {
+                IEnumerable<FacilityDef> facilityDefs = facilityManager.FacilityDefsInstalled.Where(x => x.ProducedResources.Any(y => resourceDefs.Contains(y)));
+                if (facilityDefs.Any())
+                {
+                    potentialResults.Add(facilityManager);
+                }
+            }
+
+            if (potentialResults.Any())
+            {
+                return potentialResults.RandomElement();
+            }
+
+            CanMakeFacilities = false;
+            return null;
+        }
+
+        /// <summary>
         ///     If we have an excess of resources, the AI will uninstall potential facilities to allocate space for new ones.
         /// </summary>
         /// <returns></returns>
         public bool UninstallResourceProducingFacility()
         {
-            ResourceDef resourceDef = player.ResourceManager.FindExcessResources().RandomElementWithFallback();
+            List<ResourceDef> resourceDefs = player.ResourceManager.ExcessResources;
 
-            if (resourceDef == null) return false;
+            if (!resourceDefs.NullOrEmpty())
+            {
+                ResourceDef resourceDef = resourceDefs.RandomElement();
 
-            FacilityDef facilityDef = FacilityDefsInstalled.Where(x => x.ProducedResources.Contains(resourceDef)).RandomElementWithFallback();
+                if (FacilityDefsInstalled.Any(x => x.ProducedResources.Contains(resourceDef)))
+                {
+                    FacilityDef facilityDef = FacilityDefsInstalled.Where(x => x.ProducedResources.Contains(resourceDef)).RandomElement();
+                    return RemoveFacility(facilityDef);
+                }
+            }
 
-            return facilityDef != null && RemoveFacility(facilityDef);
+            return false;
         }
 
-
-        public bool RemoveFacility([NotNull] FacilityDef facilityDef)
+        public bool RemoveFacility(FacilityDef facilityDef)
         {
-            (Settlement settlement, FacilityManager facilityManager) = player.Manager.Settlements.First(x => x.Value.HasFacility(facilityDef));
+            KeyValuePair<Settlement, FacilityManager> settlementAndManager = player.Manager.Settlements.First(x => x.Value.HasFacility(facilityDef));
+            Settlement settlement = settlementAndManager.Key;
+            FacilityManager facilityManager = settlementAndManager.Value;
 
-            if (settlement == null || facilityManager == null) return false;
+            if (settlement != null && facilityManager != null)
+            {
+                facilityManager.RemoveFacility(facilityDef);
+            }
 
-            facilityManager.RemoveFacility(facilityDef);
-            return true;
+            return false;
         }
 
         public override void DoModuleAction()
         {
             //Some basic facility action
-            bool builtSomething = BuildResourceFacility();
-            bool uninstalledFacility = UninstallResourceProducingFacility();
-            CanMakeFacilities = !builtSomething && player.ResourceManager.HasCriticalResource && !uninstalledFacility;
+            FacilityManager manager = FindManagerToBuildOn();
+            if (manager != null)
+            {
+                bool builtSomething = BuildFacility(manager);
+                bool uninstalledFacility = !builtSomething && UninstallResourceProducingFacility();
+                CanMakeFacilities = !builtSomething && player.ResourceManager.HasCriticalResource && !uninstalledFacility;
+            }
+        }
+
+        public override void DoThreadableAction()
+        {
+            throw new NotImplementedException();
         }
     }
 }

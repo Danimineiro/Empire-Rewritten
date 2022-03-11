@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Linq;
 using Empire_Rewritten.Resources;
 using Empire_Rewritten.Resources.Stats;
-using Empire_Rewritten.Utils.GUI;
+using Empire_Rewritten.Utils;
 using JetBrains.Annotations;
 using UnityEngine;
 using Verse;
@@ -19,6 +19,13 @@ namespace Empire_Rewritten.Windows
         {
             Find.WindowStack.Add(new ResourceInfoWindow());
         }
+
+        [PublicAPI]
+        [DebugAction("Empire", "Facility info window", allowedGameStates = AllowedGameStates.Entry)]
+        public static void FacilityInfoWindow()
+        {
+            Find.WindowStack.Add(new FacilityInfoWindow());
+        }
     }
 
     public class ResourceInfoWindow : Window
@@ -29,7 +36,7 @@ namespace Empire_Rewritten.Windows
         private static readonly Rect RectFull = new Rect(22f, 22f, 1202f, 592f);
 
         private static readonly Rect RectDefIcon = new Rect(2f, 2f, 64f, 64f);
-        private static readonly Rect RectDefSelector = new Rect(68f, 2f, 514f, 64f);
+        private static readonly Rect RectDefSelector = new Rect(66f, 0f, 518f, 68f);
         private static readonly Rect RectFullDefDesc = new Rect(2f, 86f, 580f, 240f);
         private static readonly Rect RectDefDescValue = new Rect(0f, 0f, 570f, 24f);
 
@@ -48,18 +55,21 @@ namespace Empire_Rewritten.Windows
 
         private static readonly Color TransparentGray = new Color(0f, 0f, 0f, 0.5f);
 
-        private static readonly GameFont PreviousFont = Text.Font;
-        private static readonly TextAnchor PreviousAnchor = Text.Anchor;
-        private static readonly Color PreviousColor = GUI.color;
+        private readonly List<ResourceDef> resourceDefs;
 
         private List<FloatMenuOption> cachedOptions;
+
         private Vector2 defDescScrollVector;
 
         private ResourceDef defSelected;
         private Rect rectScrollView = new Rect(602f, 2f, 563f, 324f);
 
-        private List<ResourceDef> resources;
         private Vector2 scrollRectVector;
+
+        public ResourceInfoWindow()
+        {
+            resourceDefs = DefDatabase<ResourceDef>.AllDefsListForReading;
+        }
 
         public override Vector2 InitialSize => new Vector2(1229f, 619f);
 
@@ -73,12 +83,12 @@ namespace Empire_Rewritten.Windows
 
         public override void DoWindowContents(Rect inRect)
         {
-            if (Widgets.CloseButtonFor(inRect)) Close();
-
+            DrawCloseButton(inRect);
             GUI.BeginGroup(RectFull);
             DrawDefSelectorButton();
             DrawDefContent();
             GUI.EndGroup();
+            WindowHelper.ResetTextAndColor();
         }
 
         /// <summary>
@@ -128,13 +138,14 @@ namespace Empire_Rewritten.Windows
             {
                 GUI.color = Color.red + Color.yellow;
                 Widgets.Label(rect, "Empire_ResourceInfoWindowCurveMissing".Translate());
-                ResetTextAndColor();
+                WindowHelper.ResetTextAndColor();
 
                 Widgets.DrawBoxSolid(rect, Color.black);
                 rect.DrawBorderAroundRect(BorderSize);
                 return;
             }
 
+            Text.Font = GameFont.Tiny;
             Rect tempLabelRect = rect.BottomPartPixels(rect.height / 12f);
 
             SimpleCurveDrawerStyle style = new SimpleCurveDrawerStyle
@@ -166,7 +177,7 @@ namespace Empire_Rewritten.Windows
 
             Text.Anchor = TextAnchor.LowerLeft;
             Widgets.Label(tempLabelRect, $" {"Empire_ResourceInfoWindowEfficiency".Translate()} ");
-            ResetTextAndColor();
+            WindowHelper.ResetTextAndColor();
         }
 
         /// <summary>
@@ -210,7 +221,7 @@ namespace Empire_Rewritten.Windows
             }
 
             Widgets.EndScrollView();
-            ResetTextAndColor();
+            WindowHelper.ResetTextAndColor();
         }
 
         /// <summary>
@@ -244,7 +255,7 @@ namespace Empire_Rewritten.Windows
             DrawResourceValues(tempValuesRect, tempTex);
             RectFullDefDesc.DrawBorderAroundRect(BorderSize);
 
-            ResetTextAndColor();
+            WindowHelper.ResetTextAndColor();
         }
 
         /// <summary>
@@ -308,17 +319,7 @@ namespace Empire_Rewritten.Windows
         /// </summary>
         private void DrawDefSelectorButton()
         {
-            Text.Anchor = TextAnchor.MiddleCenter;
-            Text.Font = GameFont.Medium;
-
-            Widgets.DrawLightHighlight(RectDefSelector);
-            Widgets.DrawHighlightIfMouseover(RectDefSelector);
-            Widgets.Label(RectDefSelector, defSelected?.label ?? "Empire_ResourceInfoWindowSelector".Translate());
-            RectDefSelector.DrawBorderAroundRect(BorderSize);
-
-            ResetTextAndColor();
-
-            if (Widgets.ButtonInvisible(RectDefSelector))
+            if (WindowHelper.DrawInfoScreenSelectorButton(RectDefSelector, defSelected?.label ?? "Empire_ResourceInfoWindowSelector".Translate()))
             {
                 Find.WindowStack.Add(new FloatMenu(DefOptions));
             }
@@ -334,27 +335,12 @@ namespace Empire_Rewritten.Windows
         /// </returns>
         private List<FloatMenuOption> CreateFloatMenuOptions()
         {
-            resources = resources ?? (resources = DefDatabase<ResourceDef>.AllDefsListForReading);
-
-            List<FloatMenuOption> floatMenuOptions = new List<FloatMenuOption>();
-
-            foreach (ResourceDef def in resources)
-            {
-                floatMenuOptions.Add(new FloatMenuOption(def.label, delegate { defSelected = def; }));
-            }
-
-            return floatMenuOptions;
+            return FloatMenuOptionCreator.CreateFloatMenuOptions(resourceDefs, def => defSelected = def);
         }
 
-        /// <summary>
-        ///     Resets <see cref="Text.Font" />, <see cref="Text.Anchor" />, and <see cref="GUI.color" /> to what they were
-        ///     previously.
-        /// </summary>
-        private static void ResetTextAndColor()
+        private void DrawCloseButton(Rect inRect)
         {
-            Text.Font = PreviousFont;
-            Text.Anchor = PreviousAnchor;
-            GUI.color = PreviousColor;
+            if (Widgets.CloseButtonFor(inRect)) Close();
         }
     }
 }

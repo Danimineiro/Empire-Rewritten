@@ -25,6 +25,16 @@ namespace Empire_Rewritten.Resources
 
         public List<BiomeModifier> biomeModifiers;
 
+        /// <summary>
+        ///     The AI will start trying to get rid of facilities and this resource if it produces more than this number.
+        /// </summary>
+        public int desiredAIMaximum = 50;
+
+        /// <summary>
+        ///     The AI will focus more on this resource if its income is below this amount.
+        /// </summary>
+        public int desiredAIMinimum = 30;
+
         private bool hasCachedThingDefs;
         public SimpleCurve heightCurve;
 
@@ -110,7 +120,6 @@ namespace Empire_Rewritten.Resources
             result *= tempVal * heightVal * biomeModifier.multiplier * swampinessVal * rainfallVal;
 
             ResourceModifier modifer = new ResourceModifier(this, biomeModifier.offset, result);
-
 
             return modifer;
         }

@@ -10,5 +10,10 @@
         }
 
         public abstract void DoModuleAction();
+
+        /// <summary>
+        ///     These actions can be loaded to another thread.
+        /// </summary>
+        public abstract void DoThreadableAction();
     }
 }

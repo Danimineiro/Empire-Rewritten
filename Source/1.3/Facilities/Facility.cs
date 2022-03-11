@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Empire_Rewritten.Resources;
 using JetBrains.Annotations;
@@ -20,10 +21,15 @@ namespace Empire_Rewritten.Facilities
             this.def = def;
             this.settlement = settlement;
             amount = 1;
+            FacilityWorker = def.FacilityWorker;
         }
 
         [UsedImplicitly]
         public Facility() { }
+
+        public FacilityWorker FacilityWorker { get; }
+
+        public int Amount => amount;
 
         public int FacilitiesInstalled => amount;
 
@@ -61,6 +67,7 @@ namespace Empire_Rewritten.Facilities
         {
             amount += amountToAdd;
             shouldRecalculateModifiers = true;
+            FacilityWorker?.NotifyConstructed(this);
         }
 
         /// <summary>
@@ -79,6 +86,8 @@ namespace Empire_Rewritten.Facilities
         {
             amount -= amountToRemove;
             if (amount < 0) amount = 0;
+            
+            FacilityWorker?.NotifyDestroyed(this);
 
             shouldRecalculateModifiers = true;
         }
@@ -98,15 +107,28 @@ namespace Empire_Rewritten.Facilities
         {
             modifiers.Clear();
 
-            IEnumerable<ResourceDef> defs = def.resourceMultipliers.Keys.Concat(def.resourceOffsets.Keys);
+            IEnumerable<ResourceDef> defs = def.resourceMultipliers.Select(r => r.def).Concat(def.resourceOffsets.Select(r => r.def));
 
             foreach (ResourceDef resourceDef in defs)
             {
                 Tile tile = Find.WorldGrid.tiles[settlement.Tile];
                 ResourceModifier modifier = resourceDef.GetTileModifier(tile);
 
-                modifier.multiplier *= amount * def.resourceMultipliers.TryGetValue(resourceDef, 1f);
-                modifier.offset += amount * def.resourceOffsets.TryGetValue(resourceDef, 1);
+                ResourceChange multiplier = def.resourceMultipliers.FirstOrFallback(r => r.def == resourceDef);
+                if (multiplier is null)
+                {
+                    modifier.multiplier *= amount;
+                }
+                else
+                {
+                    modifier.multiplier *= amount * multiplier.amount;
+                }
+
+                ResourceChange offset = def.resourceOffsets.FirstOrFallback(r => r.def == resourceDef);
+                if (!(offset is null))
+                {
+                    modifier.offset += amount * offset.amount;
+                }
 
                 modifiers.Add(modifier);
             }

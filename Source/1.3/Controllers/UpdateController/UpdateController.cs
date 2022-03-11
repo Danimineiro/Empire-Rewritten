@@ -13,7 +13,7 @@ namespace Empire_Rewritten.Controllers
     public class UpdateController : WorldComponent
     {
         private static readonly List<Action<FactionController>> FinalizeInitHooks = new List<Action<FactionController>>();
-        private readonly List<UpdateControllerAction> Actions = new List<UpdateControllerAction>();
+        private readonly List<UpdateControllerAction> actions = new List<UpdateControllerAction>();
 
         private FactionController factionController;
 
@@ -64,7 +64,7 @@ namespace Empire_Rewritten.Controllers
         /// </param>
         public void AddUpdateCall([NotNull] Action<FactionController> updateCall, [NotNull] Func<bool> shouldExecute)
         {
-            Actions.Add(new UpdateControllerAction(updateCall, shouldExecute));
+            actions.Add(new UpdateControllerAction(updateCall, shouldExecute));
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace Empire_Rewritten.Controllers
         /// <param name="action">The <see cref="UpdateControllerAction" /> to be added</param>
         public void AddUpdateCall([NotNull] UpdateControllerAction action)
         {
-            Actions.Add(action);
+            actions.Add(action);
         }
 
         /// <summary>
@@ -113,9 +113,9 @@ namespace Empire_Rewritten.Controllers
         /// </summary>
         public override void WorldComponentTick()
         {
-            Actions.RemoveAll(updateControllerAction =>
+            actions.RemoveAll(action =>
             {
-                updateControllerAction.TryExecute(factionController, out bool shouldDiscard);
+                action.TryExecute(factionController, out bool shouldDiscard);
                 return shouldDiscard;
             });
         }
