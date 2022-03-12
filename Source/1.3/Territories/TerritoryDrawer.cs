@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
 using RimWorld.Planet;
 using UnityEngine;
@@ -12,7 +11,7 @@ namespace Empire_Rewritten.Territories
     public class TerritoryDrawer : WorldLayer
     {
         public static bool dirty = true;
-        private readonly Dictionary<Territory, List<int>> tilesDrawnOn = new Dictionary<Territory, List<int>>();
+        private readonly List<Vector3> vertices = new List<Vector3>();
 
         public override bool ShouldRegenerate => dirty;
 
@@ -26,36 +25,46 @@ namespace Empire_Rewritten.Territories
                 subMeshes[i].Clear(MeshParts.All);
             }
 
-            WorldGrid worldGrid = Find.WorldGrid;
-            DrawAllTerritories(worldGrid);
+            DrawAllTerritories();
             FinalizeMesh(MeshParts.All);
             yield break;
         }
 
-        private void DrawTerritory(WorldGrid worldGrid, Territory territory)
+        private void DrawTile(int tileId, LayerSubMesh subMesh, Color factionColor)
         {
-            Color factionColor = territory.Faction.Color;
-
-            Material material = MaterialPool.MatFrom("World/SelectedTile", ShaderDatabase.WorldOverlayTransparentLit, factionColor, WorldMaterials.WorldObjectRenderQueue);
-            if (!tilesDrawnOn.ContainsKey(territory))
+            Find.WorldGrid.GetTileVertices(tileId, vertices);
+            int subMeshVerticesCount = subMesh.verts.Count;
+            int verticesCount = vertices.Count;
+            for (int i = 0; i < verticesCount; i++)
             {
-                tilesDrawnOn.Add(territory, new List<int>());
-            }
-
-            foreach (int tile in territory.Tiles.Where(tile => !tilesDrawnOn[territory].Contains(tile)))
-            {
-                tilesDrawnOn[territory].Add(tile);
-                LayerSubMesh layerSubMesh = GetSubMesh(material);
-                Vector3 vector = Find.WorldGrid.GetTileCenter(tile);
-                WorldRendererUtility.PrintQuadTangentialToPlanet(vector, vector, worldGrid.averageTileSize, 1, layerSubMesh, false, false, false);
+                subMesh.verts.Add(vertices[i] + vertices[i].normalized * 0.012f);
+                subMesh.uvs.Add((GenGeo.RegularPolygonVertexPosition(verticesCount, i) + Vector2.one) / 2f);
+                if (i < verticesCount - 2)
+                {
+                    subMesh.tris.Add(subMeshVerticesCount + i + 2);
+                    subMesh.tris.Add(subMeshVerticesCount + i + 1);
+                    subMesh.tris.Add(subMeshVerticesCount);
+                }
             }
         }
 
-        private void DrawAllTerritories(WorldGrid worldGrid)
+        private void DrawTerritory(Territory territory)
+        {
+            Color factionColor = territory.Faction.Color;
+
+            foreach (int tile in territory.Tiles)
+            {
+                Material material = MaterialPool.MatFrom("Territory", ShaderDatabase.WorldOverlayTransparentLit, factionColor, WorldMaterials.WorldObjectRenderQueue);
+                LayerSubMesh layerSubMesh = GetSubMesh(material);
+                DrawTile(tile, layerSubMesh, factionColor);
+            }
+        }
+
+        private void DrawAllTerritories()
         {
             foreach (Territory territory in TerritoryManager.GetTerritoryManager.Territories)
             {
-                DrawTerritory(worldGrid, territory);
+                DrawTerritory(territory);
             }
         }
     }
