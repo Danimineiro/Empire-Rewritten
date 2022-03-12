@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Empire_Rewritten.Facilities;
 using Empire_Rewritten.Resources;
+using Empire_Rewritten.Utils;
 using Empire_Rewritten.Territories;
 using JetBrains.Annotations;
 using RimWorld;
@@ -163,7 +164,7 @@ namespace Empire_Rewritten.Settlements
                 return settlements[settlement];
             }
 
-            Log.Warning($"[Empire]: {settlement.Name} was not in the settlement manager! Returning null.");
+            Logger.Warn($"{settlement.Name} was not in the settlement manager! Returning null.");
             return null;
         }
     }

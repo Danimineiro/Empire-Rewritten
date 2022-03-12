@@ -5,6 +5,7 @@ using Empire_Rewritten.AI;
 using Empire_Rewritten.Controllers.CivicEthic;
 using Empire_Rewritten.Player;
 using Empire_Rewritten.Settlements;
+using Empire_Rewritten.Utils;
 using Empire_Rewritten.Territories;
 using JetBrains.Annotations;
 using RimWorld;
@@ -103,7 +104,7 @@ namespace Empire_Rewritten.Controllers
             {
                 if (settlements[0] is null)
                 {
-                    Log.Error("<color=orange>[Empire]</color> settlements has null-entry");
+                    Logger.Error(nameof(settlements) + " has null-entry");
                 }
 
                 aiPlayer.Manager.AddSettlement(settlements[0]);
@@ -114,8 +115,6 @@ namespace Empire_Rewritten.Controllers
                     item.Destroy();
                 }
             }
-
-            Log.Message($"Created AI for: {faction.Name}");
         }
 
         /// <summary>
