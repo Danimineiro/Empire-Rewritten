@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Empire_Rewritten.Borders;
+using Empire_Rewritten.Territories;
 using RimWorld;
 using RimWorld.Planet;
 using Verse;
@@ -16,7 +16,7 @@ namespace Empire_Rewritten.HarmonyPatches
             }
 
             Settlement settlement = Find.WorldObjects.SettlementBases.First(x => x.Faction == __instance);
-            BorderManager.GetBorderManager.GetBorder(__instance).SettlementClaimTiles(settlement);
+            TerritoryManager.GetTerritoryManager.GetTerritory(__instance).SettlementClaimTiles(settlement);
         }
     }
 }

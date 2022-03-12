@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Empire_Rewritten.AI;
-using Empire_Rewritten.Borders;
 using Empire_Rewritten.Controllers.CivicEthic;
 using Empire_Rewritten.Player;
 using Empire_Rewritten.Settlements;
 using Empire_Rewritten.Utils;
+using Empire_Rewritten.Territories;
 using JetBrains.Annotations;
 using RimWorld;
 using RimWorld.Planet;
@@ -40,21 +40,21 @@ namespace Empire_Rewritten.Controllers
         /// </param>
         public FactionController(List<FactionSettlementData> factionSettlementDataList)
         {
-            ShouldRefreshBorders = true;
-            BorderManager = new BorderManager();
+            ShouldRefreshTerritories = true;
+            TerritoryManager = new TerritoryManager();
             this.factionSettlementDataList = factionSettlementDataList;
         }
 
-        public BorderManager BorderManager { get; } = new BorderManager();
+        public TerritoryManager TerritoryManager { get; } = new TerritoryManager();
 
         /// <summary>
-        ///     Meant for things that cache the borders to check.
+        ///     Meant for things that cache the territories to check.
         /// </summary>
-        public bool ShouldRefreshBorders { get; } = true;
+        public bool ShouldRefreshTerritories { get; } = true;
 
         public void ExposeData()
         {
-            Scribe_Collections.Look(ref factionSettlementDataList, "FactionSettlementDataList");
+            Scribe_Collections.Look(ref factionSettlementDataList, "factionSettlementDataList");
         }
 
         /// <param name="faction"></param>
@@ -90,7 +90,7 @@ namespace Empire_Rewritten.Controllers
             // NOTE: Why is this unused?
             UserPlayer player = new UserPlayer(faction);
             IEnumerable<WorldObject> settlements = Find.WorldObjects.Settlements.Where(x => x.Faction == faction);
-            BorderManager.GetBorder(faction).SettlementClaimTiles((Settlement)settlements.First());
+            TerritoryManager.GetTerritory(faction).SettlementClaimTiles((Settlement)settlements.First());
         }
 
         public void CreateNewAIPlayer(Faction faction)

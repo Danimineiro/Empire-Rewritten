@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Empire_Rewritten.Borders;
+using Empire_Rewritten.Territories;
 using RimWorld;
 using RimWorld.Planet;
 using UnityEngine;
@@ -64,7 +64,7 @@ namespace Empire_Rewritten.AI
             int smallestDist = 0;
             int range = TechLevel.IsNeolithicOrWorse() ? 3 : 7;
 
-            List<int> tiles = BorderManager.GetBorderManager.GetBorder(player.faction).GetTilesRecursively(id, range);
+            List<int> tiles = Territory.GetSurroundingTiles(id, range);
             foreach (int other in tiles)
             {
                 Settlement settlement = Find.WorldObjects.SettlementAt(other);
@@ -104,7 +104,7 @@ namespace Empire_Rewritten.AI
 
         public void CalculateAllUnknownTiles()
         {
-            IEnumerable<int> tiles = BorderManager.GetBorderManager.GetBorder(player.Faction).Tiles.ListFullCopy();
+            IEnumerable<int> tiles = TerritoryManager.GetTerritoryManager.GetTerritory(player.Faction).Tiles.ListFullCopy();
             int counter = 0;
             foreach (int tile in tiles)
             {
