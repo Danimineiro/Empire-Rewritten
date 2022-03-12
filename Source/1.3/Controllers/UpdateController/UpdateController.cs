@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Empire_Rewritten.Utils;
 using JetBrains.Annotations;
 using RimWorld.Planet;
 using Verse;
@@ -37,7 +38,7 @@ namespace Empire_Rewritten.Controllers
             {
                 if (HasFactionController)
                 {
-                    Log.Warning("factionController is already set, skipping assignment");
+                    Logger.Warn("factionController is already set, skipping assignment");
                     return;
                 }
 
@@ -88,7 +89,7 @@ namespace Empire_Rewritten.Controllers
         {
             if (CurrentWorldInstance != null)
             {
-                Log.Warning("Tried to add a FinalizeInitHook after WorldComp was already created! Skipping...");
+                Logger.Warn("Tried to add a FinalizeInitHook after WorldComp was already created! Skipping...");
                 return;
             }
 
