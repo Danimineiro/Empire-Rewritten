@@ -64,7 +64,7 @@ namespace Empire_Rewritten.AI
             int smallestDist = 0;
             int range = TechLevel.IsNeolithicOrWorse() ? 3 : 7;
 
-            List<int> tiles = BorderManager.GetBorderManager.GetBorder(player.faction).GetTilesRecursively(id, range);
+            List<int> tiles = Border.GetSurroundingTiles(id, range);
             foreach (int other in tiles)
             {
                 Settlement settlement = Find.WorldObjects.SettlementAt(other);
