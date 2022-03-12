@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Verse;
 
 namespace Empire_Rewritten.Facilities.FacilityWorkers
@@ -17,8 +13,6 @@ namespace Empire_Rewritten.Facilities.FacilityWorkers
             {
                 yield return gizmo;
             }
-
-
         }
     }
 }

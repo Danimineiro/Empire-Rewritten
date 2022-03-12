@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Empire_Rewritten.Resources;
+using Empire_Rewritten.Utils;
 using Verse;
 
 namespace Empire_Rewritten
@@ -56,7 +57,7 @@ namespace Empire_Rewritten
             {
                 if (newCount < 0)
                 {
-                    Log.Warning($"<color=orange>[Empire]</color> We had negative of {def.defName} after {nameof(TryRemoveThingsFromStorage)}, this shouldn't happen");
+                    Logger.Warn($"We had negative of {def.defName} after {nameof(TryRemoveThingsFromStorage)}, this shouldn't happen");
                 }
 
                 storedThings.Remove(def);

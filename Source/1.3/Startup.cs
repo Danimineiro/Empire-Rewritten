@@ -19,7 +19,7 @@ namespace Empire_Rewritten
         [UsedImplicitly]
         static Startup()
         {
-            Log.Message("[Empire Rewritten] just here to say hello! ^-^ Have a nice day and great fun with Empire!".Rainbowify(' ', 35));
+            Logger.Message("[Empire] just here to say hello! ^-^ Have a nice day and great fun with Empire!".Rainbowify(' ', 35));
             AppendActionsToWorldStart();
             HarmonyPatcher.DoPatches();
         }
@@ -29,7 +29,7 @@ namespace Empire_Rewritten
         /// </summary>
         private static void AppendActionsToWorldStart()
         {
-            Log.Message("<color=orange>[Empire]</color> Attaching actions to world start");
+            Logger.Log("Attaching actions to world start");
             UpdateController.AddFinalizeInitHook(AddFactionControllerIfMissing);
             UpdateController.AddFinalizeInitHook(InitPlayerHandler);
             UpdateController.AddFinalizeInitHook(AddAIToNonPlayers);
@@ -59,7 +59,7 @@ namespace Empire_Rewritten
             {
                 if (!faction.IsPlayer && !faction.Hidden)
                 {
-                    Log.Message("<color=orange>[Empire]</color> Creating AI for faction: '" + faction.NameColored.Formatted());
+                    Logger.Log("Creating AI for faction: '" + faction.NameColored.Formatted());
                     factionController.CreateNewAIPlayer(faction);
                 }
             }

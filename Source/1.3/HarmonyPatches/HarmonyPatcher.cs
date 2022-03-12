@@ -1,7 +1,7 @@
-﻿using HarmonyLib;
+﻿using Empire_Rewritten.Utils;
+using HarmonyLib;
 using RimWorld;
 using RimWorld.Planet;
-using Verse;
 
 namespace Empire_Rewritten.HarmonyPatches
 {
@@ -18,7 +18,7 @@ namespace Empire_Rewritten.HarmonyPatches
                           new HarmonyMethod(typeof(PlaySettingsControlsPatch), nameof(PlaySettingsControlsPatch.Postfix)));
             harmony.Patch(typeof(SettleUtility).GetMethod(nameof(SettleUtility.AddNewHome)), null, new HarmonyMethod(typeof(SettleUtilityPatch), nameof(SettleUtilityPatch.Postfix)));
 
-            Log.Message("<color=orange>[Empire]</color> Patches completed!");
+            Logger.Log("Patches completed!");
         }
     }
 }

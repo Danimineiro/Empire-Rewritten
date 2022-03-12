@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Empire_Rewritten.Resources;
 using JetBrains.Annotations;
@@ -86,7 +85,7 @@ namespace Empire_Rewritten.Facilities
         {
             amount -= amountToRemove;
             if (amount < 0) amount = 0;
-            
+
             FacilityWorker?.NotifyDestroyed(this);
 
             shouldRecalculateModifiers = true;
