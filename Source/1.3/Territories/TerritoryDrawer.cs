@@ -20,7 +20,7 @@ namespace Empire_Rewritten.Territories
         public override IEnumerable Regenerate()
         {
             dirty = false;
-            for (int i = 0; i < subMeshes.Count; i++)
+            for (int i = subMeshes.Count - 1; i >= 0; i--)
             {
                 subMeshes[i].Clear(MeshParts.All);
             }
@@ -30,7 +30,7 @@ namespace Empire_Rewritten.Territories
             yield break;
         }
 
-        private void DrawTile(int tileId, LayerSubMesh subMesh, Color factionColor)
+        private void DrawTile(int tileId, LayerSubMesh subMesh)
         {
             Find.WorldGrid.GetTileVertices(tileId, vertices);
             int subMeshVerticesCount = subMesh.verts.Count;
@@ -56,7 +56,7 @@ namespace Empire_Rewritten.Territories
             {
                 Material material = MaterialPool.MatFrom("Territory", ShaderDatabase.WorldOverlayTransparentLit, factionColor, WorldMaterials.WorldObjectRenderQueue);
                 LayerSubMesh layerSubMesh = GetSubMesh(material);
-                DrawTile(tile, layerSubMesh, factionColor);
+                DrawTile(tile, layerSubMesh);
             }
         }
 
