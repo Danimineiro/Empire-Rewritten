@@ -14,6 +14,9 @@ namespace Empire_Rewritten.Territories
 
         private List<int> tiles;
 
+        [UsedImplicitly]
+        public Territory() { }
+
         public Territory(Faction faction)
         {
             this.faction = faction;

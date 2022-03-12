@@ -7,7 +7,6 @@ namespace Empire_Rewritten
     public static class PlayerHandler
     {
         private static List<BasePlayer> _players = new List<BasePlayer>();
-        private static bool _hasStartedOnce;
 
         private static int _tick;
 
@@ -17,15 +16,12 @@ namespace Empire_Rewritten
         {
             _hasRegisteredUser = false;
             _players = new List<BasePlayer>();
-            if (!_hasStartedOnce)
-            {
-                UpdateController controller = UpdateController.CurrentWorldInstance;
 
-                controller.AddUpdateCall(MakeMoves, DoPlayerTick);
-                controller.AddUpdateCall(MakeThreadedMoves, DoPlayerTick);
-                controller.AddUpdateCall(RegisterPlayerFactionAsPlayer, ShouldRegisterPlayerFaction);
-                _hasStartedOnce = true;
-            }
+            UpdateController controller = UpdateController.CurrentWorldInstance;
+
+            controller.AddUpdateCall(MakeMoves, DoPlayerTick);
+            controller.AddUpdateCall(MakeThreadedMoves, DoPlayerTick);
+            controller.AddUpdateCall(RegisterPlayerFactionAsPlayer, ShouldRegisterPlayerFaction);
         }
 
         public static void RegisterPlayer(BasePlayer basePlayer)
