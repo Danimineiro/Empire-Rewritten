@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Empire_Rewritten.Borders;
 using Empire_Rewritten.Facilities;
 using Empire_Rewritten.Resources;
+using Empire_Rewritten.Territories;
 using JetBrains.Annotations;
 using RimWorld;
 using RimWorld.Planet;
@@ -16,8 +16,7 @@ namespace Empire_Rewritten.Settlements
     /// </summary>
     public class Empire : IExposable, ILoadReferenceable
     {
-        private bool borderIsDirty;
-        private Border cachedBorder;
+        private Territory cachedTerritory;
         private List<FacilityManager> facilityManagersForLoading = new List<FacilityManager>();
         private Faction faction;
 
@@ -25,6 +24,7 @@ namespace Empire_Rewritten.Settlements
 
         private List<Settlement> settlementsForLoading = new List<Settlement>();
         private StorageTracker storageTracker = new StorageTracker();
+        private bool territoryIsDirty;
 
         [UsedImplicitly]
         public Empire() { }
@@ -38,17 +38,17 @@ namespace Empire_Rewritten.Settlements
         public Dictionary<Settlement, FacilityManager> Settlements => settlements;
         public List<int> SettlementTiles { get; } = new List<int>();
 
-        private Border Border
+        private Territory Territory
         {
             get
             {
-                if (cachedBorder == null || borderIsDirty)
+                if (cachedTerritory == null || territoryIsDirty)
                 {
-                    borderIsDirty = false;
-                    cachedBorder = BorderManager.GetBorderManager.GetBorder(faction);
+                    territoryIsDirty = false;
+                    cachedTerritory = TerritoryManager.GetTerritoryManager.GetTerritory(faction);
                 }
 
-                return cachedBorder;
+                return cachedTerritory;
             }
         }
 
@@ -66,9 +66,9 @@ namespace Empire_Rewritten.Settlements
             return $"{nameof(Empire)}_{GetHashCode()}";
         }
 
-        public void SetBorderDirty()
+        public void SetTerritoryDirty()
         {
-            borderIsDirty = true;
+            territoryIsDirty = true;
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace Empire_Rewritten.Settlements
         {
             FacilityManager tracker = new FacilityManager(settlement);
             settlements.Add(settlement, tracker);
-            Border.SettlementClaimTiles(settlement);
+            Territory.SettlementClaimTiles(settlement);
             SettlementTiles.Add(settlement.Tile);
         }
 

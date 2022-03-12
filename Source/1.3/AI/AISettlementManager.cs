@@ -55,7 +55,7 @@ namespace Empire_Rewritten.AI
         ///     Search for tiles to build settlements on based off weights;
         ///     Weights:
         ///     - Resources
-        ///     - Border distance
+        ///     - Territory distance
         ///     Resources AI wants = higher weight
         ///     Resources AI has excess of = lower weight
         /// </summary>

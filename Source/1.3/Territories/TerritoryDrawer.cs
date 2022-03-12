@@ -1,20 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using RimWorld.Planet;
 using UnityEngine;
 using Verse;
 
-namespace Empire_Rewritten.Borders
+namespace Empire_Rewritten.Territories
 {
-    public class BorderDrawer : WorldLayer
+    [UsedImplicitly]
+    public class TerritoryDrawer : WorldLayer
     {
         public static bool dirty = true;
-        private readonly Dictionary<Border, List<int>> tilesDrawnOn = new Dictionary<Border, List<int>>();
+        private readonly Dictionary<Territory, List<int>> tilesDrawnOn = new Dictionary<Territory, List<int>>();
 
         public override bool ShouldRegenerate => dirty;
 
-        protected override float Alpha => BorderUtils.BorderAlpha;
+        protected override float Alpha => TerritoryUtils.TerritoryAlpha;
 
         public override IEnumerable Regenerate()
         {
@@ -25,42 +27,35 @@ namespace Empire_Rewritten.Borders
             }
 
             WorldGrid worldGrid = Find.WorldGrid;
-            DrawAllBorders(worldGrid);
+            DrawAllTerritories(worldGrid);
             FinalizeMesh(MeshParts.All);
             yield break;
         }
 
-        private void DrawBorder(WorldGrid worldGrid, Border border)
+        private void DrawTerritory(WorldGrid worldGrid, Territory territory)
         {
-            Color factionColor = border.Faction.Color;
-
-            /* TODO: struct is never null. When was this supposed to fire?
-            if (factionColor == null)
-            {
-                factionColor = ColorsFromSpectrum.Get(border.Faction.def.colorSpectrum, border.Faction.colorFromSpectrum);
-            }
-            */
+            Color factionColor = territory.Faction.Color;
 
             Material material = MaterialPool.MatFrom("World/SelectedTile", ShaderDatabase.WorldOverlayTransparentLit, factionColor, WorldMaterials.WorldObjectRenderQueue);
-            if (!tilesDrawnOn.ContainsKey(border))
+            if (!tilesDrawnOn.ContainsKey(territory))
             {
-                tilesDrawnOn.Add(border, new List<int>());
+                tilesDrawnOn.Add(territory, new List<int>());
             }
 
-            foreach (int tile in border.Tiles.Where(tile => !tilesDrawnOn[border].Contains(tile)))
+            foreach (int tile in territory.Tiles.Where(tile => !tilesDrawnOn[territory].Contains(tile)))
             {
-                tilesDrawnOn[border].Add(tile);
+                tilesDrawnOn[territory].Add(tile);
                 LayerSubMesh layerSubMesh = GetSubMesh(material);
                 Vector3 vector = Find.WorldGrid.GetTileCenter(tile);
                 WorldRendererUtility.PrintQuadTangentialToPlanet(vector, vector, worldGrid.averageTileSize, 1, layerSubMesh, false, false, false);
             }
         }
 
-        private void DrawAllBorders(WorldGrid worldGrid)
+        private void DrawAllTerritories(WorldGrid worldGrid)
         {
-            foreach (Border border in BorderManager.GetBorderManager.Borders)
+            foreach (Territory territory in TerritoryManager.GetTerritoryManager.Territories)
             {
-                DrawBorder(worldGrid, border);
+                DrawTerritory(worldGrid, territory);
             }
         }
     }

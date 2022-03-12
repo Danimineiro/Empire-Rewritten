@@ -5,16 +5,16 @@ using RimWorld;
 using RimWorld.Planet;
 using Verse;
 
-namespace Empire_Rewritten.Borders
+namespace Empire_Rewritten.Territories
 {
-    public class Border : IExposable
+    public class Territory : IExposable
     {
         private static WorldGrid _worldGrid;
         private Faction faction;
 
         private List<int> tiles;
 
-        public Border(Faction faction)
+        public Territory(Faction faction)
         {
             this.faction = faction;
             tiles = new List<int>();
@@ -34,10 +34,10 @@ namespace Empire_Rewritten.Borders
 
         public void ClaimTile(int id)
         {
-            if (!BorderManager.GetBorderManager.AnyFactionOwnsTile(id))
+            if (!TerritoryManager.GetTerritoryManager.AnyFactionOwnsTile(id))
             {
                 tiles.Add(id);
-                BorderDrawer.dirty = true;
+                TerritoryDrawer.dirty = true;
             }
         }
 

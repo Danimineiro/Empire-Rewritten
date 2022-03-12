@@ -158,14 +158,14 @@ namespace Empire_Rewritten.AI
         ///     Search for tiles to build settlements on based off weights;
         ///     Weights:
         ///     - Resources
-        ///     - Border distance
+        ///     - Territory distance
         ///     Resources AI wants = higher weight
         ///     Resources AI has excess of = lower weight
         /// </summary>
         /// <returns></returns>
         public float GetTileResourceWeight(Tile tile)
         {
-            //TODO: When BorderManager is implemented, only pull from owned tiles.
+            //TODO: When TerritoryManager is implemented, only pull from owned tiles.
 
             float weight = 0;
             foreach (ResourceDef resourceDef in LowResources)

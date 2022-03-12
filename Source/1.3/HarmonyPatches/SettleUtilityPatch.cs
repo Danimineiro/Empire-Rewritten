@@ -1,4 +1,4 @@
-﻿using Empire_Rewritten.Borders;
+﻿using Empire_Rewritten.Territories;
 using RimWorld;
 using RimWorld.Planet;
 
@@ -13,7 +13,7 @@ namespace Empire_Rewritten.HarmonyPatches
                 return;
             }
 
-            BorderManager.GetBorderManager.GetBorder(faction).SettlementClaimTiles(__result);
+            TerritoryManager.GetTerritoryManager.GetTerritory(faction).SettlementClaimTiles(__result);
         }
     }
 }
