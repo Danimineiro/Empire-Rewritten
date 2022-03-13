@@ -36,6 +36,7 @@ namespace Empire_Rewritten.Windows
         private bool hexChanged = true;
         private string hexCode = "#FFFFFF";
         private float hue = 0f;
+        private float oldHue = 1f;
         private Texture2D texture;
 
         private Color selectedColor = Color.red;
@@ -79,16 +80,18 @@ namespace Empire_Rewritten.Windows
 
             hexCode = "#";
 
-            // Update the RGB field
             for (int i = 0; i < 3; i++)
             {
-                rectRGBValues[i] = (int) (SelectedColor[i] * 255);
-                colorBuffers[i] = ((int) (SelectedColor[i] * 255)).ToString();
-                hexCode += ((int) (SelectedColor[i] * 255)).ToString("X2");
+                rectRGBValues[i] = (int)(SelectedColor[i] * 255);
+                colorBuffers[i] = ((int)(SelectedColor[i] * 255)).ToString();
+                hexCode += ((int)(SelectedColor[i] * 255)).ToString("X2");
             }
 
-            // TODO: Use this function to set all of the widgets' values if one of them changes SelectedColor
-            //       e.g. changing the red value text widget should update the hue of the SV Square
+            if (!SelectedColor.Equals(Color.white) && !SelectedColor.Equals(Color.black))
+            {
+                Color.RGBToHSV(SelectedColor, out hue, out _, out _);
+                texture = MakeSaturationValueTexture(hue);
+            }
         }
 
         public override void DoWindowContents(Rect inRect)
@@ -184,7 +187,10 @@ namespace Empire_Rewritten.Windows
 
         private Texture2D MakeSaturationValueTexture(float hue)
         {
-            Texture2D texture = new Texture2D(ColorComponentHeight, ColorComponentHeight)
+            if (hue == oldHue) return texture;
+
+            oldHue = hue;
+            Texture2D newTexture = new Texture2D(ColorComponentHeight, ColorComponentHeight)
             {
                 wrapMode = TextureWrapMode.Clamp
             };
@@ -198,9 +204,9 @@ namespace Empire_Rewritten.Windows
                 }
             }
 
-            texture.SetPixels(colors);
-            texture.Apply();
-            return texture;
+            newTexture.SetPixels(colors);
+            newTexture.Apply();
+            return newTexture;
         }
 
         /// <summary>
