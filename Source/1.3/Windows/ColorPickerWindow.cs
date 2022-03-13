@@ -17,7 +17,7 @@ namespace Empire_Rewritten.Windows
 
         private readonly string[] colorBuffers = {"255", "255", "255"};
 
-        private readonly Regex hexRx = new Regex(@"[^a-f0-9]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private readonly Regex hexRx = new Regex(@"#[a-f0-9]{6}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private readonly Texture2D hueBarTexture = new Texture2D(1, ColorComponentHeight);
         private readonly Rect rectColorInput;
@@ -147,8 +147,7 @@ namespace Empire_Rewritten.Windows
         {
             Texture2D texture = new Texture2D(ColorComponentHeight, ColorComponentHeight)
             {
-                wrapMode = TextureWrapMode.Clamp,
-                hideFlags = HideFlags.DontSave // TODO: Check out what these two things actually are
+                wrapMode = TextureWrapMode.Clamp
             };
 
             Color[] colors = new Color[ColorComponentHeight * ColorComponentHeight];
@@ -183,7 +182,7 @@ namespace Empire_Rewritten.Windows
         /// </summary>
         private void DrawHexCodeInputField()
         {
-            if (hexRx.IsMatch(hexCode.Substring(1)) || hexCode.Length != 7) //Mark the field red if there is an error
+            if (!hexRx.IsMatch(hexCode)) //Mark the field red if there is an error
             {
                 GUI.color = Color.red;
             }
