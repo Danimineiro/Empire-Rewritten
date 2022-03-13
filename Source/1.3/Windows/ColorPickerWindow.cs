@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -30,6 +31,7 @@ namespace Empire_Rewritten.Windows
         private readonly int[] rectRGBValues = {0, 0, 0};
         private readonly Rect rectSaturationValueSquare;
 
+        private bool keepTrackingMouse = false;
         private bool hexChanged = true;
         private string hexCode = "#FFFFFF";
 
@@ -104,6 +106,26 @@ namespace Empire_Rewritten.Windows
         }
 
         private void DrawSaturationValueSquare()
+        {
+            texture = texture ?? MakeSaturaturationValueTexture(0f);
+            GUI.DrawTexture(rectSaturationValueSquare, texture);
+
+            if ((Mouse.IsOver(rectSaturationValueSquare) || keepTrackingMouse) && Input.GetMouseButton(0))
+            {
+                keepTrackingMouse = true;
+                Vector2 mousePositionInRect = Event.current.mousePosition - rectSaturationValueSquare.position;
+
+                mousePositionInRect.x = Math.Min(mousePositionInRect.x, ColorComponentHeight);
+                mousePositionInRect.x = Math.Max(mousePositionInRect.x, 0f);
+
+                mousePositionInRect.y = Math.Min(mousePositionInRect.y, ColorComponentHeight);
+                mousePositionInRect.y = Math.Max(mousePositionInRect.y, 0f);
+
+                SelectedColor = Color.HSVToRGB(0f, mousePositionInRect.x / ColorComponentHeight, 1f - mousePositionInRect.y / ColorComponentHeight);
+            }
+
+            keepTrackingMouse = keepTrackingMouse && Input.GetMouseButton(0);
+        }
         {
             Texture2D texture = new Texture2D(ColorComponentHeight, ColorComponentHeight)
             {
