@@ -31,9 +31,11 @@ namespace Empire_Rewritten.Windows
         private readonly int[] rectRGBValues = {0, 0, 0};
         private readonly Rect rectSaturationValueSquare;
 
-        private bool keepTrackingMouse = false;
+        private bool keepTrackingMouseSaturation = false;
+        private bool keepTrackingMouseHue = false;
         private bool hexChanged = true;
         private string hexCode = "#FFFFFF";
+        private float hue = 0f;
         private Texture2D texture;
 
         private Color selectedColor = Color.red;
@@ -54,6 +56,8 @@ namespace Empire_Rewritten.Windows
             }
 
             hueBarTexture.Apply();
+
+            texture = MakeSaturationValueTexture(hue);
         }
 
         private Color SelectedColor
@@ -100,7 +104,7 @@ namespace Empire_Rewritten.Windows
             DrawHexCodeInputField();
             DrawRGBInputValues();
 
-            Color.RGBToHSV(SelectedColor, out float hue, out float saturation, out float value);
+            Color.RGBToHSV(SelectedColor, out float _, out float saturation, out float value);
 
             //Crosshair
             Rect verticalLine = new Rect(0f, (int) (ColorComponentHeight - value * ColorComponentHeight - 2f), ColorComponentHeight, 3f);
@@ -117,30 +121,58 @@ namespace Empire_Rewritten.Windows
             Widgets.DrawBoxSolid(horizontalLine.ContractedBy(1), Color.black);
 
             GUI.EndGroup();
+
+            //HueLine
+            Rect hueLine = new Rect(0f, rectHueBar.height - rectHueBar.height * hue - 2f, rectHueBar.width, 3);
+            GUI.BeginGroup(rectHueBar);
+
+            GUI.color = Color.gray;
+            Widgets.DrawBox(hueLine);
+            GUI.color = Color.white;
+
+            Widgets.DrawBoxSolid(hueLine.ContractedBy(1), Color.black);
+
+            GUI.EndGroup();
         }
 
         private void DrawHueBar()
         {
             GUI.DrawTexture(rectHueBar, hueBarTexture);
+
+            if (((Mouse.IsOver(rectHueBar) || keepTrackingMouseHue) && Input.GetMouseButton(0)) && !keepTrackingMouseSaturation)
+            {
+                keepTrackingMouseHue = true;
+                Vector2 mousePositionInRect = Event.current.mousePosition - rectHueBar.position;
+
+                mousePositionInRect.x = Mathf.Clamp(mousePositionInRect.x, 0f, rectHueBar.width);
+                mousePositionInRect.y = Mathf.Clamp(mousePositionInRect.y, 0f, rectHueBar.height);
+
+                Color.RGBToHSV(SelectedColor, out float _, out float saturation, out float value);
+                hue = 1f - mousePositionInRect.y / rectHueBar.height;
+
+                SelectedColor = Color.HSVToRGB(hue, saturation, value);
+                texture = MakeSaturationValueTexture(hue);
+            }
+
+            keepTrackingMouseHue = keepTrackingMouseHue && Input.GetMouseButton(0);
         }
 
         private void DrawSaturationValueSquare()
         {
-            texture = texture ?? MakeSaturationValueTexture(0f);
             GUI.DrawTexture(rectSaturationValueSquare, texture);
 
-            if ((Mouse.IsOver(rectSaturationValueSquare) || keepTrackingMouse) && Input.GetMouseButton(0))
+            if (((Mouse.IsOver(rectSaturationValueSquare) || keepTrackingMouseSaturation) && Input.GetMouseButton(0)) && !keepTrackingMouseHue)
             {
-                keepTrackingMouse = true;
+                keepTrackingMouseSaturation = true;
                 Vector2 mousePositionInRect = Event.current.mousePosition - rectSaturationValueSquare.position;
 
                 mousePositionInRect.x = Mathf.Clamp(mousePositionInRect.x, 0f, ColorComponentHeight);
                 mousePositionInRect.y = Mathf.Clamp(mousePositionInRect.y, 0f, ColorComponentHeight);
 
-                SelectedColor = Color.HSVToRGB(0f, mousePositionInRect.x / ColorComponentHeight, 1f - mousePositionInRect.y / ColorComponentHeight);
+                SelectedColor = Color.HSVToRGB(hue, mousePositionInRect.x / ColorComponentHeight, 1f - mousePositionInRect.y / ColorComponentHeight);
             }
 
-            keepTrackingMouse = keepTrackingMouse && Input.GetMouseButton(0);
+            keepTrackingMouseSaturation = keepTrackingMouseSaturation && Input.GetMouseButton(0);
         }
 
         private Texture2D MakeSaturationValueTexture(float hue)
