@@ -78,9 +78,9 @@ namespace Empire_Rewritten.Windows
             // Update the RGB field
             for (int i = 0; i < 3; i++)
             {
-                rectRGBValues[i] = (int) (selectedColor[i] * 255);
-                colorBuffers[i] = ((int) (selectedColor[i] * 255)).ToString();
-                hexCode += ((int) (selectedColor[i] * 255)).ToString("X2");
+                rectRGBValues[i] = (int) (SelectedColor[i] * 255);
+                colorBuffers[i] = ((int) (SelectedColor[i] * 255)).ToString();
+                hexCode += ((int) (SelectedColor[i] * 255)).ToString("X2");
             }
 
             // TODO: Use this function to set all of the widgets' values if one of them changes SelectedColor
