@@ -11,7 +11,7 @@ namespace Empire_Rewritten.Windows
 {
     public class ColorPickerWindow : Window
     {
-        private const int CreatedBoxes = 4;
+        private const int CreatedBoxes = 5;
         private const int ColorComponentHeight = 200;
         private const int HueBarWidth = 20;
 
@@ -104,6 +104,8 @@ namespace Empire_Rewritten.Windows
             DrawHexCodeInputField();
             DrawRGBInputValues();
 
+            //Color Preview
+            Widgets.DrawBoxSolid(rectColorInputBoxes[4].ContractedBy(5f), SelectedColor);
             Color.RGBToHSV(SelectedColor, out float _, out float saturation, out float value);
 
             //Crosshair
