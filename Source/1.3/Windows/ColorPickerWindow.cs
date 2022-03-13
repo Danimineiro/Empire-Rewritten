@@ -188,9 +188,11 @@ namespace Empire_Rewritten.Windows
             }
             else if (hexChanged) //Only changes if the hexcode is legal
             {
-                float r = int.Parse(hexCode.Substring(1, 2), NumberStyles.HexNumber) / 255f;
-                float g = int.Parse(hexCode.Substring(3, 2), NumberStyles.HexNumber) / 255f;
-                float b = int.Parse(hexCode.Substring(5, 2), NumberStyles.HexNumber) / 255f;
+                int num = int.Parse(hexCode.Substring(1), NumberStyles.AllowHexSpecifier);
+
+                float b = (num & 0xFF) / 255f;
+                float g = ((num >> 8) & 0xFF) / 255f;
+                float r = ((num >> 16) & 0xFF) / 255f;
 
                 SelectedColor = new Color(r, g, b); 
 
