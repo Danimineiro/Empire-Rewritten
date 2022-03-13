@@ -98,19 +98,24 @@ namespace Empire_Rewritten.Windows
             DrawSaturationValueSquare();
             DrawHueBar();
 
-            WindowHelper.DrawBoxes(new[] {rectMain, rectSaturationValueSquare, rectHueBar, rectColorInput});
+            WindowHelper.DrawBoxes(new[] { rectMain, rectSaturationValueSquare, rectHueBar, rectColorInput });
 
             DrawInputFieldLabels();
             DrawHexCodeInputField();
             DrawRGBInputValues();
+            DrawControls();
 
             //Color Preview
             Widgets.DrawBoxSolid(rectColorInputBoxes[4].ContractedBy(5f), SelectedColor);
+        }
+
+        private void DrawControls()
+        {
             Color.RGBToHSV(SelectedColor, out float _, out float saturation, out float value);
 
             //Crosshair
-            Rect verticalLine = new Rect(0f, (int) (ColorComponentHeight - value * ColorComponentHeight - 2f), ColorComponentHeight, 3f);
-            Rect horizontalLine = new Rect((int) ((saturation * ColorComponentHeight) - 2f), 0f, 3f, ColorComponentHeight);
+            Rect verticalLine = new Rect(0f, (int)(ColorComponentHeight - value * ColorComponentHeight - 2f), ColorComponentHeight, 3f);
+            Rect horizontalLine = new Rect((int)((saturation * ColorComponentHeight) - 2f), 0f, 3f, ColorComponentHeight);
 
             GUI.BeginGroup(rectSaturationValueSquare);
 
