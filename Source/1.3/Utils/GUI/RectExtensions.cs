@@ -39,8 +39,6 @@ namespace Empire_Rewritten.Utils
             {
                 yield return rect.TopPartPixels(rect.height / times).MoveRect(new Vector2(0f, rect.height / times * i));
             }
-
-            yield break;
         }
 
         public static IEnumerable<Rect> DivideHorizontal(this Rect rect, int times)
@@ -49,8 +47,6 @@ namespace Empire_Rewritten.Utils
             {
                 yield return rect.LeftPartPixels(rect.width / times).MoveRect(new Vector2(rect.width / times * i, 0f));
             }
-
-            yield break;
         }
     }
 }

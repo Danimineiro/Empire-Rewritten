@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using Empire_Rewritten.Utils;
 using UnityEngine;
@@ -12,50 +10,118 @@ namespace Empire_Rewritten.Windows
 {
     public class ColorPickerWindow : Window
     {
-        private readonly Rect rectFull = new Rect(0f, 0f, 600f, 600f);
-        private readonly Rect rectMain;
-        private readonly Rect rectColorSquare;
-        private readonly Rect rectColorBar;
-        private readonly Rect rectColorInput;
-        private readonly List<Rect> rectColorInputBoxes;
-        private readonly List<Rect> rectRGBInputBoxes;
-        private readonly List<int> rectRGBValues = new List<int>(3) { 0, 0, 0 };
-        private readonly List<string> colorBuffers = new List<string>(3) { "255", "255", "255" };
+        private const int CreatedBoxes = 4;
+        private const int ColorComponentHeight = 200;
+        private const int HueBarWidth = 20;
+
+        private readonly string[] colorBuffers = {"255", "255", "255"};
 
         private readonly Regex hexRx = new Regex(@"[^a-f0-9]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
+        private readonly Texture2D hueBarTexture = new Texture2D(1, ColorComponentHeight);
+        private readonly Rect rectColorInput;
+        private readonly List<Rect> rectColorInputBoxes;
+        private readonly Rect rectFull = new Rect(0f, 0f, 600f, 600f);
+
+        private readonly Rect rectHueBar;
+        private readonly Rect rectMain;
+        private readonly List<Rect> rectRGBInputBoxes;
+
+        private readonly int[] rectRGBValues = {0, 0, 0};
+        private readonly Rect rectSaturationValueSquare;
+
         private bool hexChanged = true;
-        private bool rgbChanged = false;
-        private const int CreatedBoxes = 4;
         private string hexCode = "#FFFFFF";
+        private bool rgbChanged;
+
+        private Color selectedColor = Color.red;
+
+        public ColorPickerWindow()
+        {
+            rectMain = new Rect(rectFull).ContractedBy(25f);
+            rectSaturationValueSquare = new Rect(rectMain.position, new Vector2(ColorComponentHeight, ColorComponentHeight));
+            rectHueBar = rectSaturationValueSquare.MoveRect(new Vector2(rectSaturationValueSquare.width + 10f, 0f)).LeftPartPixels(HueBarWidth);
+            rectColorInput = rectHueBar.MoveRect(new Vector2(rectHueBar.width + 10f, 0f));
+            rectColorInput.size = new Vector2(rectMain.width - rectColorInput.position.x + 25f, rectSaturationValueSquare.height);
+            rectColorInputBoxes = rectColorInput.DivideVertical(CreatedBoxes).ToList();
+            rectRGBInputBoxes = rectColorInputBoxes[3].DivideHorizontal(3).ToList();
+
+            for (int y = 0; y < ColorComponentHeight; y++)
+            {
+                hueBarTexture.SetPixel(0, y, Color.HSVToRGB((float)y / ColorComponentHeight, 1, 1));
+            }
+
+            hueBarTexture.Apply();
+        }
+
+        private Color SelectedColor
+        {
+            get => selectedColor;
+            set
+            {
+                selectedColor = value;
+                UpdateColor();
+            }
+        }
 
         public override Vector2 InitialSize => rectFull.size;
 
         protected override float Margin => 0f;
 
-        public ColorPickerWindow()
+        private void UpdateColor()
         {
-            rectMain = new Rect(rectFull).ContractedBy(25f);
-            rectColorSquare = new Rect(rectMain.position, new Vector2(200f, 200f));
-            rectColorBar = rectColorSquare.MoveRect(new Vector2(rectColorSquare.width + 10f, 0f)).LeftPartPixels(20f);
-            rectColorInput = rectColorBar.MoveRect(new Vector2(rectColorBar.width + 10f, 0f));
-            rectColorInput.size = new Vector2(rectMain.width - rectColorInput.position.x + 25f, rectColorSquare.height);
-            rectColorInputBoxes = rectColorInput.DivideVertical(CreatedBoxes).ToList();
-            rectRGBInputBoxes = rectColorInputBoxes[3].DivideHorizontal(3).ToList();
+            // TODO: Use this function to set all of the widgets' values if one of them changes SelectedColor
+            //       e.g. changing the red value text widget should update the hue of the SV Square
         }
 
         public override void DoWindowContents(Rect inRect)
         {
             DrawCloseButton(inRect);
-            WindowHelper.DrawBoxes(new Rect[] { rectMain, rectColorSquare, rectColorBar, rectColorInput });
-            
+
+            DrawSaturationValueSquare();
+            DrawHueBar();
+
+            WindowHelper.DrawBoxes(new[] {rectMain, rectSaturationValueSquare, rectHueBar, rectColorInput});
+
             DrawInputFieldLabels();
             DrawHexCodeInputField();
             DrawRGBInputValues();
         }
 
+        private void DrawHueBar()
+        {
+            GUI.DrawTexture(rectHueBar, hueBarTexture);
+        }
+
+        private void DrawSaturationValueSquare()
+        {
+            Texture2D texture = new Texture2D(ColorComponentHeight, ColorComponentHeight)
+            {
+                wrapMode = TextureWrapMode.Clamp,
+                hideFlags = HideFlags.DontSave // TODO: Check out what these two things actually are
+            };
+
+            Color[] colors = new Color[ColorComponentHeight * ColorComponentHeight];
+            for (int x = 0; x < ColorComponentHeight; x++)
+            {
+                for (int y = 0; y < ColorComponentHeight; y++)
+                {
+                    colors[x + y * ColorComponentHeight] = Color.HSVToRGB(0f, (float)x / ColorComponentHeight, (float)y / ColorComponentHeight);
+                }
+            }
+
+            texture.SetPixels(colors);
+            texture.Apply();
+            GUI.DrawTexture(rectSaturationValueSquare, texture);
+            if (Widgets.ButtonInvisible(rectSaturationValueSquare))
+            {
+                Vector2 mousePositionInRect = Event.current.mousePosition - rectSaturationValueSquare.position;
+                SelectedColor = Color.HSVToRGB(0f, mousePositionInRect.x / ColorComponentHeight, 1f - mousePositionInRect.y / ColorComponentHeight);
+            }
+        }
+
         /// <summary>
-        /// Draws the input field labels
+        ///     Draws the input field labels
         /// </summary>
         private void DrawInputFieldLabels()
         {
@@ -67,8 +133,8 @@ namespace Empire_Rewritten.Windows
         }
 
         /// <summary>
-        ///     Creates the <see cref="hexCode"/> value input field
-        ///     Changes the <see cref="rectRGBValues"/> when a new value is inputted
+        ///     Creates the <see cref="hexCode" /> value input field
+        ///     Changes the <see cref="rectRGBValues" /> when a new value is inputted
         /// </summary>
         private void DrawHexCodeInputField()
         {
@@ -80,7 +146,7 @@ namespace Empire_Rewritten.Windows
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    rectRGBValues[i] = int.Parse(hexCode.Substring(1 + 2 * i, 2), System.Globalization.NumberStyles.HexNumber);
+                    rectRGBValues[i] = int.Parse(hexCode.Substring(1 + 2 * i, 2), NumberStyles.HexNumber);
                 }
 
                 hexChanged = false;
@@ -105,8 +171,8 @@ namespace Empire_Rewritten.Windows
         }
 
         /// <summary>
-        ///     Creates the RGB value input fields and stores the inputs inside <see cref="rectRGBValues"/>
-        ///     Changes the <see cref="hexCode"/> when new values are inputted
+        ///     Creates the RGB value input fields and stores the inputs inside <see cref="rectRGBValues" />
+        ///     Changes the <see cref="hexCode" /> when new values are inputted
         /// </summary>
         private void DrawRGBInputValues()
         {
