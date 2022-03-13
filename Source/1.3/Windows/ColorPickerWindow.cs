@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -31,12 +30,17 @@ namespace Empire_Rewritten.Windows
         private readonly int[] rectRGBValues = {0, 0, 0};
         private readonly Rect rectSaturationValueSquare;
 
-        private bool keepTrackingMouseSaturation = false;
-        private bool keepTrackingMouseHue = false;
+        private readonly Texture2D texture = new Texture2D(ColorComponentHeight, ColorComponentHeight)
+        {
+            wrapMode = TextureWrapMode.Clamp
+        };
+
         private bool hexChanged = true;
         private string hexCode = "#FFFFFF";
-        private float hue = 0f;
-        private Texture2D texture;
+        private float hue;
+        private bool keepTrackingMouseHue;
+
+        private bool keepTrackingMouseSaturation;
 
         private Color selectedColor = Color.red;
 
@@ -57,7 +61,7 @@ namespace Empire_Rewritten.Windows
 
             hueBarTexture.Apply();
 
-            texture = MakeSaturationValueTexture(hue);
+            UpdateSaturationValueTexture();
         }
 
         private Color SelectedColor
@@ -76,16 +80,18 @@ namespace Empire_Rewritten.Windows
 
         private void UpdateColor()
         {
-
             hexCode = "#";
 
             // Update the RGB field
             for (int i = 0; i < 3; i++)
             {
-                rectRGBValues[i] = (int) (SelectedColor[i] * 255);
-                colorBuffers[i] = ((int) (SelectedColor[i] * 255)).ToString();
-                hexCode += ((int) (SelectedColor[i] * 255)).ToString("X2");
+                rectRGBValues[i] = (int)(SelectedColor[i] * 255);
+                colorBuffers[i] = ((int)(SelectedColor[i] * 255)).ToString();
+                hexCode += ((int)(SelectedColor[i] * 255)).ToString("X2");
             }
+
+            Color.RGBToHSV(SelectedColor, out hue, out _, out _);
+            UpdateSaturationValueTexture();
 
             // TODO: Use this function to set all of the widgets' values if one of them changes SelectedColor
             //       e.g. changing the red value text widget should update the hue of the SV Square
@@ -107,8 +113,8 @@ namespace Empire_Rewritten.Windows
             Color.RGBToHSV(SelectedColor, out float _, out float saturation, out float value);
 
             //Crosshair
-            Rect verticalLine = new Rect(0f, (int) (ColorComponentHeight - value * ColorComponentHeight - 2f), ColorComponentHeight, 3f);
-            Rect horizontalLine = new Rect((int) ((saturation * ColorComponentHeight) - 2f), 0f, 3f, ColorComponentHeight);
+            Rect verticalLine = new Rect(0f, (int)(ColorComponentHeight - value * ColorComponentHeight - 2f), ColorComponentHeight, 3f);
+            Rect horizontalLine = new Rect((int)(saturation * ColorComponentHeight - 2f), 0f, 3f, ColorComponentHeight);
 
             GUI.BeginGroup(rectSaturationValueSquare);
 
@@ -139,7 +145,7 @@ namespace Empire_Rewritten.Windows
         {
             GUI.DrawTexture(rectHueBar, hueBarTexture);
 
-            if (((Mouse.IsOver(rectHueBar) || keepTrackingMouseHue) && Input.GetMouseButton(0)) && !keepTrackingMouseSaturation)
+            if ((Mouse.IsOver(rectHueBar) || keepTrackingMouseHue) && Input.GetMouseButton(0) && !keepTrackingMouseSaturation)
             {
                 keepTrackingMouseHue = true;
                 Vector2 mousePositionInRect = Event.current.mousePosition - rectHueBar.position;
@@ -151,7 +157,7 @@ namespace Empire_Rewritten.Windows
                 hue = 1f - mousePositionInRect.y / rectHueBar.height;
 
                 SelectedColor = Color.HSVToRGB(hue, saturation, value);
-                texture = MakeSaturationValueTexture(hue);
+                UpdateSaturationValueTexture();
             }
 
             keepTrackingMouseHue = keepTrackingMouseHue && Input.GetMouseButton(0);
@@ -161,7 +167,7 @@ namespace Empire_Rewritten.Windows
         {
             GUI.DrawTexture(rectSaturationValueSquare, texture);
 
-            if (((Mouse.IsOver(rectSaturationValueSquare) || keepTrackingMouseSaturation) && Input.GetMouseButton(0)) && !keepTrackingMouseHue)
+            if ((Mouse.IsOver(rectSaturationValueSquare) || keepTrackingMouseSaturation) && Input.GetMouseButton(0) && !keepTrackingMouseHue)
             {
                 keepTrackingMouseSaturation = true;
                 Vector2 mousePositionInRect = Event.current.mousePosition - rectSaturationValueSquare.position;
@@ -175,13 +181,8 @@ namespace Empire_Rewritten.Windows
             keepTrackingMouseSaturation = keepTrackingMouseSaturation && Input.GetMouseButton(0);
         }
 
-        private Texture2D MakeSaturationValueTexture(float hue)
+        private void UpdateSaturationValueTexture()
         {
-            Texture2D texture = new Texture2D(ColorComponentHeight, ColorComponentHeight)
-            {
-                wrapMode = TextureWrapMode.Clamp
-            };
-
             Color[] colors = new Color[ColorComponentHeight * ColorComponentHeight];
             for (int x = 0; x < ColorComponentHeight; x++)
             {
@@ -193,7 +194,6 @@ namespace Empire_Rewritten.Windows
 
             texture.SetPixels(colors);
             texture.Apply();
-            return texture;
         }
 
         /// <summary>
@@ -226,7 +226,7 @@ namespace Empire_Rewritten.Windows
                 float g = ((num >> 8) & 0xFF) / 255f;
                 float r = ((num >> 16) & 0xFF) / 255f;
 
-                SelectedColor = new Color(r, g, b); 
+                SelectedColor = new Color(r, g, b);
 
                 hexChanged = false;
             }
