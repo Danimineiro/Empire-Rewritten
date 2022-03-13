@@ -20,12 +20,14 @@ namespace Empire_Rewritten.Windows
         private readonly Regex hexRx = new Regex(@"#[a-f0-9]{6}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private readonly Texture2D hueBarTexture = new Texture2D(1, ColorComponentHeight);
-        private readonly Rect rectColorInput;
-        private readonly List<Rect> rectColorInputBoxes;
-        private readonly Rect rectFull = new Rect(0f, 0f, 600f, 600f);
 
-        private readonly Rect rectHueBar;
+        private readonly Rect rectColorInput;
+        private readonly Rect rectFull = new Rect(0f, 0f, 600f, 300f);
         private readonly Rect rectMain;
+        private readonly Rect rectHueBar;
+        private readonly Rect rectHistoryMain;
+
+        private readonly List<Rect> rectColorInputBoxes;
         private readonly List<Rect> rectRGBInputBoxes;
 
         private readonly int[] rectRGBValues = {0, 0, 0};
@@ -58,7 +60,7 @@ namespace Empire_Rewritten.Windows
 
             hueBarTexture.Apply();
 
-            texture = MakeSaturationValueTexture(hue);
+            RefreshSaturationTexture();
         }
 
         private Color SelectedColor
@@ -91,6 +93,7 @@ namespace Empire_Rewritten.Windows
             {
                 Color.RGBToHSV(SelectedColor, out hue, out _, out _);
                 texture = MakeSaturationValueTexture(hue);
+                RefreshSaturationTexture();
             }
         }
 
@@ -109,7 +112,8 @@ namespace Empire_Rewritten.Windows
             DrawControls();
 
             //Color Preview
-            Widgets.DrawBoxSolid(rectColorInputBoxes[4].ContractedBy(5f), SelectedColor);
+            Widgets.DrawBoxSolid(rectColorInputBoxes[4].ContractedBy(5f), Color.black);
+            Widgets.DrawBoxSolid(rectColorInputBoxes[4].ContractedBy(10f), SelectedColor);
         }
 
         private void DrawControls()
@@ -161,7 +165,7 @@ namespace Empire_Rewritten.Windows
                 hue = 1f - mousePositionInRect.y / rectHueBar.height;
 
                 SelectedColor = Color.HSVToRGB(hue, saturation, value);
-                texture = MakeSaturationValueTexture(hue);
+                RefreshSaturationTexture();
             }
 
             keepTrackingMouseHue = keepTrackingMouseHue && Input.GetMouseButton(0);
@@ -185,9 +189,9 @@ namespace Empire_Rewritten.Windows
             keepTrackingMouseSaturation = keepTrackingMouseSaturation && Input.GetMouseButton(0);
         }
 
-        private Texture2D MakeSaturationValueTexture(float hue)
+        private void RefreshSaturationTexture()
         {
-            if (hue == oldHue) return texture;
+            if (hue == oldHue) return;
 
             oldHue = hue;
             Texture2D newTexture = new Texture2D(ColorComponentHeight, ColorComponentHeight)
@@ -206,7 +210,7 @@ namespace Empire_Rewritten.Windows
 
             newTexture.SetPixels(colors);
             newTexture.Apply();
-            return newTexture;
+            texture = newTexture;
         }
 
         /// <summary>
