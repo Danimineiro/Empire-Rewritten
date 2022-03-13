@@ -32,7 +32,6 @@ namespace Empire_Rewritten.Windows
 
         private bool hexChanged = true;
         private string hexCode = "#FFFFFF";
-        private bool rgbChanged;
 
         private Color selectedColor = Color.red;
 
@@ -70,6 +69,17 @@ namespace Empire_Rewritten.Windows
 
         private void UpdateColor()
         {
+
+            hexCode = "#";
+
+            // Update the RGB field
+            for (int i = 0; i < 3; i++)
+            {
+                rectRGBValues[i] = (int) (selectedColor[i] * 255);
+                colorBuffers[i] = ((int) (selectedColor[i] * 255)).ToString();
+                hexCode += ((int) (selectedColor[i] * 255)).ToString("X2");
+            }
+
             // TODO: Use this function to set all of the widgets' values if one of them changes SelectedColor
             //       e.g. changing the red value text widget should update the hue of the SV Square
         }
@@ -144,10 +154,11 @@ namespace Empire_Rewritten.Windows
             }
             else if (hexChanged) //Only changes if the hexcode is legal
             {
-                for (int i = 0; i < 3; i++)
-                {
-                    rectRGBValues[i] = int.Parse(hexCode.Substring(1 + 2 * i, 2), NumberStyles.HexNumber);
-                }
+                float r = int.Parse(hexCode.Substring(1, 2), NumberStyles.HexNumber) / 255f;
+                float g = int.Parse(hexCode.Substring(3, 2), NumberStyles.HexNumber) / 255f;
+                float b = int.Parse(hexCode.Substring(5, 2), NumberStyles.HexNumber) / 255f;
+
+                SelectedColor = new Color(r, g, b); 
 
                 hexChanged = false;
             }
@@ -165,7 +176,7 @@ namespace Empire_Rewritten.Windows
                 //Fixes the # char being moved to the third position if someone writes before it
                 if (hexCode.Length >= 3 && hexCode[2].Equals('#'))
                 {
-                    hexCode = $"{hexCode.Substring(0, 2)}{(hexCode.Length >= 4 ? hexCode.Substring(4) : string.Empty)}";
+                    hexCode = $"{hexCode.Substring(0, 2)}{(hexCode.Length >= 3 ? hexCode.Substring(3) : string.Empty)}";
                 }
             }
         }
@@ -176,35 +187,25 @@ namespace Empire_Rewritten.Windows
         /// </summary>
         private void DrawRGBInputValues()
         {
+            bool rgbChanged = false;
+
             //Creates the RGB value inputs and handles them
             for (int i = 0; i < 3; i++)
             {
                 int value = rectRGBValues[i];
                 string colorBuffer = colorBuffers[i];
 
-                int colorBefore = value;
                 Widgets.TextFieldNumeric(rectRGBInputBoxes[i].ContractedBy(5f), ref value, ref colorBuffer, 0f, 255f);
+
+                rgbChanged = rgbChanged || value != rectRGBValues[i];
 
                 rectRGBValues[i] = value;
                 colorBuffers[i] = colorBuffer;
-
-                if (!colorBefore.Equals(rectRGBValues[i]))
-                {
-                    rgbChanged = true;
-                }
             }
 
-            //Adjusts the hexCode if the rgb values were changed
             if (rgbChanged)
             {
-                hexCode = "#";
-
-                for (int i = 0; i < 3; i++)
-                {
-                    hexCode += rectRGBValues[i].ToString("X2");
-                }
-
-                rgbChanged = false;
+                SelectedColor = new Color(rectRGBValues[0] / 255f, rectRGBValues[1] / 255f, rectRGBValues[2] / 255f);
             }
         }
 
