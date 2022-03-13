@@ -126,7 +126,7 @@ namespace Empire_Rewritten.Windows
 
         private void DrawSaturationValueSquare()
         {
-            texture = texture ?? MakeSaturaturationValueTexture(0f);
+            texture = texture ?? MakeSaturationValueTexture(0f);
             GUI.DrawTexture(rectSaturationValueSquare, texture);
 
             if ((Mouse.IsOver(rectSaturationValueSquare) || keepTrackingMouse) && Input.GetMouseButton(0))
@@ -134,11 +134,8 @@ namespace Empire_Rewritten.Windows
                 keepTrackingMouse = true;
                 Vector2 mousePositionInRect = Event.current.mousePosition - rectSaturationValueSquare.position;
 
-                mousePositionInRect.x = Math.Min(mousePositionInRect.x, ColorComponentHeight);
-                mousePositionInRect.x = Math.Max(mousePositionInRect.x, 0f);
-
-                mousePositionInRect.y = Math.Min(mousePositionInRect.y, ColorComponentHeight);
-                mousePositionInRect.y = Math.Max(mousePositionInRect.y, 0f);
+                mousePositionInRect.x = Mathf.Clamp(mousePositionInRect.x, 0f, ColorComponentHeight);
+                mousePositionInRect.y = Mathf.Clamp(mousePositionInRect.y, 0f, ColorComponentHeight);
 
                 SelectedColor = Color.HSVToRGB(0f, mousePositionInRect.x / ColorComponentHeight, 1f - mousePositionInRect.y / ColorComponentHeight);
             }
@@ -146,7 +143,7 @@ namespace Empire_Rewritten.Windows
             keepTrackingMouse = keepTrackingMouse && Input.GetMouseButton(0);
         }
 
-        private Texture2D MakeSaturaturationValueTexture(float hue)
+        private Texture2D MakeSaturationValueTexture(float hue)
         {
             Texture2D texture = new Texture2D(ColorComponentHeight, ColorComponentHeight)
             {
