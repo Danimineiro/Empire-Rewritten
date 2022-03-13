@@ -34,6 +34,7 @@ namespace Empire_Rewritten.Windows
         private bool keepTrackingMouse = false;
         private bool hexChanged = true;
         private string hexCode = "#FFFFFF";
+        private Texture2D texture;
 
         private Color selectedColor = Color.red;
 
@@ -98,6 +99,24 @@ namespace Empire_Rewritten.Windows
             DrawInputFieldLabels();
             DrawHexCodeInputField();
             DrawRGBInputValues();
+
+            Color.RGBToHSV(SelectedColor, out float hue, out float saturation, out float value);
+
+            //Crosshair
+            Rect verticalLine = new Rect(0f, (int) (ColorComponentHeight - value * ColorComponentHeight - 2f), ColorComponentHeight, 3f);
+            Rect horizontalLine = new Rect((int) ((saturation * ColorComponentHeight) - 2f), 0f, 3f, ColorComponentHeight);
+
+            GUI.BeginGroup(rectSaturationValueSquare);
+
+            GUI.color = Color.gray;
+            Widgets.DrawBox(verticalLine);
+            Widgets.DrawBox(horizontalLine);
+            GUI.color = Color.white;
+
+            Widgets.DrawBoxSolid(verticalLine.ContractedBy(1), Color.black);
+            Widgets.DrawBoxSolid(horizontalLine.ContractedBy(1), Color.black);
+
+            GUI.EndGroup();
         }
 
         private void DrawHueBar()
@@ -126,6 +145,8 @@ namespace Empire_Rewritten.Windows
 
             keepTrackingMouse = keepTrackingMouse && Input.GetMouseButton(0);
         }
+
+        private Texture2D MakeSaturaturationValueTexture(float hue)
         {
             Texture2D texture = new Texture2D(ColorComponentHeight, ColorComponentHeight)
             {
@@ -138,18 +159,13 @@ namespace Empire_Rewritten.Windows
             {
                 for (int y = 0; y < ColorComponentHeight; y++)
                 {
-                    colors[x + y * ColorComponentHeight] = Color.HSVToRGB(0f, (float)x / ColorComponentHeight, (float)y / ColorComponentHeight);
+                    colors[x + y * ColorComponentHeight] = Color.HSVToRGB(hue, (float)x / ColorComponentHeight, (float)y / ColorComponentHeight);
                 }
             }
 
             texture.SetPixels(colors);
             texture.Apply();
-            GUI.DrawTexture(rectSaturationValueSquare, texture);
-            if (Widgets.ButtonInvisible(rectSaturationValueSquare))
-            {
-                Vector2 mousePositionInRect = Event.current.mousePosition - rectSaturationValueSquare.position;
-                SelectedColor = Color.HSVToRGB(0f, mousePositionInRect.x / ColorComponentHeight, 1f - mousePositionInRect.y / ColorComponentHeight);
-            }
+            return texture;
         }
 
         /// <summary>
