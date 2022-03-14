@@ -114,7 +114,7 @@ namespace Empire_Rewritten.Windows
             }
 
             //If gray, don't update hue => gray tones don't have a hue and would lose the user input
-            if (!(SelectedColor.r == SelectedColor.g && SelectedColor.g == selectedColor.r))
+            if (SelectedColor.r != SelectedColor.g || SelectedColor.g != selectedColor.b)
             {
                 Color.RGBToHSV(SelectedColor, out hue, out _, out _);
                 RefreshSaturationTexture();
