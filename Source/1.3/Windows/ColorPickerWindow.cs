@@ -151,7 +151,7 @@ namespace Empire_Rewritten.Windows
             DrawSaturationValueSquare();
             DrawHueBar();
 
-            WindowHelper.DrawBoxes(new[] { rectMain, rectSaturationValueSquare, rectHueBar, rectColorInput });
+            WindowHelper.DrawBoxes(new[] { rectMain, rectHistoryMain });
            
             DrawColorHistoryButtons();
             DrawInputFieldLabels();
@@ -196,10 +196,11 @@ namespace Empire_Rewritten.Windows
             {
                 for (int j = 0; j < colorHistory[i].Count; j++)
                 {
-                    Rect tempButtonRect = rectHistoryArray[i, j];
-                    Widgets.DrawBoxSolid(tempButtonRect.ContractedBy(5f), Color.black);
-                    Widgets.DrawBoxSolid(tempButtonRect.ContractedBy(10f), colorHistory[i][j]);
-                    if (Widgets.ButtonInvisible(tempButtonRect.ContractedBy(5f)))
+                    Rect tempMainRect = rectHistoryArray[i, j];
+
+                    Widgets.DrawBoxSolid(tempMainRect, Color.white);
+                    Widgets.DrawBoxSolid(tempMainRect.ContractedBy(1f), colorHistory[i][j]);
+                    if (Widgets.ButtonInvisible(tempMainRect))
                     {
                         SelectedColor = colorHistory[i][j];
                     }
