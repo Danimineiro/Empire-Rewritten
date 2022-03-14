@@ -18,7 +18,7 @@ namespace Empire_Rewritten.Windows
         private const int HistoryRows = 2;
 
         private readonly string[] colorBuffers = {"255", "255", "255"};
-        private readonly List<Color>[] colorHistory;
+        private readonly Color[] colorHistory;
 
         private readonly Regex hexRx = new Regex(@"#[a-f0-9]{6}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
@@ -63,16 +63,16 @@ namespace Empire_Rewritten.Windows
             rectRGBInputBoxes = rectColorInputBoxes[3].DivideHorizontal(3).ToList();
             rectHistoryMain = new Rect(rectMain.position.x, ColorComponentHeight + 25f, rectMain.width, rectMain.height - ColorComponentHeight);
             rectHistoryArray = new Rect[HistoryRows, HistoryColumns];
-            colorHistory = new List<Color>[HistoryRows];
+            colorHistory = new Color[HistoryColumns * HistoryRows];
 
             Rect[] historyRowRects = rectHistoryMain.DivideVertical(HistoryRows).ToArray();
             for (int i = 0; i < HistoryRows; i++)
             {
                 Rect[] historyColumnRects = historyRowRects[i].DivideHorizontal(HistoryColumns).ToArray();
-                colorHistory[i] = new List<Color>(HistoryColumns);
                 for (int j = 0; j < HistoryColumns; j++)
                 {
                     rectHistoryArray[i, j] = historyColumnRects[j];
+                    colorHistory[j + i * HistoryColumns] = Color.black;
                 }
             }
 
@@ -121,33 +121,24 @@ namespace Empire_Rewritten.Windows
             }
         }
 
-        private void SaveCurrentColor()
+        private void InsertColorInHistory(Color color)
         {
-            if (HistoryContains(SelectedColor, out int index0, out int index1))
+            if (colorHistory.Contains(color))
             {
-                Color temp = colorHistory[index0][index1];
-                colorHistory[index0].RemoveAt(index1);
-                InsertColorInHistory(temp);
+                for (int i = colorHistory.FirstIndexOf(val => val == color); i >= 1; i--)
+                {
+                    colorHistory[i] = colorHistory[i - 1];
+                }
             }
             else
             {
-                InsertColorInHistory(SelectedColor);
-            }
-        }
-
-        private void InsertColorInHistory(Color color)
-        {
-            colorHistory[0].Insert(0, color);
-
-            if (colorHistory[0].Count > HistoryColumns)
-            {
-                colorHistory[1].Insert(0, colorHistory[0].Pop());
-
-                if (colorHistory[1].Count > HistoryColumns)
+                for (int i = colorHistory.Length - 1; i >= 1; i--)
                 {
-                    colorHistory[1].Pop();
+                    colorHistory[i] = colorHistory[i - 1];
                 }
             }
+
+            colorHistory[0] = color;
         }
 
         public override void DoWindowContents(Rect inRect)
@@ -172,44 +163,24 @@ namespace Empire_Rewritten.Windows
             //Save color button
             if (Widgets.ButtonText(rectColorInputBoxes[5].ContractedBy(5f), "##SaveColor"))
             {
-                SaveCurrentColor();
+                InsertColorInHistory(SelectedColor);
             }
-        }
-
-        private bool HistoryContains(Color color, out int index0, out int index1)
-        {
-            for (int i = 0; i < colorHistory.Length; i++)
-            {
-                for (int j = 0; j < colorHistory[i].Count; j++)
-                {
-                    if (colorHistory[i][j].Equals(color))
-                    {
-                        index0 = i;
-                        index1 = j;
-                        return true;
-                    }
-                }
-            }
-
-            index0 = -1;
-            index1 = -1;
-            return false;
         }
 
         private void DrawColorHistoryButtons()
         {
-            for (int i = 0; i < colorHistory.Length; i++)
+            for (int y = 0; y < HistoryRows; y++)
             {
-                for (int j = 0; j < colorHistory[i].Count; j++)
+                for (int x = 0; x < HistoryColumns; x++)
                 {
-                    Rect tempMainRect = rectHistoryArray[i, j];
+                    Rect historyRect = rectHistoryArray[y, x];
 
-                    Widgets.DrawBoxSolid(tempMainRect, Color.white);
-                    Widgets.DrawBoxSolid(tempMainRect.ContractedBy(1f), colorHistory[i][j]);
-                    if (Widgets.ButtonInvisible(tempMainRect))
+                    Widgets.DrawBoxSolid(historyRect, Color.white);
+                    Widgets.DrawBoxSolid(historyRect.ContractedBy(1f), colorHistory[x + y * HistoryColumns]);
+                    if (Widgets.ButtonInvisible(historyRect))
                     {
-                        SelectedColor = colorHistory[i][j];
-                        SaveCurrentColor();
+                        SelectedColor = colorHistory[x + y * HistoryColumns];
+                        InsertColorInHistory(SelectedColor);
                     }
                 }
             }
