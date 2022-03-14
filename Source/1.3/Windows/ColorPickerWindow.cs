@@ -108,7 +108,8 @@ namespace Empire_Rewritten.Windows
                 hexCode += ((int)(SelectedColor[i] * 255)).ToString("X2");
             }
 
-            if (!SelectedColor.Equals(Color.white) && !SelectedColor.Equals(Color.black))
+            
+            if (!(SelectedColor.r == SelectedColor.g && SelectedColor.g == selectedColor.r))
             {
                 Color.RGBToHSV(SelectedColor, out hue, out _, out _);
                 RefreshSaturationTexture();
