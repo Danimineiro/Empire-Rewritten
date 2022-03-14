@@ -50,6 +50,11 @@ namespace Empire_Rewritten.Windows
 
         public ColorPickerWindow()
         {
+            closeOnClickedOutside = true;
+            forcePause = true;
+            preventCameraMotion = true;
+            onlyOneOfTypeAllowed = true;
+
             rectMain = new Rect(rectFull).ContractedBy(25f);
             rectSaturationValueSquare = new Rect(rectMain.position, new Vector2(ColorComponentHeight, ColorComponentHeight));
             rectHueBar = rectSaturationValueSquare.MoveRect(new Vector2(rectSaturationValueSquare.width + 10f, 0f)).LeftPartPixels(HueBarWidth);
@@ -92,6 +97,8 @@ namespace Empire_Rewritten.Windows
             }
         }
 
+        public static Color LastSelectedColor { get; private set; }
+
         public override Vector2 InitialSize => rectFull.size;
 
         protected override float Margin => 0f;
@@ -108,7 +115,7 @@ namespace Empire_Rewritten.Windows
                 hexCode += ((int)(SelectedColor[i] * 255)).ToString("X2");
             }
 
-            
+            //If gray, don't update hue => gray tones don't have a hue and would lose the user input
             if (!(SelectedColor.r == SelectedColor.g && SelectedColor.g == selectedColor.r))
             {
                 Color.RGBToHSV(SelectedColor, out hue, out _, out _);
@@ -204,6 +211,7 @@ namespace Empire_Rewritten.Windows
                     if (Widgets.ButtonInvisible(tempMainRect))
                     {
                         SelectedColor = colorHistory[i][j];
+                        SaveCurrentColor();
                     }
                 }
             }
@@ -230,7 +238,7 @@ namespace Empire_Rewritten.Windows
             GUI.EndGroup();
 
             //HueLine
-            Rect hueLine = new Rect(0f, rectHueBar.height - rectHueBar.height * hue - 2f, rectHueBar.width, 3);
+            Rect hueLine = new Rect(0f, (int) (rectHueBar.height - rectHueBar.height * hue - 2f), rectHueBar.width, 3);
             GUI.BeginGroup(rectHueBar);
 
             GUI.color = Color.gray;
@@ -246,7 +254,7 @@ namespace Empire_Rewritten.Windows
         {
             GUI.DrawTexture(rectHueBar, hueBarTexture);
 
-            if (((Mouse.IsOver(rectHueBar) || keepTrackingMouseHue) && Input.GetMouseButton(0)) && !keepTrackingMouseSaturation)
+            if ((Mouse.IsOver(rectHueBar) || keepTrackingMouseHue) && Input.GetMouseButton(0) && !keepTrackingMouseSaturation)
             {
                 keepTrackingMouseHue = true;
                 Vector2 mousePositionInRect = Event.current.mousePosition - rectHueBar.position;
@@ -390,6 +398,12 @@ namespace Empire_Rewritten.Windows
         private void DrawCloseButton(Rect inRect)
         {
             if (Widgets.CloseButtonFor(inRect)) Close();
+        }
+
+        public override void Close(bool doCloseSound = true)
+        {
+            LastSelectedColor = SelectedColor;
+            base.Close(doCloseSound);
         }
     }
 }
