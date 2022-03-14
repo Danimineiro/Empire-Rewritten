@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -15,38 +14,38 @@ namespace Empire_Rewritten.Windows
         private const int ColorComponentHeight = 200;
         private const int HueBarWidth = 20;
 
+        private const int HistoryColumns = 5;
+        private const int HistoryRows = 2;
+
         private readonly string[] colorBuffers = {"255", "255", "255"};
+        private readonly List<Color>[] colorHistory;
 
         private readonly Regex hexRx = new Regex(@"#[a-f0-9]{6}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private readonly Texture2D hueBarTexture = new Texture2D(1, ColorComponentHeight);
 
         private readonly Rect rectColorInput;
-        private readonly Rect rectFull = new Rect(0f, 0f, 600f, 300f);
-        private readonly Rect rectMain;
-        private readonly Rect rectHueBar;
-        private readonly Rect rectHistoryMain;
 
         private readonly List<Rect> rectColorInputBoxes;
-        private readonly List<Rect> rectRGBInputBoxes;
+        private readonly Rect rectFull = new Rect(0f, 0f, 600f, 300f);
         private readonly Rect[,] rectHistoryArray;
-        private readonly List<Color>[] colorHistory;
-
-        private readonly int historyRows = 2;
-        private readonly int historyColumns = 5;
+        private readonly Rect rectHistoryMain;
+        private readonly Rect rectHueBar;
+        private readonly Rect rectMain;
+        private readonly List<Rect> rectRGBInputBoxes;
 
         private readonly int[] rectRGBValues = {0, 0, 0};
         private readonly Rect rectSaturationValueSquare;
-
-        private bool keepTrackingMouseSaturation = false;
-        private bool keepTrackingMouseHue = false;
         private bool hexChanged = true;
         private string hexCode = "#FFFFFF";
-        private float hue = 0f;
+        private float hue;
+        private bool keepTrackingMouseHue;
+
+        private bool keepTrackingMouseSaturation;
         private float oldHue = 1f;
-        private Texture2D texture;
 
         private Color selectedColor = Color.red;
+        private Texture2D texture;
 
         public ColorPickerWindow()
         {
@@ -63,15 +62,15 @@ namespace Empire_Rewritten.Windows
             rectColorInputBoxes = rectColorInput.DivideVertical(CreatedBoxes).ToList();
             rectRGBInputBoxes = rectColorInputBoxes[3].DivideHorizontal(3).ToList();
             rectHistoryMain = new Rect(rectMain.position.x, ColorComponentHeight + 25f, rectMain.width, rectMain.height - ColorComponentHeight);
-            rectHistoryArray = new Rect[historyRows, historyColumns];
-            colorHistory = new List<Color>[historyRows];
+            rectHistoryArray = new Rect[HistoryRows, HistoryColumns];
+            colorHistory = new List<Color>[HistoryRows];
 
-            Rect[] historyRowRects = rectHistoryMain.DivideVertical(historyRows).ToArray(); 
-            for (int i = 0; i < historyRows; i++)
+            Rect[] historyRowRects = rectHistoryMain.DivideVertical(HistoryRows).ToArray();
+            for (int i = 0; i < HistoryRows; i++)
             {
-                Rect[] historyColumnRects = historyRowRects[i].DivideHorizontal(historyColumns).ToArray();
-                colorHistory[i] = new List<Color>(historyColumns);
-                for (int j = 0; j < historyColumns; j++)
+                Rect[] historyColumnRects = historyRowRects[i].DivideHorizontal(HistoryColumns).ToArray();
+                colorHistory[i] = new List<Color>(HistoryColumns);
+                for (int j = 0; j < HistoryColumns; j++)
                 {
                     rectHistoryArray[i, j] = historyColumnRects[j];
                 }
@@ -105,7 +104,6 @@ namespace Empire_Rewritten.Windows
 
         private void UpdateColor()
         {
-
             hexCode = "#";
 
             for (int i = 0; i < 3; i++)
@@ -141,11 +139,11 @@ namespace Empire_Rewritten.Windows
         {
             colorHistory[0].Insert(0, color);
 
-            if (colorHistory[0].Count > historyColumns)
+            if (colorHistory[0].Count > HistoryColumns)
             {
                 colorHistory[1].Insert(0, colorHistory[0].Pop());
 
-                if (colorHistory[1].Count > historyColumns)
+                if (colorHistory[1].Count > HistoryColumns)
                 {
                     colorHistory[1].Pop();
                 }
@@ -159,8 +157,8 @@ namespace Empire_Rewritten.Windows
             DrawSaturationValueSquare();
             DrawHueBar();
 
-            WindowHelper.DrawBoxes(new[] { rectMain, rectHistoryMain });
-           
+            WindowHelper.DrawBoxes(new[] {rectMain, rectHistoryMain});
+
             DrawColorHistoryButtons();
             DrawInputFieldLabels();
             DrawHexCodeInputField();
@@ -185,9 +183,9 @@ namespace Empire_Rewritten.Windows
                 for (int j = 0; j < colorHistory[i].Count; j++)
                 {
                     if (colorHistory[i][j].Equals(color))
-                    {   
+                    {
                         index0 = i;
-                        index1 = j; 
+                        index1 = j;
                         return true;
                     }
                 }
@@ -221,9 +219,9 @@ namespace Empire_Rewritten.Windows
         {
             Color.RGBToHSV(SelectedColor, out float _, out float saturation, out float value);
 
-            //Crosshair
+            // Cross-hair
             Rect verticalLine = new Rect(0f, (int)(ColorComponentHeight - value * ColorComponentHeight - 2f), ColorComponentHeight, 3f);
-            Rect horizontalLine = new Rect((int)((saturation * ColorComponentHeight) - 2f), 0f, 3f, ColorComponentHeight);
+            Rect horizontalLine = new Rect((int)(saturation * ColorComponentHeight - 2f), 0f, 3f, ColorComponentHeight);
 
             GUI.BeginGroup(rectSaturationValueSquare);
 
@@ -238,7 +236,7 @@ namespace Empire_Rewritten.Windows
             GUI.EndGroup();
 
             //HueLine
-            Rect hueLine = new Rect(0f, (int) (rectHueBar.height - rectHueBar.height * hue - 2f), rectHueBar.width, 3);
+            Rect hueLine = new Rect(0f, (int)(rectHueBar.height - rectHueBar.height * hue - 2f), rectHueBar.width, 3);
             GUI.BeginGroup(rectHueBar);
 
             GUI.color = Color.gray;
@@ -276,7 +274,7 @@ namespace Empire_Rewritten.Windows
         {
             GUI.DrawTexture(rectSaturationValueSquare, texture);
 
-            if (((Mouse.IsOver(rectSaturationValueSquare) || keepTrackingMouseSaturation) && Input.GetMouseButton(0)) && !keepTrackingMouseHue)
+            if ((Mouse.IsOver(rectSaturationValueSquare) || keepTrackingMouseSaturation) && Input.GetMouseButton(0) && !keepTrackingMouseHue)
             {
                 keepTrackingMouseSaturation = true;
                 Vector2 mousePositionInRect = Event.current.mousePosition - rectSaturationValueSquare.position;
@@ -336,7 +334,7 @@ namespace Empire_Rewritten.Windows
             {
                 GUI.color = Color.red;
             }
-            else if (hexChanged) //Only changes if the hexcode is legal
+            else if (hexChanged) //Only changes if the hex code is legal
             {
                 int num = int.Parse(hexCode.Substring(1), NumberStyles.AllowHexSpecifier);
 
@@ -344,7 +342,7 @@ namespace Empire_Rewritten.Windows
                 float g = ((num >> 8) & 0xFF) / 255f;
                 float r = ((num >> 16) & 0xFF) / 255f;
 
-                SelectedColor = new Color(r, g, b); 
+                SelectedColor = new Color(r, g, b);
 
                 hexChanged = false;
             }
