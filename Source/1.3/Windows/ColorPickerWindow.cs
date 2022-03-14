@@ -11,7 +11,7 @@ namespace Empire_Rewritten.Windows
 {
     public class ColorPickerWindow : Window
     {
-        private const int CreatedBoxes = 5;
+        private const int CreatedBoxes = 6;
         private const int ColorComponentHeight = 200;
         private const int HueBarWidth = 20;
 
@@ -29,6 +29,11 @@ namespace Empire_Rewritten.Windows
 
         private readonly List<Rect> rectColorInputBoxes;
         private readonly List<Rect> rectRGBInputBoxes;
+        private readonly Rect[,] rectHistoryArray;
+        private readonly List<Color>[] colorHistory;
+
+        private readonly int historyRows = 2;
+        private readonly int historyColumns = 5;
 
         private readonly int[] rectRGBValues = {0, 0, 0};
         private readonly Rect rectSaturationValueSquare;
@@ -52,6 +57,20 @@ namespace Empire_Rewritten.Windows
             rectColorInput.size = new Vector2(rectMain.width - rectColorInput.position.x + 25f, rectSaturationValueSquare.height);
             rectColorInputBoxes = rectColorInput.DivideVertical(CreatedBoxes).ToList();
             rectRGBInputBoxes = rectColorInputBoxes[3].DivideHorizontal(3).ToList();
+            rectHistoryMain = new Rect(rectMain.position.x, ColorComponentHeight + 25f, rectMain.width, rectMain.height - ColorComponentHeight);
+            rectHistoryArray = new Rect[historyRows, historyColumns];
+            colorHistory = new List<Color>[historyRows];
+
+            Rect[] historyRowRects = rectHistoryMain.DivideVertical(historyRows).ToArray(); 
+            for (int i = 0; i < historyRows; i++)
+            {
+                Rect[] historyColumnRects = historyRowRects[i].DivideHorizontal(historyColumns).ToArray();
+                colorHistory[i] = new List<Color>(historyColumns);
+                for (int j = 0; j < historyColumns; j++)
+                {
+                    rectHistoryArray[i, j] = historyColumnRects[j];
+                }
+            }
 
             for (int y = 0; y < ColorComponentHeight; y++)
             {
@@ -92,8 +111,36 @@ namespace Empire_Rewritten.Windows
             if (!SelectedColor.Equals(Color.white) && !SelectedColor.Equals(Color.black))
             {
                 Color.RGBToHSV(SelectedColor, out hue, out _, out _);
-                texture = MakeSaturationValueTexture(hue);
                 RefreshSaturationTexture();
+            }
+        }
+
+        private void SaveCurrentColor()
+        {
+            if (HistoryContains(SelectedColor, out int index0, out int index1))
+            {
+                Color temp = colorHistory[index0][index1];
+                colorHistory[index0].RemoveAt(index1);
+                InsertColorInHistory(temp);
+            }
+            else
+            {
+                InsertColorInHistory(SelectedColor);
+            }
+        }
+
+        private void InsertColorInHistory(Color color)
+        {
+            colorHistory[0].Insert(0, color);
+
+            if (colorHistory[0].Count > historyColumns)
+            {
+                colorHistory[1].Insert(0, colorHistory[0].Pop());
+
+                if (colorHistory[1].Count > historyColumns)
+                {
+                    colorHistory[1].Pop();
+                }
             }
         }
 
@@ -105,7 +152,8 @@ namespace Empire_Rewritten.Windows
             DrawHueBar();
 
             WindowHelper.DrawBoxes(new[] { rectMain, rectSaturationValueSquare, rectHueBar, rectColorInput });
-
+           
+            DrawColorHistoryButtons();
             DrawInputFieldLabels();
             DrawHexCodeInputField();
             DrawRGBInputValues();
@@ -114,6 +162,49 @@ namespace Empire_Rewritten.Windows
             //Color Preview
             Widgets.DrawBoxSolid(rectColorInputBoxes[4].ContractedBy(5f), Color.black);
             Widgets.DrawBoxSolid(rectColorInputBoxes[4].ContractedBy(10f), SelectedColor);
+
+            //Save color button
+            if (Widgets.ButtonText(rectColorInputBoxes[5].ContractedBy(5f), "##SaveColor"))
+            {
+                SaveCurrentColor();
+            }
+        }
+
+        private bool HistoryContains(Color color, out int index0, out int index1)
+        {
+            for (int i = 0; i < colorHistory.Length; i++)
+            {
+                for (int j = 0; j < colorHistory[i].Count; j++)
+                {
+                    if (colorHistory[i][j].Equals(color))
+                    {   
+                        index0 = i;
+                        index1 = j; 
+                        return true;
+                    }
+                }
+            }
+
+            index0 = -1;
+            index1 = -1;
+            return false;
+        }
+
+        private void DrawColorHistoryButtons()
+        {
+            for (int i = 0; i < colorHistory.Length; i++)
+            {
+                for (int j = 0; j < colorHistory[i].Count; j++)
+                {
+                    Rect tempButtonRect = rectHistoryArray[i, j];
+                    Widgets.DrawBoxSolid(tempButtonRect.ContractedBy(5f), Color.black);
+                    Widgets.DrawBoxSolid(tempButtonRect.ContractedBy(10f), colorHistory[i][j]);
+                    if (Widgets.ButtonInvisible(tempButtonRect.ContractedBy(5f)))
+                    {
+                        SelectedColor = colorHistory[i][j];
+                    }
+                }
+            }
         }
 
         private void DrawControls()
@@ -220,8 +311,8 @@ namespace Empire_Rewritten.Windows
         {
             Text.Anchor = TextAnchor.MiddleCenter;
             Text.Font = GameFont.Medium;
-            Widgets.Label(rectColorInputBoxes[0], "Hex");
-            Widgets.Label(rectColorInputBoxes[2], "RGB");
+            Widgets.Label(rectColorInputBoxes[0], "##HexCode");
+            Widgets.Label(rectColorInputBoxes[2], "##RGB");
             WindowHelper.ResetTextAndColor();
         }
 
