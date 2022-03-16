@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Empire_Rewritten.Utils;
 using JetBrains.Annotations;
 using RimWorld;
 using UnityEngine;
@@ -21,7 +20,7 @@ namespace Empire_Rewritten.Windows
         }
 
         public override Vector2 RequestedTabSize => new Vector2(350f, 400f);
-        public static List<EmpireOverviewTabDef> SortedTabs => _sortedTabs ?? (_sortedTabs = DefDatabase<EmpireOverviewTabDef>.AllDefsListForReading.OrderByDescending(def => def.Weight()).ToList());
+        private static List<EmpireOverviewTabDef> SortedTabs => _sortedTabs ?? (_sortedTabs = DefDatabase<EmpireOverviewTabDef>.AllDefsListForReading.OrderByDescending(def => def.Weight()).ToList());
 
         public override void DoWindowContents(Rect inRect)
         {
@@ -33,7 +32,6 @@ namespace Empire_Rewritten.Windows
 
         private void DrawTabbar(Rect inRect)
         {
-            IEnumerable<Rect> rects = inRect.DivideHorizontal(SortedTabs.Count);
             WidgetRow row = new WidgetRow(inRect.x, inRect.y, UIDirection.RightThenDown, inRect.width, 0f);
             foreach (EmpireOverviewTabDef tab in SortedTabs)
             {
