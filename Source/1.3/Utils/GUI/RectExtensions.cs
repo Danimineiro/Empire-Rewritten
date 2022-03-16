@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
+using Verse;
 
 namespace Empire_Rewritten.Utils
 {
@@ -29,6 +31,22 @@ namespace Empire_Rewritten.Utils
             Rect newRect = new Rect(rect);
             newRect.xMin -= scaleBy;
             return newRect;
+        }
+
+        public static IEnumerable<Rect> DivideVertical(this Rect rect, int times)
+        {
+            for (int i = 0; i < times; i++)
+            {
+                yield return rect.TopPartPixels(rect.height / times).MoveRect(new Vector2(0f, rect.height / times * i));
+            }
+        }
+
+        public static IEnumerable<Rect> DivideHorizontal(this Rect rect, int times)
+        {
+            for (int i = 0; i < times; i++)
+            {
+                yield return rect.LeftPartPixels(rect.width / times).MoveRect(new Vector2(rect.width / times * i, 0f));
+            }
         }
     }
 }
