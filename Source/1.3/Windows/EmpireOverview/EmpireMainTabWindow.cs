@@ -34,7 +34,9 @@ namespace Empire_Rewritten.Windows
 
             const float margin = 5f;
             Text.Anchor = TextAnchor.UpperLeft;
-            selectedTab?.Draw(new Rect(inRect.x + margin, inRect.y + buttonHeight + margin, inRect.width - margin * 2, inRect.height - buttonHeight - margin * 2));
+            Rect tabRect = inRect.ContractedBy(margin);
+            tabRect.yMin += buttonHeight;
+            selectedTab?.Draw(tabRect);
         }
     }
 }
