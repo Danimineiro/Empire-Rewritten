@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+	<!-- ~~~~~~~~~~~ MainButtonDef that doesn't deserve its own file ~~~~~~~~~~~ -->
+	<MainButtonDef>
+		<defName>Empire</defName>
+		<label>empire</label>
+		<tabWindowClass>Empire_Rewritten.Windows.EmpireMainTabWindow</tabWindowClass>
+		<order>1000</order>
+	</MainButtonDef>
+
+	<!-- ~~~~~~~~~~~ Actual Tabs ~~~~~~~~~~~ -->
+
+	<Empire_Rewritten.Windows.EmpireMainTabDef>
+		<defName>Main</defName>
+		<tabClass>Empire_Rewritten.Windows.OverviewTabs.MainTab</tabClass>
+		<label>Empire_TabName_Main</label>
+		<description>Overview over all the empire stuff plz change this string later</description>
+		<order>0</order>
+	</Empire_Rewritten.Windows.EmpireMainTabDef>
+
+	<Empire_Rewritten.Windows.EmpireMainTabDef>
+		<defName>Storage</defName>
+		<tabClass>Empire_Rewritten.Windows.OverviewTabs.StorageTab</tabClass>
+		<label>Empire_TabName_Storage</label>
+		<description>Check your Empire's currently stored materials this string is also WIP</description>
+		<order>1</order>
+	</Empire_Rewritten.Windows.EmpireMainTabDef>
+</Defs>

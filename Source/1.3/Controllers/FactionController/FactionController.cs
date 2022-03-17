@@ -5,8 +5,8 @@ using Empire_Rewritten.AI;
 using Empire_Rewritten.Controllers.CivicEthic;
 using Empire_Rewritten.Player;
 using Empire_Rewritten.Settlements;
-using Empire_Rewritten.Utils;
 using Empire_Rewritten.Territories;
+using Empire_Rewritten.Utils;
 using JetBrains.Annotations;
 using RimWorld;
 using RimWorld.Planet;
@@ -59,6 +59,7 @@ namespace Empire_Rewritten.Controllers
 
         /// <param name="faction"></param>
         /// <returns>The <see cref="Empire" /> owned by a given <paramref name="faction" /></returns>
+        [Pure]
         public Empire GetOwnedSettlementManager(Faction faction)
         {
             foreach (FactionSettlementData factionSettlementData in factionSettlementDataList)

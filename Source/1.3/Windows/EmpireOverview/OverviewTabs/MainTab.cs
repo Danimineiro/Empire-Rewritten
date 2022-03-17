@@ -5,13 +5,15 @@ using Verse;
 namespace Empire_Rewritten.Windows.OverviewTabs
 {
     [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
-    public class MainTab : EmpireOverviewTab
+    public class MainTab : EmpireWindowTab
     {
+        public MainTab([NotNull] EmpireMainTabDef def) : base(def) { }
+
         public override void Draw(Rect inRect)
         {
             GUI.BeginGroup(inRect);
-            Widgets.DrawLineHorizontal(0, 0, inRect.width);
-            float curY = 1;
+            float curY = 0;
+            // TODO: Remove this text, or replace with localized version
             Widgets.Label(0, ref curY, inRect.width, Find.FactionManager.OfPlayer?.NameColored, new TipSignal("The name of your faction"));
             GUI.EndGroup();
         }

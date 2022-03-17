@@ -6,14 +6,14 @@ using Verse;
 namespace Empire_Rewritten.Windows
 {
     [UsedImplicitly(ImplicitUseKindFlags.Assign, ImplicitUseTargetFlags.WithMembers)]
-    public class EmpireOverviewTabDef : Def
+    public class EmpireMainTabDef : Def
     {
         public int order;
 
-        [Unsaved] private EmpireOverviewTab tab;
+        [Unsaved] private EmpireWindowTab tab;
 
         public Type tabClass;
-        public EmpireOverviewTab Tab => tab ?? (tab = (EmpireOverviewTab)Activator.CreateInstance(tabClass));
+        public EmpireWindowTab Tab => tab ?? (tab = (EmpireWindowTab)Activator.CreateInstance(tabClass, this));
 
         public override IEnumerable<string> ConfigErrors()
         {
@@ -29,11 +29,11 @@ namespace Empire_Rewritten.Windows
 
             if (tabClass is null)
             {
-                yield return $"no tabClass set; It should be a subclass of {nameof(EmpireOverviewTab)}";
+                yield return $"no tabClass set; It should be a subclass of {nameof(EmpireWindowTab)}";
             }
-            else if (!tabClass.IsSubclassOf(typeof(EmpireOverviewTab)))
+            else if (!tabClass.IsSubclassOf(typeof(EmpireWindowTab)))
             {
-                yield return $"invalid tabClass {tabClass.ToStringSafe()} that is not a subclass of {nameof(EmpireOverviewTab)}";
+                yield return $"invalid tabClass {tabClass.ToStringSafe()} that is not a subclass of {nameof(EmpireWindowTab)}";
             }
         }
     }
