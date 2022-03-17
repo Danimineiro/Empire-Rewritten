@@ -32,8 +32,9 @@ namespace Empire_Rewritten.Windows
                 FloatMenuUtility.MakeMenu(sortedTabs, tabDef => tabDef.label.TranslateSimple(), tabDef => delegate { selectedTab = tabDef.Tab; });
             }
 
+            const float margin = 5f;
             Text.Anchor = TextAnchor.UpperLeft;
-            selectedTab?.Draw(new Rect(inRect.x, inRect.y + buttonHeight, inRect.width, inRect.height - buttonHeight));
+            selectedTab?.Draw(new Rect(inRect.x + margin, inRect.y + buttonHeight + margin, inRect.width - margin * 2, inRect.height - buttonHeight - margin * 2));
         }
     }
 }
