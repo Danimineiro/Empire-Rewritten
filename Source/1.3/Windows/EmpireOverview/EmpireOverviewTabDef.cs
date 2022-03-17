@@ -8,7 +8,12 @@ namespace Empire_Rewritten.Windows
     [UsedImplicitly(ImplicitUseKindFlags.Assign, ImplicitUseTargetFlags.WithMembers)]
     public class EmpireOverviewTabDef : Def
     {
+        public int order;
+
+        [Unsaved] private EmpireOverviewTab tab;
+
         public Type tabClass;
+        public EmpireOverviewTab Tab => tab ?? (tab = (EmpireOverviewTab)Activator.CreateInstance(tabClass));
 
         public override IEnumerable<string> ConfigErrors()
         {
@@ -30,11 +35,6 @@ namespace Empire_Rewritten.Windows
             {
                 yield return $"invalid tabClass {tabClass.ToStringSafe()} that is not a subclass of {nameof(EmpireOverviewTab)}";
             }
-        }
-
-        public double Weight()
-        {
-            return 0f;
         }
     }
 }

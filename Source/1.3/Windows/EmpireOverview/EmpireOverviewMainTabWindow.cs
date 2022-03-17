@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using RimWorld;
@@ -11,35 +10,68 @@ namespace Empire_Rewritten.Windows
     [UsedImplicitly]
     public class EmpireOverviewMainTabWindow : MainTabWindow
     {
-        private static List<EmpireOverviewTabDef> _sortedTabs;
+        private const int TabBarHeight = 42;
+        private const float TabBarItemGap = 4f;
+        private readonly List<EmpireOverviewTabDef> sortedTabs;
+
+        private readonly float tabBarWidth;
         private EmpireOverviewTab selectedTab;
+
+        private Vector2 tabBarScrollPosition = Vector2.zero;
 
         public EmpireOverviewMainTabWindow()
         {
             closeOnClickedOutside = true;
+            sortedTabs = DefDatabase<EmpireOverviewTabDef>.AllDefs.OrderBy(tabDef => tabDef.order).ToList();
+            tabBarWidth = sortedTabs.Aggregate(-TabBarItemGap, (curWidth, tabDef) => curWidth + ButtonSize(tabDef.LabelCap).x);
+            selectedTab = sortedTabs.FirstOrFallback()?.Tab;
         }
 
         public override Vector2 RequestedTabSize => new Vector2(350f, 400f);
-        private static List<EmpireOverviewTabDef> SortedTabs => _sortedTabs ?? (_sortedTabs = DefDatabase<EmpireOverviewTabDef>.AllDefsListForReading.OrderByDescending(def => def.Weight()).ToList());
+
+        /// <summary>
+        ///     Modified version of <see cref="WidgetRow.ButtonRect" />
+        ///     Measures the size of a theoretical <see cref="WidgetRow.ButtonText" /> with a given <see cref="string" /> label
+        /// </summary>
+        /// <param name="label">The <see cref="string" /> content of the theoretical button</param>
+        /// <returns>The <see cref="Vector2">size</see> of the button</returns>
+        private static Vector2 ButtonSize(string label)
+        {
+            Vector2 vector = Text.CalcSize(label);
+            vector.x += 16f + TabBarItemGap;
+            vector.y += 2f;
+            return vector;
+        }
 
         public override void DoWindowContents(Rect inRect)
         {
-            DrawTabbar(inRect.TopPartPixels(24f));
-            if (selectedTab is null) return;
+            DrawTabBar(inRect.TopPartPixels(TabBarHeight));
 
-            selectedTab.Draw(new Rect(inRect.x, inRect.y + 24f, inRect.width, inRect.height));
+            selectedTab?.Draw(new Rect(inRect.x, inRect.y + TabBarHeight, inRect.width, inRect.height - TabBarHeight));
         }
 
-        private void DrawTabbar(Rect inRect)
+        private void DrawTabBar(Rect inRect)
         {
-            WidgetRow row = new WidgetRow(inRect.x, inRect.y, UIDirection.RightThenDown, inRect.width, 0f);
-            foreach (EmpireOverviewTabDef tab in SortedTabs)
+            GUI.BeginGroup(inRect);
+
+            Rect viewRect = new Rect(0, 0, tabBarWidth, Text.CalcHeight("A", 10));
+            Rect screenRect = new Rect(0, 0, inRect.width, inRect.height);
+
+            Widgets.ScrollHorizontal(screenRect, ref tabBarScrollPosition, viewRect);
+            Widgets.BeginScrollView(screenRect, ref tabBarScrollPosition, viewRect);
+
+            WidgetRow row = new WidgetRow(0, 0, gap: TabBarItemGap);
+            foreach (EmpireOverviewTabDef tab in sortedTabs)
             {
-                if (row.ButtonText(tab.label, tab.description))
+                if (row.ButtonText(tab.LabelCap, tab.description))
                 {
-                    selectedTab = (EmpireOverviewTab)Activator.CreateInstance(tab.tabClass);
+                    selectedTab = tab.Tab;
                 }
             }
+
+            Widgets.EndScrollView();
+
+            GUI.EndGroup();
         }
     }
 }

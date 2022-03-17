@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+	<!-- ~~~~~~~~~~~ MainButtonDef that doesn't deserve its own file ~~~~~~~~~~~ -->
+	<MainButtonDef>
+		<defName>Empire</defName>
+		<label>empire</label>
+		<tabWindowClass>Empire_Rewritten.Windows.EmpireOverviewMainTabWindow</tabWindowClass>
+		<order>1000</order>
+	</MainButtonDef>
+
+	<!-- ~~~~~~~~~~~ Actual Tabs ~~~~~~~~~~~ -->
+
+	<Empire_Rewritten.Windows.EmpireOverviewTabDef>
+		<defName>Main</defName>
+		<tabClass>Empire_Rewritten.Windows.OverviewTabs.MainTab</tabClass>
+		<label>main</label>
+		<description>Overview over all the empire stuff plz change this string later</description>
+		<order>0</order>
+	</Empire_Rewritten.Windows.EmpireOverviewTabDef>
+
+	<Empire_Rewritten.Windows.EmpireOverviewTabDef>
+		<defName>Main2</defName>
+		<tabClass>Empire_Rewritten.Windows.OverviewTabs.MainTab</tabClass>
+		<label>main</label>
+		<description>Overview over all the empire stuff plz change this string later</description>
+		<order>0</order>
+	</Empire_Rewritten.Windows.EmpireOverviewTabDef>
+
+	<Empire_Rewritten.Windows.EmpireOverviewTabDef>
+		<defName>Main3</defName>
+		<tabClass>Empire_Rewritten.Windows.OverviewTabs.MainTab</tabClass>
+		<label>main</label>
+		<description>Overview over all the empire stuff plz change this string later</description>
+		<order>0</order>
+	</Empire_Rewritten.Windows.EmpireOverviewTabDef>
+
+	<Empire_Rewritten.Windows.EmpireOverviewTabDef>
+		<defName>Main4</defName>
+		<tabClass>Empire_Rewritten.Windows.OverviewTabs.MainTab</tabClass>
+		<label>main</label>
+		<description>Overview over all the empire stuff plz change this string later</description>
+		<order>0</order>
+	</Empire_Rewritten.Windows.EmpireOverviewTabDef>
+
+	<Empire_Rewritten.Windows.EmpireOverviewTabDef>
+		<defName>Main5</defName>
+		<tabClass>Empire_Rewritten.Windows.OverviewTabs.MainTab</tabClass>
+		<label>main</label>
+		<description>Overview over all the empire stuff plz change this string later</description>
+		<order>0</order>
+	</Empire_Rewritten.Windows.EmpireOverviewTabDef>
+
+	<Empire_Rewritten.Windows.EmpireOverviewTabDef>
+		<defName>Main6</defName>
+		<tabClass>Empire_Rewritten.Windows.OverviewTabs.MainTab</tabClass>
+		<label>main</label>
+		<description>Overview over all the empire stuff plz change this string later</description>
+		<order>0</order>
+	</Empire_Rewritten.Windows.EmpireOverviewTabDef>
+
+	<Empire_Rewritten.Windows.EmpireOverviewTabDef>
+		<defName>Main7</defName>
+		<tabClass>Empire_Rewritten.Windows.OverviewTabs.MainTab</tabClass>
+		<label>main</label>
+		<description>Overview over all the empire stuff plz change this string later</description>
+		<order>0</order>
+	</Empire_Rewritten.Windows.EmpireOverviewTabDef>
+
+	<Empire_Rewritten.Windows.EmpireOverviewTabDef>
+		<defName>Main8</defName>
+		<tabClass>Empire_Rewritten.Windows.OverviewTabs.MainTab</tabClass>
+		<label>main</label>
+		<description>Overview over all the empire stuff plz change this string later</description>
+		<order>0</order>
+	</Empire_Rewritten.Windows.EmpireOverviewTabDef>
+
+	<Empire_Rewritten.Windows.EmpireOverviewTabDef>
+		<defName>Main9</defName>
+		<tabClass>Empire_Rewritten.Windows.OverviewTabs.MainTab</tabClass>
+		<label>main</label>
+		<description>Overview over all the empire stuff plz change this string later</description>
+		<order>0</order>
+	</Empire_Rewritten.Windows.EmpireOverviewTabDef>
+
+	<Empire_Rewritten.Windows.EmpireOverviewTabDef>
+		<defName>NotMain</defName>
+		<tabClass>Empire_Rewritten.Windows.OverviewTabs.MainTab</tabClass>
+		<label>not actually main so I can see the dynamic resizing isn't a fluke</label>
+		<description>Overview over all the empire stuff plz change this string later</description>
+		<order>0</order>
+	</Empire_Rewritten.Windows.EmpireOverviewTabDef>
+</Defs>
