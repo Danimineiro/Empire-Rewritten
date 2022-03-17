@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using Verse;
 
-namespace Empire_Rewritten.Windows
+namespace Empire_Rewritten.Windows.MainTabWindowTabs
 {
     [UsedImplicitly(ImplicitUseKindFlags.Assign, ImplicitUseTargetFlags.WithMembers)]
-    public class EmpireMainTabDef : Def
+    public class MainTabWindowTabDef : Def
     {
         public int order;
 
-        [Unsaved] private EmpireWindowTab tab;
+        [Unsaved] private BaseMainTabWindowTab tab;
 
         public Type tabClass;
-        public EmpireWindowTab Tab => tab ?? (tab = (EmpireWindowTab)Activator.CreateInstance(tabClass, this));
+        public BaseMainTabWindowTab Tab => tab ?? (tab = (BaseMainTabWindowTab)Activator.CreateInstance(tabClass, this));
 
         public override IEnumerable<string> ConfigErrors()
         {
@@ -29,11 +29,11 @@ namespace Empire_Rewritten.Windows
 
             if (tabClass is null)
             {
-                yield return $"no tabClass set; It should be a subclass of {nameof(EmpireWindowTab)}";
+                yield return $"no tabClass set; It should be a subclass of {nameof(BaseMainTabWindowTab)}";
             }
-            else if (!tabClass.IsSubclassOf(typeof(EmpireWindowTab)))
+            else if (!tabClass.IsSubclassOf(typeof(BaseMainTabWindowTab)))
             {
-                yield return $"invalid tabClass {tabClass.ToStringSafe()} that is not a subclass of {nameof(EmpireWindowTab)}";
+                yield return $"invalid tabClass {tabClass.ToStringSafe()} that is not a subclass of {nameof(BaseMainTabWindowTab)}";
             }
         }
     }

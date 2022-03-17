@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Empire_Rewritten.Windows.MainTabWindowTabs;
 using JetBrains.Annotations;
 using RimWorld;
 using UnityEngine;
@@ -10,14 +11,14 @@ namespace Empire_Rewritten.Windows
     [UsedImplicitly]
     public class EmpireMainTabWindow : MainTabWindow
     {
-        private readonly List<EmpireMainTabDef> sortedTabs;
+        private readonly List<MainTabWindowTabDef> sortedTabs;
 
-        private EmpireWindowTab selectedTab;
+        private BaseMainTabWindowTab selectedTab;
 
         public EmpireMainTabWindow()
         {
             closeOnClickedOutside = true;
-            sortedTabs = DefDatabase<EmpireMainTabDef>.AllDefs.OrderBy(tabDef => tabDef.order).ToList();
+            sortedTabs = DefDatabase<MainTabWindowTabDef>.AllDefs.OrderBy(tabDef => tabDef.order).ToList();
             selectedTab = sortedTabs.FirstOrFallback()?.Tab;
         }
 

@@ -2,12 +2,12 @@
 using UnityEngine;
 using Verse;
 
-namespace Empire_Rewritten.Windows.OverviewTabs
+namespace Empire_Rewritten.Windows.MainTabWindowTabs
 {
     [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
-    public class MainTab : EmpireWindowTab
+    public class OverviewTab : BaseMainTabWindowTab
     {
-        public MainTab([NotNull] EmpireMainTabDef def) : base(def) { }
+        public OverviewTab([NotNull] MainTabWindowTabDef def) : base(def) { }
 
         public override void Draw(Rect inRect)
         {

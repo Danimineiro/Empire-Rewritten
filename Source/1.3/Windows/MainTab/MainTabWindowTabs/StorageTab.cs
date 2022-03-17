@@ -9,14 +9,14 @@ using System.Linq;
 using System.Reflection;
 #endif
 
-namespace Empire_Rewritten.Windows.OverviewTabs
+namespace Empire_Rewritten.Windows.MainTabWindowTabs
 {
     [UsedImplicitly]
-    public class StorageTab : EmpireWindowTab
+    public class StorageTab : BaseMainTabWindowTab
     {
         private Vector2 scrollPosition = Vector2.zero;
 
-        public StorageTab([NotNull] EmpireMainTabDef def) : base(def) { }
+        public StorageTab([NotNull] MainTabWindowTabDef def) : base(def) { }
 
         public override void Draw(Rect inRect)
         {
