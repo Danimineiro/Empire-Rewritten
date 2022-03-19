@@ -26,11 +26,14 @@ namespace Empire_Rewritten.Windows
         {
             Find.WindowStack.Add(new FacilityInfoWindow());
         }
+
         [PublicAPI]
         [DebugAction("Empire", "Color picker window", allowedGameStates = AllowedGameStates.Entry)]
         public static void ColorPickerWindow()
         {
-            Find.WindowStack.Add(new ColorPickerWindow());
+            Color color = Color.green;
+            Color[] colors = new Color[10];
+            Find.WindowStack.Add(new ColorPickerWindow(color, colors, (_) => { }, (_) => { }));
         }
     }
 

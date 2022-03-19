@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -41,14 +42,22 @@ namespace Empire_Rewritten.Windows
         private float hue;
         private bool keepTrackingMouseHue;
 
+        private readonly Action<Color> setColor;
+        private readonly Action<Color[]> setColorHistory;
+
         private bool keepTrackingMouseSaturation;
         private float oldHue = 1f;
 
         private Color selectedColor = Color.red;
         private Texture2D texture;
 
-        public ColorPickerWindow()
+        public ColorPickerWindow(Color color, Color[] colorHistory, Action<Color> setColor, Action<Color[]> setColorHistory)
         {
+            this.colorHistory = colorHistory;
+            this.setColor = setColor;
+            this.setColorHistory = setColorHistory;
+            SelectedColor = color;
+
             closeOnClickedOutside = true;
             forcePause = true;
             preventCameraMotion = true;
@@ -92,6 +101,7 @@ namespace Empire_Rewritten.Windows
             set
             {
                 selectedColor = value;
+                setColor(SelectedColor);
                 UpdateColor();
             }
         }
@@ -371,6 +381,7 @@ namespace Empire_Rewritten.Windows
 
         public override void Close(bool doCloseSound = true)
         {
+            setColorHistory(colorHistory);
             LastSelectedColor = SelectedColor;
             base.Close(doCloseSound);
         }
