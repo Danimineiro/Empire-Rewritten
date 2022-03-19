@@ -33,6 +33,12 @@ namespace Empire_Rewritten.Utils
             return newRect;
         }
 
+        /// <summary>
+        ///     Devides a <see cref="Rect"/> <paramref name="rect"/> vertically into <see cref="int"/> <paramref name="times"/> amount of pieces
+        /// </summary>
+        /// <param name="rect">the initial <see cref="Rect"/> that is to be devided</param>
+        /// <param name="times">the amount of times it should be devided</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> with <paramref name="times"/> amount of pieces </returns>
         public static IEnumerable<Rect> DivideVertical(this Rect rect, int times)
         {
             for (int i = 0; i < times; i++)
@@ -41,6 +47,12 @@ namespace Empire_Rewritten.Utils
             }
         }
 
+        /// <summary>
+        ///     Devides a <see cref="Rect"/> <paramref name="rect"/> horizontally into <see cref="int"/> <paramref name="times"/> amount of pieces
+        /// </summary>
+        /// <param name="rect">the initial <see cref="Rect"/> that is to be devided</param>
+        /// <param name="times">the amount of times it should be devided</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> with <paramref name="times"/> amount of pieces </returns>
         public static IEnumerable<Rect> DivideHorizontal(this Rect rect, int times)
         {
             for (int i = 0; i < times; i++)
