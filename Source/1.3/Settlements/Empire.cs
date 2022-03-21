@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Empire_Rewritten.Facilities;
 using Empire_Rewritten.Resources;
-using Empire_Rewritten.Utils;
 using Empire_Rewritten.Territories;
+using Empire_Rewritten.Utils;
 using JetBrains.Annotations;
 using RimWorld;
 using RimWorld.Planet;
@@ -39,7 +39,7 @@ namespace Empire_Rewritten.Settlements
         public Dictionary<Settlement, FacilityManager> Settlements => settlements;
         public List<int> SettlementTiles { get; } = new List<int>();
 
-        private Territory Territory
+        public Territory Territory
         {
             get
             {

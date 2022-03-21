@@ -6,7 +6,6 @@ using Empire_Rewritten.Controllers.CivicEthic;
 using Empire_Rewritten.Player;
 using Empire_Rewritten.Settlements;
 using Empire_Rewritten.Territories;
-using Empire_Rewritten.Utils;
 using JetBrains.Annotations;
 using RimWorld;
 using RimWorld.Planet;
@@ -88,10 +87,24 @@ namespace Empire_Rewritten.Controllers
             Faction faction = Faction.OfPlayer;
             FactionSettlementData factionSettlementData = new FactionSettlementData(faction, new Empire(faction));
             factionSettlementDataList.Add(factionSettlementData);
-            // NOTE: Why is this unused?
             UserPlayer player = new UserPlayer(faction);
-            IEnumerable<WorldObject> settlements = Find.WorldObjects.Settlements.Where(x => x.Faction == faction);
-            TerritoryManager.GetTerritory(faction).SettlementClaimTiles((Settlement)settlements.First());
+
+            IEnumerable<Settlement> settlements = Find.WorldObjects.Settlements.Where(x => x.Faction == faction);
+
+            bool first = true;
+            foreach (Settlement settlement in settlements)
+            {
+                if (first)
+                {
+                    first = false;
+                    player.Manager.AddSettlement(settlement);
+                    TerritoryManager.GetTerritory(faction).SettlementClaimTiles(settlement);
+                }
+                else
+                {
+                    settlement.Destroy();
+                }
+            }
         }
 
         public void CreateNewAIPlayer(Faction faction)
@@ -100,20 +113,20 @@ namespace Empire_Rewritten.Controllers
             AIFactions.Add(faction, aiPlayer);
 
             //Find preexisting settlements.
-            List<Settlement> settlements = Find.WorldObjects.Settlements.Where(x => x.Faction == faction).ToList();
-            if (settlements.Any())
+            IEnumerable<Settlement> settlements = Find.WorldObjects.Settlements.Where(x => x.Faction == faction);
+
+            bool first = true;
+            foreach (Settlement settlement in settlements)
             {
-                if (settlements[0] is null)
+                if (first)
                 {
-                    Logger.Error(nameof(settlements) + " has null-entry");
+                    first = false;
+                    aiPlayer.Manager.AddSettlement(settlement);
+                    TerritoryManager.GetTerritory(faction).SettlementClaimTiles(settlement);
                 }
-
-                aiPlayer.Manager.AddSettlement(settlements[0]);
-                settlements.RemoveAt(0);
-
-                foreach (Settlement item in settlements)
+                else
                 {
-                    item.Destroy();
+                    settlement.Destroy();
                 }
             }
         }

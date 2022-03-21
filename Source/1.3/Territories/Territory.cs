@@ -57,7 +57,7 @@ namespace Empire_Rewritten.Territories
             }
         }
 
-        public void SettlementClaimTiles(Settlement settlement)
+        public void SettlementClaimTiles([NotNull] Settlement settlement)
         {
             Task.Run(() => ClaimTiles(GetSurroundingTiles(settlement.Tile, (int)(faction.def.techLevel + 1))));
         }
