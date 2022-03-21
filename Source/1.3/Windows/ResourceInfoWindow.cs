@@ -4,30 +4,12 @@ using System.Linq;
 using Empire_Rewritten.Resources;
 using Empire_Rewritten.Resources.Stats;
 using Empire_Rewritten.Utils;
-using JetBrains.Annotations;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
 
 namespace Empire_Rewritten.Windows
 {
-    public static class DebugActionsMisc
-    {
-        [PublicAPI]
-        [DebugAction("Empire", "Resource info window", allowedGameStates = AllowedGameStates.Entry)]
-        public static void DisplayResourceInfoWindow()
-        {
-            Find.WindowStack.Add(new ResourceInfoWindow());
-        }
-
-        [PublicAPI]
-        [DebugAction("Empire", "Facility info window", allowedGameStates = AllowedGameStates.Entry)]
-        public static void FacilityInfoWindow()
-        {
-            Find.WindowStack.Add(new FacilityInfoWindow());
-        }
-    }
-
     public class ResourceInfoWindow : Window
     {
         private const int BorderSize = 2;
@@ -42,6 +24,7 @@ namespace Empire_Rewritten.Windows
 
         //In GUI.Group managed by container
         private static readonly Rect RectThingDefContainer = new Rect(602f, 2f, 580f, 29f);
+
         private static readonly Rect RectThingDefIcons = new Rect(2f, 2f, 25f, 25f);
         private static readonly Rect RectThingDefs = new Rect(47f, 2f, 513f, 25f);
         private static readonly Rect RectThingDefsHighlight = new Rect(0f, 0f, 569f, 29f);
