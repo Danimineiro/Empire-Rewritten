@@ -8,8 +8,11 @@ namespace Empire_Rewritten.Territories
 {
     public class TerritoryManager : IExposable
     {
-        private readonly Dictionary<Faction, int> territoryIDs = new Dictionary<Faction, int>();
         private List<Territory> territories = new List<Territory>();
+        private Dictionary<Faction, int> territoryIDs = new Dictionary<Faction, int>();
+
+        private List<Faction> territoryIDsKeysListForSaving = new List<Faction>();
+        private List<int> territoryIDsValuesListForSaving = new List<int>();
 
         public TerritoryManager()
         {
@@ -23,19 +26,31 @@ namespace Empire_Rewritten.Territories
         public void ExposeData()
         {
             Scribe_Collections.Look(ref territories, "territories");
+            Scribe_Collections.Look(ref territoryIDs, "territoryIDs", LookMode.Reference, LookMode.Value, ref territoryIDsKeysListForSaving, ref territoryIDsValuesListForSaving);
+        }
+
+        /// <summary>
+        ///     Gets the <see cref="Faction" /> that owns a given world tile
+        /// </summary>
+        /// <param name="tileId">The <see cref="int">ID</see> of the world tile to check</param>
+        /// <returns>The <see cref="Faction" /> that owns <paramref name="tileId" />, if the tile not owned, <c>null</c></returns>
+        [CanBeNull]
+        public Faction GetTileOwner(int tileId)
+        {
+            foreach (Territory territory in territories)
+            {
+                if (territory.Tiles.Contains(tileId))
+                {
+                    return territory.Faction;
+                }
+            }
+
+            return null;
         }
 
         public bool AnyFactionOwnsTile(int tile)
         {
-            foreach (Territory territory in territories)
-            {
-                if (territory.Tiles.Contains(tile))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return GetTileOwner(tile) != null;
         }
 
         public bool FactionOwnsTile([NotNull] Faction faction, int tile)
