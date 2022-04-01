@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 using Verse;
 
 namespace Empire_Rewritten.Utils
@@ -56,6 +58,30 @@ namespace Empire_Rewritten.Utils
             ResetTextAndColor();
 
             return Widgets.ButtonInvisible(inRect);
+        }
+
+        /// <summary>
+        ///     Draws boxes around all the <paramref name="rects"/> given.
+        /// </summary>
+        /// <param name="rects"></param>
+        public static void DrawBoxes(Rect[] rects)
+        {
+            for (int i = 0; i < rects.Length; i++)
+            {
+                Widgets.DrawBox(rects[i]);
+            }
+        }
+
+        /// <summary>
+        ///     Draws boxes around all the <paramref name="rects"/> given.
+        /// </summary>
+        /// <param name="rects"></param>
+        public static void DrawBoxes(IEnumerable<Rect> rects)
+        {
+            foreach (Rect rect in rects)
+            {
+                Widgets.DrawBox(rect);
+            }
         }
     }
 }

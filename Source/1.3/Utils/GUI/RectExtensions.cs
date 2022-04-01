@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
+using Verse;
 
 namespace Empire_Rewritten.Utils
 {
@@ -29,6 +31,34 @@ namespace Empire_Rewritten.Utils
             Rect newRect = new Rect(rect);
             newRect.xMin -= scaleBy;
             return newRect;
+        }
+
+        /// <summary>
+        ///     Devides a <see cref="Rect"/> <paramref name="rect"/> vertically into <see cref="int"/> <paramref name="times"/> amount of pieces
+        /// </summary>
+        /// <param name="rect">the initial <see cref="Rect"/> that is to be devided</param>
+        /// <param name="times">the amount of times it should be devided</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> with <paramref name="times"/> amount of pieces </returns>
+        public static IEnumerable<Rect> DivideVertical(this Rect rect, int times)
+        {
+            for (int i = 0; i < times; i++)
+            {
+                yield return rect.TopPartPixels(rect.height / times).MoveRect(new Vector2(0f, rect.height / times * i));
+            }
+        }
+
+        /// <summary>
+        ///     Devides a <see cref="Rect"/> <paramref name="rect"/> horizontally into <see cref="int"/> <paramref name="times"/> amount of pieces
+        /// </summary>
+        /// <param name="rect">the initial <see cref="Rect"/> that is to be devided</param>
+        /// <param name="times">the amount of times it should be devided</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> with <paramref name="times"/> amount of pieces </returns>
+        public static IEnumerable<Rect> DivideHorizontal(this Rect rect, int times)
+        {
+            for (int i = 0; i < times; i++)
+            {
+                yield return rect.LeftPartPixels(rect.width / times).MoveRect(new Vector2(rect.width / times * i, 0f));
+            }
         }
     }
 }
