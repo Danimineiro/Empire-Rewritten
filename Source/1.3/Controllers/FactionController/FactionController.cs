@@ -5,8 +5,8 @@ using Empire_Rewritten.AI;
 using Empire_Rewritten.Controllers.CivicEthic;
 using Empire_Rewritten.Player;
 using Empire_Rewritten.Settlements;
-using Empire_Rewritten.Utils;
 using Empire_Rewritten.Territories;
+using Empire_Rewritten.Utils;
 using JetBrains.Annotations;
 using RimWorld;
 using RimWorld.Planet;
@@ -23,6 +23,7 @@ namespace Empire_Rewritten.Controllers
         private readonly Dictionary<Faction, AIPlayer> AIFactions = new Dictionary<Faction, AIPlayer>();
         private readonly List<FactionCivicAndEthicData> factionCivicAndEthicDataList = new List<FactionCivicAndEthicData>();
         private List<FactionSettlementData> factionSettlementDataList = new List<FactionSettlementData>();
+        private TerritoryManager territoryManager = new TerritoryManager();
 
         /// <summary>
         ///     Needed for loading
@@ -41,11 +42,11 @@ namespace Empire_Rewritten.Controllers
         public FactionController(List<FactionSettlementData> factionSettlementDataList)
         {
             ShouldRefreshTerritories = true;
-            TerritoryManager = new TerritoryManager();
+            territoryManager = new TerritoryManager();
             this.factionSettlementDataList = factionSettlementDataList;
         }
 
-        public TerritoryManager TerritoryManager { get; } = new TerritoryManager();
+        public TerritoryManager TerritoryManager => territoryManager;
 
         /// <summary>
         ///     Meant for things that cache the territories to check.
@@ -55,6 +56,7 @@ namespace Empire_Rewritten.Controllers
         public void ExposeData()
         {
             Scribe_Collections.Look(ref factionSettlementDataList, "factionSettlementDataList");
+            Scribe_Deep.Look(ref territoryManager, "territoryManager");
         }
 
         /// <param name="faction"></param>

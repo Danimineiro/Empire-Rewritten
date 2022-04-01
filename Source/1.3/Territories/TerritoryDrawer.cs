@@ -52,10 +52,10 @@ namespace Empire_Rewritten.Territories
         {
             Color factionColor = territory.Faction.Color;
 
+            Material material = MaterialPool.MatFrom("Territory", ShaderDatabase.WorldOverlayTransparentLit, factionColor, WorldMaterials.WorldObjectRenderQueue);
+            LayerSubMesh layerSubMesh = GetSubMesh(material);
             foreach (int tile in territory.Tiles)
             {
-                Material material = MaterialPool.MatFrom("Territory", ShaderDatabase.WorldOverlayTransparentLit, factionColor, WorldMaterials.WorldObjectRenderQueue);
-                LayerSubMesh layerSubMesh = GetSubMesh(material);
                 DrawTile(tile, layerSubMesh);
             }
         }

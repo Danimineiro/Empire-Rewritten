@@ -57,21 +57,6 @@ namespace Empire_Rewritten.Controllers
         }
 
         /// <summary>
-        ///     Creates all required FactionSettlementDatas
-        /// </summary>
-        /// <returns>the FactionSettlementDatas</returns>
-        internal static List<FactionSettlementData> CreateFactionSettlementDatas()
-        {
-            List<FactionSettlementData> factionSettlementDatas = new List<FactionSettlementData>();
-            foreach (Faction faction in Find.FactionManager.AllFactionsListForReading)
-            {
-                factionSettlementDatas.Add(new FactionSettlementData(faction, new Empire(faction)));
-            }
-
-            return factionSettlementDatas;
-        }
-
-        /// <summary>
         ///     Creates all required instances of <see cref="FactionSettlementData" />
         /// </summary>
         /// <returns>A <see cref="List{T}" /> of the newly created <see cref="FactionSettlementData" /> instances</returns>

@@ -187,7 +187,7 @@ namespace Empire_Rewritten.Resources
         {
             if (resourceWorker != null && !resourceWorker.IsSubclassOf(typeof(ResourceWorker)))
             {
-                yield return $"{resourceWorker} does not inherit from FacilityWorker!";
+                yield return $"{resourceWorker} does not inherit from ResourceWorker!";
             }
 
             foreach (string str in base.ConfigErrors())
