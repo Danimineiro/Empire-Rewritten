@@ -18,8 +18,11 @@ namespace Empire_Rewritten.Windows
         private readonly Rect rectLeft;
         private readonly Rect rectLeftNameLabel;
         private readonly Rect rectLeftNameInput;
+        private readonly Rect rectTopPart;
+        private readonly Rect rectMiddlePart;
+        private readonly Rect rectBottomPart;
 
-        private string playerFactionName = "";
+        private string playerFactionName = Faction.OfPlayer.Name;
 
         public override Vector2 InitialSize => rectFull.size;
 
@@ -34,16 +37,35 @@ namespace Empire_Rewritten.Windows
             onlyOneOfTypeAllowed = true;
 
             rectMain = rectFull.ContractedBy(25f);
-            rectLeft = rectMain.LeftPartPixels(330f);
+            rectTopPart = rectMain.TopPartPixels(30f);
+            rectBottomPart = rectMain.BottomPartPixels(30f);
+            rectMiddlePart = new Rect(rectMain.x, rectMain.y + 30f, rectMain.width, rectMain.height - 30f * 2f);
+
+            rectLeft = rectMiddlePart.LeftPartPixels(330f);
             rectLeftNameLabel = rectLeft.TopPartPixels(30f);
             rectLeftNameInput = rectLeftNameLabel.MoveRect(new Vector2(0f, rectLeftNameLabel.height + 5f));
         }
 
         public override void DoWindowContents(Rect inRect)
         {
-            Widgets.Label(rectLeftNameLabel, "##InputFactionName");
+            Text.Font = GameFont.Medium;
+            Widgets.Label(rectTopPart, "Empire_CPF_Title".Translate());
+            Text.Font = GameFont.Small;
+
+            Widgets.DrawLineHorizontal(rectTopPart.x, rectTopPart.yMax, rectTopPart.width);
+
+            Widgets.Label(rectLeftNameLabel, "Empire_CPF_InputFactionName".Translate());
             playerFactionName = Widgets.TextField(rectLeftNameInput, playerFactionName, 25, CharacterCardUtility.ValidNameRegex);
-            Widgets.DrawBox(rectMain);
+
+            Widgets.DrawLineHorizontal(rectBottomPart.x, rectBottomPart.y, rectBottomPart.width);
+            new Rect(rectBottomPart.x, rectBottomPart.y + 5f, rectBottomPart.width, rectBottomPart.height - 10f).DrawButtonText("Empire_CPF_Apply".Translate(), ApplyAction);
+        }
+
+        public void ApplyAction()
+        {
+            //TODO: Check things inputs for validity here (name can't be empty)
+
+            Close();
         }
     }
 }
