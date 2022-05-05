@@ -83,20 +83,22 @@ namespace Empire_Rewritten.AI
             float distanceWeight = (foundASettlement ? smallestDist : -1000) * -1;
 
             /*
-            FactionController factionController = UpdateController.GetUpdateController.FactionController;
+            FactionController factionController = UpdateController.CurrentWorldInstance.FactionController;
             FactionCivicAndEthicData factionCivicAndEthicData = factionController.GetOwnedCivicAndEthicData(player.Faction);
             List<CivicDef> civicDefs = factionCivicAndEthicData.Civics;
-            foreach(CivicDef civicDef in civicDefs)
+            if (!civicDefs.NullOrEmpty())
             {
-                CivicWorker worker = civicDef.Worker;
-                if(worker != null)
+                foreach (CivicDef civicDef in civicDefs)
                 {
-                    distanceWeight += worker.CalculateDistanceWeight(distanceWeight);
+                    CivicWorker worker = civicDef.Worker;
+                    if (worker != null)
+                    {
+                        distanceWeight += worker.CalculateDistanceWeight(distanceWeight);
+                    }
                 }
             }
-            
-
             */
+            
 
             weight += techWeight + hillinessOffsetWeight + randomOffsetWeight + distanceWeight;
             return weight;
