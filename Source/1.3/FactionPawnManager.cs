@@ -4,10 +4,31 @@ using Verse;
 
 namespace Empire_Rewritten
 {
+    public struct FactionPawns : IExposable
+    {
+        public Faction faction;
+        public List<Pawn> pawns;
+        public void ExposeData()
+        {
+            Scribe_References.Look(ref faction, nameof(faction));
+            Scribe_Collections.Look(ref pawns, nameof(pawns), LookMode.Reference);
+        }
+
+        public bool IsForFaction(Faction faction) => faction == this.faction;
+
+        public bool HasPawn(Pawn pawn)=>pawns.Contains(pawn);
+    }
     public class FactionPawnManager : IExposable
     {
-        private Dictionary<Faction, List<Pawn>> pawns = new Dictionary<Faction, List<Pawn>> ();
-        
+        private List<FactionPawns> FactionPawns = new List<FactionPawns>();
+
+        /// <summary>
+        /// Check if we have the faction stored.
+        /// </summary>
+        /// <param name="faction"></param>
+        /// <returns></returns>
+        public bool HasFaction(Faction faction) => FactionPawns.Any(fp => fp.IsForFaction(faction));
+
         /// <summary>
         /// Get all pawns for a faction.
         /// </summary>
@@ -17,10 +38,10 @@ namespace Empire_Rewritten
         {
             List<Pawn> result = new List<Pawn> ();
             
-            if(!pawns.ContainsKey(faction)||!pawns[faction].NullOrEmpty())
+            if(HasFaction(faction))
                 return result;
 
-            result=pawns[faction];
+            result=FactionPawns.Find(fp=>fp.faction==faction).pawns;
 
             return result;
         }
@@ -34,10 +55,30 @@ namespace Empire_Rewritten
         {
             PawnGenerationRequest generationRequest = new PawnGenerationRequest(faction.RandomPawnKind(), mustBeCapableOfViolence: true, faction: faction, fixedIdeo: faction.ideos.PrimaryIdeo);
             Pawn result = PawnGenerator.GeneratePawn(generationRequest);
-            
-            if(!pawns.ContainsKey(faction))
-                pawns.Add(faction, new List<Pawn>());
-            pawns[faction].Add(result);
+
+            FactionPawns factionPawns;
+
+
+            if (!HasFaction(faction))
+            {
+                factionPawns = new FactionPawns()
+                {
+                    faction = faction,
+                    pawns = new List<Pawn>()
+                };
+
+            }
+            else
+            {
+                factionPawns=FactionPawns.Find(fp=>fp.faction==faction);
+            }
+
+            factionPawns.pawns.Add(result);
+
+            //Replace at index
+            int index = FactionPawns.IndexOf(factionPawns);
+            FactionPawns.RemoveAt(index);
+            FactionPawns.Insert(index, factionPawns);
         }
       
         /// <summary>
@@ -55,7 +96,7 @@ namespace Empire_Rewritten
 
         public void ExposeData()
         {
-            Scribe_Collections.Look(ref pawns, "pawns", LookMode.Reference,LookMode.Reference);
+            Scribe_Collections.Look(ref FactionPawns, nameof(FactionPawns),LookMode.Deep);
         }
     }
 }
