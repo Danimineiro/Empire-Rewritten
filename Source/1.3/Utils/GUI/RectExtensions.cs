@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
@@ -58,6 +59,20 @@ namespace Empire_Rewritten.Utils
             for (int i = 0; i < times; i++)
             {
                 yield return rect.LeftPartPixels(rect.width / times).MoveRect(new Vector2(rect.width / times * i, 0f));
+            }
+        }
+
+        /// <summary>
+        ///     Makes a text button that executes an <see cref="Action"/>
+        /// </summary>
+        /// <param name="rect">The <see cref="Rect"/> to draw the button in</param>
+        /// <param name="label">The label of the button</param>
+        /// <param name="action">The <see cref="Action"/> that is executed</param>
+        public static void DrawButtonText(this Rect rect, string label, Action action)
+        {
+            if (Widgets.ButtonText(rect, label))
+            {
+                action();
             }
         }
     }
