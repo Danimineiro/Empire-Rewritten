@@ -28,5 +28,12 @@ namespace Empire_Rewritten.Windows
             Color[] colors = new Color[10];
             Find.WindowStack.Add(new ColorPickerWindow(color, colors, (_) => { }, (_) => { }));
         }
+
+        [PublicAPI]
+        [DebugAction("Empire", "Player empire creation window", allowedGameStates = AllowedGameStates.Playing)]
+        public static void PlayerCreationWindow()
+        {
+            Find.WindowStack.Add(new PlayerFactionCreationWindow());
+        }
     }
 }

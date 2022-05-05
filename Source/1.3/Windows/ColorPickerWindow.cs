@@ -63,7 +63,7 @@ namespace Empire_Rewritten.Windows
             preventCameraMotion = true;
             onlyOneOfTypeAllowed = true;
 
-            rectMain = new Rect(rectFull).ContractedBy(25f);
+            rectMain = rectFull.ContractedBy(25f);
             rectSaturationValueSquare = new Rect(rectMain.position, new Vector2(ColorComponentHeight, ColorComponentHeight));
             rectHueBar = rectSaturationValueSquare.MoveRect(new Vector2(rectSaturationValueSquare.width + 10f, 0f)).LeftPartPixels(HueBarWidth);
             rectColorInput = rectHueBar.MoveRect(new Vector2(rectHueBar.width + 10f, 0f));
