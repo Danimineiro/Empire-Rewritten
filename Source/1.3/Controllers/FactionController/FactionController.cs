@@ -24,7 +24,7 @@ namespace Empire_Rewritten.Controllers
         private readonly List<FactionCivicAndEthicData> factionCivicAndEthicDataList = new List<FactionCivicAndEthicData>();
         private List<FactionSettlementData> factionSettlementDataList = new List<FactionSettlementData>();
         private TerritoryManager territoryManager = new TerritoryManager();
-
+        private Faction playerFaction;
         /// <summary>
         ///     Needed for loading
         /// </summary>
@@ -57,6 +57,8 @@ namespace Empire_Rewritten.Controllers
         {
             Scribe_Collections.Look(ref factionSettlementDataList, "factionSettlementDataList");
             Scribe_Deep.Look(ref territoryManager, "territoryManager");
+            Scribe_References.Look(ref playerFaction, nameof(playerFaction));
+
         }
 
         /// <param name="faction"></param>
@@ -93,6 +95,10 @@ namespace Empire_Rewritten.Controllers
             UserPlayer player = new UserPlayer(faction);
             IEnumerable<WorldObject> settlements = Find.WorldObjects.Settlements.Where(x => x.Faction == faction);
             TerritoryManager.GetTerritory(faction).SettlementClaimTiles((Settlement)settlements.First());
+
+            //Generate a player faction
+            if (playerFaction == null)
+                playerFaction = PlayerFactionGenerator.GeneratePlayerFaction();
         }
 
         public void CreateNewAIPlayer(Faction faction)
