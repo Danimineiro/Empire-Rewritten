@@ -12,13 +12,29 @@ namespace Empire_Rewritten.Events
         public Type eventWorker;
 
         private EventWorker worker;
+
+      
         public EventWorker EventWorker
         {
-
             get
             {
 
                 return worker;
+            }
+        }
+
+
+        public bool canAffectAI = true;
+
+        public Type aiEventWorker;
+
+        private EventWorker aiWorker;
+
+        public EventWorker AIWorker
+        {
+            get
+            {
+                return aiWorker!=null ? aiWorker : EventWorker;
             }
         }
 
@@ -28,6 +44,10 @@ namespace Empire_Rewritten.Events
             if(eventWorker.GetType() != typeof(EventWorker))
             {
                 errors.Append($"{eventWorker.Name} is not a {nameof(EventWorker)}");
+            }
+            if (aiEventWorker!=null && aiEventWorker.GetType() != typeof(EventWorker))
+            {
+                errors.Append($"{aiEventWorker.Name} is not a {nameof(EventWorker)}");
             }
 
             return errors;
@@ -39,6 +59,11 @@ namespace Empire_Rewritten.Events
             {
                 worker = (EventWorker)Activator.CreateInstance(eventWorker);
                 worker.def = this;
+            }
+            if (aiEventWorker!=null && aiEventWorker.GetType() == typeof(EventWorker))
+            {
+                aiWorker = (EventWorker)Activator.CreateInstance(aiEventWorker);
+                aiWorker.def = this;
             }
             base.ResolveReferences();
         }

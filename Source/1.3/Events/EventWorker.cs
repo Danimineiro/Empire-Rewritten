@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Empire_Rewritten.Settlements;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,7 +17,7 @@ namespace Empire_Rewritten.Events
                 return 0f;
             }
         }
-        public virtual void Event()
+        public virtual void Event(Empire empire)
         {
 
         }

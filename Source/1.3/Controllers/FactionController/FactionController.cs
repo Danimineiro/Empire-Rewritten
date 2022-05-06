@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Empire_Rewritten.AI;
 using Empire_Rewritten.Controllers.CivicEthic;
+using Empire_Rewritten.Events;
 using Empire_Rewritten.Player;
 using Empire_Rewritten.Settlements;
 using Empire_Rewritten.Territories;
@@ -25,6 +26,9 @@ namespace Empire_Rewritten.Controllers
         private List<FactionSettlementData> factionSettlementDataList = new List<FactionSettlementData>();
         private TerritoryManager territoryManager = new TerritoryManager();
         private Faction playerFaction;
+        private EventManager eventManager = new EventManager();
+
+        public List<FactionSettlementData> ReadOnlyFactionSettlementData => factionSettlementDataList;
         /// <summary>
         ///     Needed for loading
         /// </summary>
@@ -58,7 +62,7 @@ namespace Empire_Rewritten.Controllers
             Scribe_Collections.Look(ref factionSettlementDataList, "factionSettlementDataList");
             Scribe_Deep.Look(ref territoryManager, "territoryManager");
             Scribe_References.Look(ref playerFaction, nameof(playerFaction));
-
+            Scribe_Deep.Look(ref eventManager, nameof(eventManager));
         }
 
         /// <param name="faction"></param>
@@ -89,7 +93,7 @@ namespace Empire_Rewritten.Controllers
         public void CreatePlayer()
         {
             Faction faction = Faction.OfPlayer;
-            FactionSettlementData factionSettlementData = new FactionSettlementData(faction, new Empire(faction));
+            FactionSettlementData factionSettlementData = new FactionSettlementData(faction, new Empire(faction, true));
             factionSettlementDataList.Add(factionSettlementData);
             // NOTE: Why is this unused?
             UserPlayer player = new UserPlayer(faction);
