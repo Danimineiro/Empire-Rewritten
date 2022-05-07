@@ -21,6 +21,8 @@ namespace Empire_Rewritten.Controllers
     /// </summary>
     public class FactionController : IExposable
     {
+        public const int daysPerTurn = 15;
+ 
         private readonly Dictionary<Faction, AIPlayer> AIFactions = new Dictionary<Faction, AIPlayer>();
         private readonly List<FactionCivicAndEthicData> factionCivicAndEthicDataList = new List<FactionCivicAndEthicData>();
         private List<FactionSettlementData> factionSettlementDataList = new List<FactionSettlementData>();

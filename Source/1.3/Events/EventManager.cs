@@ -27,7 +27,7 @@ namespace Empire_Rewritten.Events
         {
             int passedDays = GenDate.DaysPassed;
 
-            if (passedDays - lastDay > 15)
+            if (passedDays - lastDay >FactionController.daysPerTurn)
             {
                 lastDay = GenDate.DaysPassed;
                 return true;
