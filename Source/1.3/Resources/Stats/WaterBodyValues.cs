@@ -1,5 +1,10 @@
-﻿using System;
+﻿using Empire_Rewritten.Utils;
 using JetBrains.Annotations;
+using RimWorld;
+using RimWorld.Planet;
+using System;
+using System.Collections.Generic;
+using Verse;
 
 namespace Empire_Rewritten.Resources.Stats
 {
@@ -37,6 +42,58 @@ namespace Empire_Rewritten.Resources.Stats
                 default:
                     throw new ArgumentOutOfRangeException(nameof(stat), stat, "Invalid value");
             }
+        }
+
+        public float GetValueMult(Tile tile)
+        {
+            float value = 1;
+            List<int> neighbourTiles = new List<int>();
+            WorldGrid worldGrid = Find.WorldGrid;
+
+            worldGrid.GetTileNeighbors(worldGrid.tiles.IndexOf(tile), neighbourTiles);
+
+            if (!tile.Rivers.NullOrEmpty())
+            {
+                value *= river;
+            }
+
+            if (neighbourTiles.Any(neighbour => worldGrid.tiles[neighbour].biome == BiomeDefOf.Lake))
+            {
+                value *= lake;
+            }
+
+            if (neighbourTiles.Any(neighbour => worldGrid.tiles[neighbour].biome == BiomeDefOf.Ocean))
+            {
+                value *= ocean;
+            }
+
+            return value;
+        }
+
+        public float GetValueAdd(Tile tile)
+        {
+            float value = 0;
+            List<int> neighbourTiles = new List<int>();
+            WorldGrid worldGrid = Find.WorldGrid;
+
+            worldGrid.GetTileNeighbors(worldGrid.tiles.IndexOf(tile), neighbourTiles);
+
+            if (!tile.Rivers.NullOrEmpty())
+            {
+                value += river;
+            }
+
+            if (neighbourTiles.Any(neighbour => worldGrid.tiles[neighbour].biome == BiomeDefOf.Lake))
+            {
+                value += lake;
+            }
+
+            if (neighbourTiles.Any(neighbour => worldGrid.tiles[neighbour].biome == BiomeDefOf.Ocean))
+            {
+                value += ocean;
+            }
+
+            return value;
         }
     }
 }
