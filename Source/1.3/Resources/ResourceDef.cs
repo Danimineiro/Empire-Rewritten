@@ -60,6 +60,21 @@ namespace Empire_Rewritten.Resources
 
         private ResourceWorker worker;
 
+        private static IEnumerable<ResourceDef> _cachedDefs = null;
+
+        public static IEnumerable<ResourceDef> AllResourceDefs
+        {
+            get
+            {
+                if (_cachedDefs.EnumerableNullOrEmpty())
+                {
+                    _cachedDefs = DefDatabase<ResourceDef>.AllDefsListForReading;
+                }
+
+                return _cachedDefs;
+            }
+        }
+
         public Graphic Graphic => iconData.Graphic;
 
         /// <summary>

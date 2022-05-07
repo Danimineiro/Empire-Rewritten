@@ -21,18 +21,7 @@ namespace Empire_Rewritten.AI
 
         public List<ResourceDef> LowResources { get; private set; } = new List<ResourceDef>();
 
-        private static IEnumerable<ResourceDef> AllResourceDefs
-        {
-            get
-            {
-                if (_cachedDefs.EnumerableNullOrEmpty())
-                {
-                    _cachedDefs = DefDatabase<ResourceDef>.AllDefsListForReading;
-                }
-
-                return _cachedDefs;
-            }
-        }
+        private static IEnumerable<ResourceDef> AllResourceDefs => ResourceDef.AllResourceDefs;
 
         public bool HasCriticalResource => criticalResources.Count > 0;
 
