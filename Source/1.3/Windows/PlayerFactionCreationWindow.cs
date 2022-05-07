@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Empire_Rewritten.Controllers;
 using Empire_Rewritten.Utils;
 using RimWorld;
 using UnityEngine;
@@ -62,7 +63,13 @@ namespace Empire_Rewritten.Windows
 
         public void ApplyAction()
         {
-            //TODO: Check things inputs for validity here (name can't be empty)
+            if (playerFactionName.NullOrEmpty() && Faction.OfPlayer!=null)
+                return;
+
+            Faction.OfPlayer.Name = playerFactionName;
+            UpdateController updateController = UpdateController.CurrentWorldInstance;
+            FactionController controller = updateController.FactionController;
+            controller.CreatePlayer();
 
             Close();
         }
