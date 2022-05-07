@@ -35,5 +35,12 @@ namespace Empire_Rewritten.Windows
         {
             Find.WindowStack.Add(new PlayerFactionCreationWindow());
         }
+
+        [PublicAPI]
+        [DebugAction("Empire", "Settlement creation window", allowedGameStates = AllowedGameStates.Playing)]
+        public static void SettlementCreationWindow()
+        {
+            Find.WindowStack.Add(new SettlementPlacementWindow());
+        }
     }
 }
