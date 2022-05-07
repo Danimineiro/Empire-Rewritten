@@ -26,13 +26,19 @@ namespace Empire_Rewritten.Settlements
         private List<Settlement> settlementsForLoading = new List<Settlement>();
         private StorageTracker storageTracker = new StorageTracker();
         private bool territoryIsDirty;
+        private bool isAIPlayer;
+
+        public bool IsAIPlayer => isAIPlayer;
+        public Faction Faction => faction;
 
         [UsedImplicitly]
         public Empire() { }
 
-        public Empire([NotNull] Faction faction)
+     
+        public Empire([NotNull] Faction faction, bool isAIPlayer)
         {
             this.faction = faction ?? throw new ArgumentNullException(nameof(faction));
+            this.isAIPlayer= isAIPlayer;
         }
 
         public StorageTracker StorageTracker => storageTracker;
@@ -60,6 +66,7 @@ namespace Empire_Rewritten.Settlements
             Scribe_Collections.Look(ref settlements, "settlements", LookMode.Reference, LookMode.Deep, ref settlementsForLoading, ref facilityManagersForLoading);
             Scribe_References.Look(ref faction, "faction");
             Scribe_Deep.Look(ref storageTracker, "storageTracker");
+            Scribe_Values.Look(ref isAIPlayer, nameof(isAIPlayer));
         }
 
         public string GetUniqueLoadID()
