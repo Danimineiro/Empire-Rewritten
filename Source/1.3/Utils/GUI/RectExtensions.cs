@@ -88,5 +88,22 @@ namespace Empire_Rewritten.Utils
             height = innerHeight,
             width = outerRect.width - (innerHeight > outerRect.height ? 17f : 0f)
         };
+
+        /// <summary>
+        ///     Draws a highlight into the selected rect, a light highlight if <paramref name="light"/> is true, dark otherwise
+        /// </summary>
+        /// <param name="rect">The rect the highlight is drawn in</param>
+        /// <param name="light">If the highlight is dark or light</param>
+        public static void DoRectHighlight(this Rect rect, bool light)
+        {
+            if (light)
+            {
+                Widgets.DrawLightHighlight(rect);
+            }
+            else
+            {
+                Widgets.DrawHighlight(rect);
+            }
+        }
     }
 }
