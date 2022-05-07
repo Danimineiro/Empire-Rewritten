@@ -4,7 +4,7 @@
     {
         private const string PrefixLog = "<color=lightblue>[Empire]</color> ";
         private const string PrefixWarn = "<color=orange>[Empire]</color> ";
-        private const string PrefixError = "<color=red>[Empire</color> ";
+        private const string PrefixError = "<color=red>[Empire]</color> ";
 
         public static void Message(string message)
         {
@@ -32,5 +32,11 @@
                 Verse.Log.Error(PrefixError + message);
             }
         }
+
+        /// <summary>
+        ///     Simplifies making an error message that only errors once
+        /// </summary>
+        /// <param name="message"></param>
+        public static void ErrorOnce(this string message) => Verse.Log.ErrorOnce(PrefixError + message, message.GetHashCode());
     }
 }
