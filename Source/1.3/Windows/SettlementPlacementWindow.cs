@@ -1,5 +1,7 @@
 ﻿using Empire_Rewritten.Resources;
 using Empire_Rewritten.Utils;
+using RimWorld;
+using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
+using HarmonyLib;
 
 namespace Empire_Rewritten.Windows
 {
@@ -68,13 +71,18 @@ namespace Empire_Rewritten.Windows
 
         private void DrawMiddle()
         {
+            DrawResourceInfo();
+        }
+
+        private void DrawResourceInfo()
+        {
             Rect rectFull = rectCostInner.TopPartPixels(29f);
             Widgets.Label(rectCostLabel, "Empire_SPW_Modifiers".Translate());
             Widgets.DrawBox(rectCostOuter);
             Widgets.BeginScrollView(rectCostOuter, ref costScroll, rectCostInner);
 
             int count = 0;
-            foreach(KeyValuePair<ResourceDef, ResourceModifier> kvp in tileMods)
+            foreach (KeyValuePair<ResourceDef, ResourceModifier> kvp in tileMods)
             {
                 ResourceDef def = kvp.Key;
 
@@ -105,8 +113,14 @@ namespace Empire_Rewritten.Windows
 
         private void DrawBottom()
         {
+            bool canPlace = CanPlaceHere(out List<string> reasons);
+
             Widgets.DrawLineHorizontal(rectBot.x, rectBot.y, rectBot.width);
+            TooltipHandler.TipRegion(rectButtonApply, reasons.Join((newString) => newString, "\n"));
+            
+            if (!canPlace) GUI.color = new Color(1f, 0.4f, 0.4f);
             rectButtonApply.DrawButtonText("Empire_SPW_Apply".Translate(), ApplyAction);
+            GUI.color = Color.white;
         }
 
         private void GetTileData()
@@ -121,8 +135,28 @@ namespace Empire_Rewritten.Windows
             }
         }
 
+        public bool CanPlaceHere(out List<string> reasons)
+        {
+            bool flag = true;
+            reasons = new List<string>();
+            Tile tile = Find.WorldGrid.tiles[selectedWorldTile];
+
+            if (tile.WaterCovered)
+            {
+                reasons.Add("Empire_SPW_Water".Translate());
+                flag = false;
+            }
+
+            return flag;
+        }
+
         public void ApplyAction()
         {
+            if (!CanPlaceHere(out List<string> reasons))
+            {
+                Messages.Message(new Message(reasons.Join((newString) => newString, "\n"), MessageTypeDefOf.RejectInput));
+                return;
+            }
             //TODO: Check things inputs for validity here (name can't be empty)
 
             Close();
