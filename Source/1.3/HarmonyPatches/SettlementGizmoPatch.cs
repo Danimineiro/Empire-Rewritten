@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Empire_Rewritten.Controllers;
 using Empire_Rewritten.Facilities;
 using Empire_Rewritten.Settlements;
 using RimWorld.Planet;
@@ -14,7 +15,9 @@ namespace Empire_Rewritten.HarmonyPatches
         /// </summary>
         public static void GizmoPatch(Settlement __instance, ref IEnumerable<Gizmo> __result)
         {
-            __result = __result.Concat(__instance.GetExtendedGizmos());
+            List<FactionSettlementData> data = UpdateController.CurrentWorldInstance.FactionController.ReadOnlyFactionSettlementData;
+            if(data.Any(x=>x.SettlementManager.Faction==__instance.Faction && x.SettlementManager.Settlements.ContainsKey(__instance)))
+                __result = __result.Concat(__instance.GetExtendedGizmos());
         }
     }
 }
