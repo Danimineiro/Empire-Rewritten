@@ -162,7 +162,6 @@ namespace Empire_Rewritten.Windows
 
             Tile tile = tiles[selectedWorldTile];
 
-            Tile tile = Find.WorldGrid.tiles[selectedWorldTile];
             Territory territory = TerritoryManager.GetTerritoryManager.GetTerritory(Faction.OfPlayer);
             if (tile.WaterCovered)
             {
