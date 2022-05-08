@@ -4,4 +4,5 @@
 	<Empire_SPW_Apply>Settle</Empire_SPW_Apply>
 	<Empire_SPW_Cost>Colony build cost:</Empire_SPW_Cost>
 	<Empire_SPW_Modifiers>Tile modifiers:</Empire_SPW_Modifiers>
+	<Empire_SPW_Water>Can't build on water covered tiles!</Empire_SPW_Water>
 </LanguageData>
