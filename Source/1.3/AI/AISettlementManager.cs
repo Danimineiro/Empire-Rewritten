@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Empire_Rewritten.Facilities;
+using Empire_Rewritten.Settlements;
+using RimWorld;
 using RimWorld.Planet;
 using Verse;
 
@@ -83,6 +85,16 @@ namespace Empire_Rewritten.AI
             tileToBuildOn = Current.Game.World.grid[result];
         }
 
+        public bool AttemptToBuildSettlement()
+        {
+            if (tileToBuildOn != null && player.Manager.StorageTracker.CanRemoveThingsFromStorage(Empire.SettlementCost))
+            {
+                BuildSettlement();
+                return true;
+            }
+            return false;
+        }
+       
         public void BuildSettlement()
         {
             if (tileToBuildOn != null)
@@ -95,7 +107,7 @@ namespace Empire_Rewritten.AI
         public override void DoModuleAction()
         {
             SearchForTile();
-            BuildSettlement();
+            AttemptToBuildSettlement();
         }
 
         public override void DoThreadableAction()

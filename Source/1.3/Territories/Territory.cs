@@ -12,7 +12,7 @@ namespace Empire_Rewritten.Territories
         private static WorldGrid _worldGrid;
         private Faction faction;
 
-        private List<int> tiles;
+        private List<int> tiles  =new List<int>();
 
         [UsedImplicitly]
         public Territory() { }
@@ -20,7 +20,6 @@ namespace Empire_Rewritten.Territories
         public Territory(Faction faction)
         {
             this.faction = faction;
-            tiles = new List<int>();
         }
 
         private static WorldGrid WorldGrid => _worldGrid ?? (_worldGrid = Find.WorldGrid);
