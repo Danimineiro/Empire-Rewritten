@@ -27,8 +27,19 @@ namespace Empire_Rewritten.Controllers
         private readonly List<FactionCivicAndEthicData> factionCivicAndEthicDataList = new List<FactionCivicAndEthicData>();
         private List<FactionSettlementData> factionSettlementDataList = new List<FactionSettlementData>();
         private TerritoryManager territoryManager = new TerritoryManager();
-        private Faction playerFaction;
+        private Faction playerStandInFaction;
         private EventManager eventManager = new EventManager();
+
+        /// <summary>
+        /// This faction is meant to be used for functions such as spawning pawns of the "player" faction without allowing the player to control them.
+        /// </summary>
+        public Faction StandInPlayerFaction
+        {
+            get
+            {
+                return playerStandInFaction;
+            }
+        }
 
         public List<FactionSettlementData> ReadOnlyFactionSettlementData => factionSettlementDataList;
         /// <summary>
@@ -63,7 +74,7 @@ namespace Empire_Rewritten.Controllers
         {
             Scribe_Collections.Look(ref factionSettlementDataList, "factionSettlementDataList");
             Scribe_Deep.Look(ref territoryManager, "territoryManager");
-            Scribe_References.Look(ref playerFaction, nameof(playerFaction));
+            Scribe_References.Look(ref playerStandInFaction, nameof(playerStandInFaction));
             Scribe_Deep.Look(ref eventManager, nameof(eventManager));
         }
 
@@ -103,8 +114,8 @@ namespace Empire_Rewritten.Controllers
             TerritoryManager.GetTerritory(faction).SettlementClaimTiles((Settlement)settlements.First());
 
             //Generate a player faction
-            if (playerFaction == null)
-                playerFaction = PlayerFactionGenerator.GeneratePlayerFaction();
+            if (playerStandInFaction == null)
+                playerStandInFaction = PlayerFactionGenerator.GeneratePlayerFaction();
         }
 
         public void CreateNewAIPlayer(Faction faction)
