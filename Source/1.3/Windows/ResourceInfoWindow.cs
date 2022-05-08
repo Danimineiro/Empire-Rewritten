@@ -54,6 +54,11 @@ namespace Empire_Rewritten.Windows
             resourceDefs = DefDatabase<ResourceDef>.AllDefsListForReading;
         }
 
+        public ResourceInfoWindow(ResourceDef defSelected) : base()
+        {
+            this.defSelected = defSelected;
+        }
+
         public override Vector2 InitialSize => new Vector2(1229f, 619f);
 
         protected override float Margin => 0f;
