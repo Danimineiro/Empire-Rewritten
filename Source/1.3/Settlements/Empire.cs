@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Empire_Rewritten.Facilities;
 using Empire_Rewritten.Resources;
-using Empire_Rewritten.Utils;
 using Empire_Rewritten.Territories;
+using Empire_Rewritten.Utils;
 using JetBrains.Annotations;
 using RimWorld;
 using RimWorld.Planet;
@@ -17,29 +17,34 @@ namespace Empire_Rewritten.Settlements
     /// </summary>
     public class Empire : IExposable, ILoadReferenceable
     {
-        private Territory cachedTerritory;
-        private List<FacilityManager> facilityManagersForLoading = new List<FacilityManager>();
-        private Faction faction;
+        public static readonly Dictionary<ThingDef, int> SettlementCost = new Dictionary<ThingDef, int>
+        {
+            { ThingDefOf.WoodLog, 500 }, { ThingDefOf.Steel, 100 }, { ThingDefOf.ComponentIndustrial, 12 }, { ThingDefOf.Silver, 200 },
+        };
+
+        private bool isAIPlayer;
+        private bool territoryIsDirty;
 
         private Dictionary<Settlement, FacilityManager> settlements = new Dictionary<Settlement, FacilityManager>();
+        private Faction faction;
+        private List<FacilityManager> facilityManagersForLoading = new List<FacilityManager>();
 
         private List<Settlement> settlementsForLoading = new List<Settlement>();
         private StorageTracker storageTracker = new StorageTracker();
-        private bool territoryIsDirty;
-        private bool isAIPlayer;
-
-        public bool IsAIPlayer => isAIPlayer;
-        public Faction Faction => faction;
+        private Territory cachedTerritory;
 
         [UsedImplicitly]
         public Empire() { }
 
-     
-        public Empire([NotNull] Faction faction, bool isAIPlayer)
+
+        public Empire([NotNull] Faction faction, bool isAIPlayer = true)
         {
             this.faction = faction ?? throw new ArgumentNullException(nameof(faction));
-            this.isAIPlayer= isAIPlayer;
+            this.isAIPlayer = isAIPlayer;
         }
+
+        public bool IsAIPlayer => isAIPlayer;
+        public Faction Faction => faction;
 
         public StorageTracker StorageTracker => storageTracker;
         public Dictionary<Settlement, FacilityManager> Settlements => settlements;
@@ -140,15 +145,27 @@ namespace Empire_Rewritten.Settlements
         }
 
         /// <summary>
-        ///     Add a settlement to the tracker.
+        ///     Add a <see cref="Settlement" /> to the <see cref="Empire" />.
         /// </summary>
-        /// <param name="settlement"></param>
+        /// <param name="settlement">The <see cref="Settlement" /> to add</param>
         public void AddSettlement(Settlement settlement)
         {
             FacilityManager tracker = new FacilityManager(settlement);
             settlements.Add(settlement, tracker);
             Territory.SettlementClaimTiles(settlement);
             SettlementTiles.Add(settlement.Tile);
+        }
+
+        /// <summary>
+        ///     Add several <see cref="Settlement">Settlements</see> to the <see cref="Empire" />.
+        /// </summary>
+        /// <param name="settlements">The <see cref="Settlement">Settlements</see> to add</param>
+        public void AddSettlements(IEnumerable<Settlement> settlements)
+        {
+            foreach (Settlement settlement in settlements)
+            {
+                AddSettlement(settlement);
+            }
         }
 
         public Settlement GetSettlement(FacilityManager manager)

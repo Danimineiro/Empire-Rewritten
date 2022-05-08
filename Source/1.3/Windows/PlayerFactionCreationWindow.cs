@@ -13,7 +13,6 @@ namespace Empire_Rewritten.Windows
 {
     public class PlayerFactionCreationWindow : Window
     {
-
         private readonly Rect rectFull = new Rect(0f, 0f, 1000f, 600f);
         private readonly Rect rectMain;
         private readonly Rect rectLeft;

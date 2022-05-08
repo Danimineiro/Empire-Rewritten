@@ -41,6 +41,18 @@ namespace Empire_Rewritten
             }
         }
 
+
+
+        public bool TryRemoveThingsFromStorage(Dictionary<ThingDef, int> things)
+        {
+            bool hasRemovedThings = true;
+            foreach(KeyValuePair<ThingDef,int> kvp in things)
+            {
+               hasRemovedThings &= TryRemoveThingsFromStorage(kvp.Key, kvp.Value);
+            }
+            return hasRemovedThings;
+        }
+
         /// <summary>
         ///     Tries to remove a given <see cref="int">amount</see> of a given <see cref="ThingDef" /> from this
         ///     <see cref="StorageTracker" />
@@ -67,6 +79,21 @@ namespace Empire_Rewritten
         }
 
         /// <summary>
+        /// Check if we can remove a set of <see cref="ThingDef"/> from the <see cref="StorageTracker"/>.
+        /// </summary>
+        /// <param name="thingsAndAmount"></param>
+        /// <returns></returns>
+        public bool CanRemoveThingsFromStorage(Dictionary<ThingDef, int> thingsAndAmount)
+        {
+            bool canRemove = true;
+            foreach(KeyValuePair<ThingDef, int> kvp in thingsAndAmount)
+            {
+               canRemove &= CanRemoveThingsFromStorage(kvp.Key, kvp.Value);
+            }
+            return canRemove;
+        }
+
+        /// <summary>
         ///     Checks whether you can remove a given <see cref="int">amount</see> of a given <see cref="ThingDef" /> from this
         ///     <see cref="StorageTracker" />
         /// </summary>
@@ -78,7 +105,7 @@ namespace Empire_Rewritten
         /// </returns>
         public bool CanRemoveThingsFromStorage(ThingDef def, int count)
         {
-            return storedThings.ContainsKey(def) && storedThings[def] >= count;
+            return GetCountOfThing(def) >= count;
         }
 
         /// <summary>

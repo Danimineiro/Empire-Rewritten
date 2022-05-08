@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+	<Empire_SPW_Title>Settle a new colony</Empire_SPW_Title>
+	<Empire_SPW_Apply>Settle</Empire_SPW_Apply>
+	<Empire_SPW_Cost>Colony build cost:</Empire_SPW_Cost>
+	<Empire_SPW_Modifiers>Tile modifiers:</Empire_SPW_Modifiers>
+	<Empire_SPW_Water>Can't build on water covered tiles!</Empire_SPW_Water>
+	<Empire_SPW_TileOutOfRange>The selected tile is out of range!</Empire_SPW_TileOutOfRange>
+	<Empire_SPW_TileNotInTerritory>The selected tile is outside of your territory!</Empire_SPW_TileNotInTerritory>
+	<Empire_SPW_NoResources>You cannot afford to build a settlement!</Empire_SPW_NoResources>
+	<Empire_SPW_ColonyCost>Colony cost:</Empire_SPW_ColonyCost>
+	<Empire_SPW_MultipleErrors>There are multiple reasons as to why you can't place a colony here. Hover over the "Settle" button to see them all.</Empire_SPW_MultipleErrors>
+</LanguageData>

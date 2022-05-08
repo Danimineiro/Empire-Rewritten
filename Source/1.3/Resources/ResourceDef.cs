@@ -110,14 +110,24 @@ namespace Empire_Rewritten.Resources
         /// <returns>The <see cref="ResourceModifier" /> for <paramref name="tile" /></returns>
         public ResourceModifier GetTileModifier(Tile tile)
         {
+            ResourceModifier biomeModifier = GetBiomeModifier(tile);
+
+            if (tile.WaterCovered || tile.hilliness == Hilliness.Impassable) return new ResourceModifier(this, biomeModifier.offset, 0f);
+
             float result = 1;
 
             float tempVal = temperatureCurve.Evaluate(tile.temperature);
             float heightVal = heightCurve.Evaluate((float)tile.hilliness);
             float swampinessVal = swampinessCurve.Evaluate(tile.swampiness);
             float rainfallVal = rainfallCurve.Evaluate(tile.rainfall);
-            ResourceModifier biomeModifier = GetBiomeModifier(tile);
-            result *= tempVal * heightVal * biomeModifier.multiplier * swampinessVal * rainfallVal;
+
+            float hillFacVal = hillinessFactors.GetValue((ResourceStat)(tile.hilliness - 1));
+            float hillOffVal = hillinessOffsets.GetValue((ResourceStat)(tile.hilliness - 1));
+
+            float waterFacVal = waterBodyFactors.GetValueMult(tile);
+            float waterOffVal = waterBodyOffsets.GetValueAdd(tile);
+
+            result = result * tempVal * heightVal * biomeModifier.multiplier * swampinessVal * rainfallVal * hillFacVal * waterFacVal + hillOffVal + waterOffVal;
 
             ResourceModifier modifer = new ResourceModifier(this, biomeModifier.offset, result);
 
