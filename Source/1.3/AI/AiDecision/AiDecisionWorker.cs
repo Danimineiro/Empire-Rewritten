@@ -24,5 +24,18 @@ namespace Empire_Rewritten.AI
         {
 
         }
+        /// <summary>
+        /// The impact scale is as follows:
+        /// 20+: Only for allies
+        /// 0-20: Allies, neutrals
+        /// 0-: Only hostile.
+        /// </summary>
+        /// <param name="player"></param>
+        /// <returns></returns>
+        public virtual float ImpactOnOtherEmpires(AIPlayer player)
+        {
+            return 0.0f;
+        }
     }
+
 }

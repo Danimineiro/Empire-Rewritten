@@ -23,6 +23,7 @@ namespace Empire_Rewritten.Controllers
     {
         public const int daysPerTurn = 15;
  
+        private UserPlayer _player;
         private readonly Dictionary<Faction, AIPlayer> AIFactions = new Dictionary<Faction, AIPlayer>();
         private readonly List<FactionCivicAndEthicData> factionCivicAndEthicDataList = new List<FactionCivicAndEthicData>();
         private List<FactionSettlementData> factionSettlementDataList = new List<FactionSettlementData>();
@@ -102,6 +103,18 @@ namespace Empire_Rewritten.Controllers
         {
             return AIFactions.ContainsKey(faction) ? AIFactions[faction] : null;
         }
+        /// <summary>
+        /// Get the player of a faction.
+        /// </summary>
+        /// <param name="faction"></param>
+        /// <returns></returns>
+        public BasePlayer PlayerOfFaction(Faction faction)
+        {
+            if (Faction.OfPlayer == faction)
+                return _player;
+            else
+                return GetAIPlayer(faction);
+        }
 
         /// <summary>
         /// Create the player's Empire, Faction data, and stand-in faction
@@ -112,7 +125,7 @@ namespace Empire_Rewritten.Controllers
             FactionSettlementData factionSettlementData = new FactionSettlementData(faction, new Empire(faction, false));
             factionSettlementDataList.Add(factionSettlementData);
             // NOTE: Why is this unused?
-            UserPlayer player = new UserPlayer(faction);
+            _player = new UserPlayer(faction);
             IEnumerable<WorldObject> settlements = Find.WorldObjects.Settlements.Where(x => x.Faction == faction);
             TerritoryManager.GetTerritory(faction).SettlementClaimTiles((Settlement)settlements.First());
 
