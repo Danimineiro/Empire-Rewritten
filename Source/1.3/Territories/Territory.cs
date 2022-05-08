@@ -34,6 +34,8 @@ namespace Empire_Rewritten.Territories
             Scribe_Collections.Look(ref tiles, "tiles");
         }
 
+        public bool HasTile(int tile)=>tiles.Contains(tile);
+
         public void ClaimTile(int id)
         {
             if (!TerritoryManager.GetTerritoryManager.AnyFactionOwnsTile(id))

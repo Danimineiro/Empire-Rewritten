@@ -33,6 +33,7 @@ namespace Empire_Rewritten.Windows
         private Vector2 costScroll;
         private int selectedWorldTile = -1;
 
+        private Empire playerEmpire;
         protected override float Margin => 0f;
 
         public override Vector2 InitialSize => rectFull.size;
@@ -62,6 +63,8 @@ namespace Empire_Rewritten.Windows
             rectCostInner = rectCostOuter.GetInnerScrollRect(29f * ResourceDef.AllResourceDefs.Count());
 
             CameraJumper.TryShowWorld();
+
+            playerEmpire = UpdateController.CurrentWorldInstance.FactionController.ReadOnlyFactionSettlementData.Find(x => !x.SettlementManager.IsAIPlayer).SettlementManager;
         }
 
         public override void DoWindowContents(Rect inRect)
@@ -117,7 +120,7 @@ namespace Empire_Rewritten.Windows
 
         private void DrawBottom()
         {
-            bool canPlace = CanPlaceHere(out List<string> reasons);
+            bool canPlace = CanPlaceHere(out List<string> reasons,playerEmpire);
 
             Widgets.DrawLineHorizontal(rectBot.x, rectBot.y, rectBot.width);
             TooltipHandler.TipRegion(rectButtonApply, reasons.Join((newString) => newString, "\n"));
@@ -139,41 +142,42 @@ namespace Empire_Rewritten.Windows
             }
         }
 
-        public bool CanPlaceHere(out List<string> reasons)
+        public bool CanPlaceHere(out List<string> reasons, Empire playerEmpire)
         {
             bool flag = true;
             reasons = new List<string>();
             Tile tile = Find.WorldGrid.tiles[selectedWorldTile];
-
+            Territory territory = TerritoryManager.GetTerritoryManager.GetTerritory(Faction.OfPlayer);
             if (tile.WaterCovered)
             {
                 reasons.Add("Empire_SPW_Water".Translate());
                 flag = false;
             }
-
+            if (!playerEmpire.StorageTracker.CanRemoveThingsFromStorage(Empire.SettlementCost))
+            {
+                reasons.Add("Empire_SPW_NoResources".Translate());
+                flag = false;
+            }
+            if (!territory.HasTile(selectedWorldTile))
+            {
+                reasons.Add("Empire_SPW_TileNotInTerritory".Translate());
+                flag = false;
+            }
             return flag;
         }
 
         public void ApplyAction()
         {
-            if (!CanPlaceHere(out List<string> reasons))
+
+            if (!CanPlaceHere(out List<string> reasons, playerEmpire))
             {
                 Messages.Message(new Message(reasons.Join((newString) => newString, "\n"), MessageTypeDefOf.RejectInput));
                 return;
             }
-            //TODO: Check things inputs for validity here (name can't be empty)
-            Territory playerTerritory = TerritoryManager.GetTerritoryManager.GetTerritory(Faction.OfPlayer);
-
-            if (playerTerritory.Tiles.Contains(selectedWorldTile))
-            {
-
-                Empire playerEmpire = UpdateController.CurrentWorldInstance.FactionController.ReadOnlyFactionSettlementData.Find(x => !x.SettlementManager.IsAIPlayer).SettlementManager;
-                if (playerEmpire.StorageTracker.CanRemoveThingsFromStorage(Empire.SettlementCost))
-                {
-                    playerEmpire.StorageTracker.TryRemoveThingsFromStorage(Empire.SettlementCost);
-                    playerEmpire.BuildNewSettlementOnTile(Find.WorldGrid[selectedWorldTile]);
-                }
-            }
+         
+            playerEmpire.StorageTracker.TryRemoveThingsFromStorage(Empire.SettlementCost);
+            playerEmpire.BuildNewSettlementOnTile(Find.WorldGrid[selectedWorldTile]);
+            
             Close();
         }
     }
