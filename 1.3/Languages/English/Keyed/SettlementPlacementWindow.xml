@@ -5,4 +5,5 @@
 	<Empire_SPW_Cost>Colony build cost:</Empire_SPW_Cost>
 	<Empire_SPW_Modifiers>Tile modifiers:</Empire_SPW_Modifiers>
 	<Empire_SPW_Water>Can't build on water covered tiles!</Empire_SPW_Water>
+	<Empire_SPW_TileOutOfRange>The selected tile is out of range!</Empire_SPW_TileOutOfRange>
 </LanguageData>

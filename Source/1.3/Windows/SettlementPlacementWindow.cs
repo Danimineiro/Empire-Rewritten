@@ -1,15 +1,12 @@
 ﻿using Empire_Rewritten.Resources;
 using Empire_Rewritten.Utils;
+using HarmonyLib;
 using RimWorld;
 using RimWorld.Planet;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
-using HarmonyLib;
 
 namespace Empire_Rewritten.Windows
 {
@@ -21,6 +18,9 @@ namespace Empire_Rewritten.Windows
         private readonly Rect rectMid;
         private readonly Rect rectBot;
         private readonly Rect rectButtonApply;
+        private readonly Rect rectResourceInfoLabel;
+        private readonly Rect rectResourceInfoOuter;
+        private readonly Rect rectResourceInfoInner;
         private readonly Rect rectCostLabel;
         private readonly Rect rectCostOuter;
         private readonly Rect rectCostInner;
@@ -49,13 +49,17 @@ namespace Empire_Rewritten.Windows
             rectMain = rectFull.ContractedBy(25f);
             rectTop = rectMain.TopPartPixels(30f);
             rectBot = rectMain.BottomPartPixels(30f);
-            rectMid = new Rect(rectMain.x, rectMain.y + 30f, rectMain.width, rectMain.height - 30f * 2f);
+            rectMid = new Rect(rectMain.x, rectMain.y + 35f, rectMain.width, rectMain.height - 35f * 2f);
             rectButtonApply = new Rect(rectBot.x, rectBot.y + 5f, rectBot.width, rectBot.height - 10f);
 
-            rectCostLabel = rectMid.TopPartPixels(25f);
-            rectCostOuter = rectMid.TopPartPixels(29f * 4 /**Default ResourceDef.Count**/).MoveRect(new Vector2(0f, rectCostLabel.height));
+            rectResourceInfoLabel = rectMid.TopPartPixels(25f);
+            rectResourceInfoOuter = rectMid.TopPartPixels(29f * 4 /**Default ResourceDef.Count**/).MoveRect(new Vector2(0f, rectResourceInfoLabel.height));
 
-            rectCostInner = rectCostOuter.GetInnerScrollRect(29f * ResourceDef.AllResourceDefs.Count());
+            rectResourceInfoInner = rectResourceInfoOuter.GetInnerScrollRect(29f * ResourceDef.AllResourceDefs.Count());
+
+            rectCostLabel = rectMid.TopPartPixels(25f).MoveRect(new Vector2(0f, rectResourceInfoLabel.height + rectResourceInfoOuter.height));
+            rectCostOuter = rectMid.BottomPartPixels(rectMid.height - rectCostLabel.yMax);
+            rectCostInner = rectCostOuter.GetInnerScrollRect(29f * 5);
 
             CameraJumper.TryShowWorld();
         }
@@ -67,6 +71,9 @@ namespace Empire_Rewritten.Windows
             DrawTop();
             DrawMiddle();
             DrawBottom();
+
+            Widgets.DrawBox(rectCostLabel);
+            Widgets.DrawBox(rectCostOuter);
         }
 
         private void DrawMiddle()
@@ -76,10 +83,10 @@ namespace Empire_Rewritten.Windows
 
         private void DrawResourceInfo()
         {
-            Rect rectFull = rectCostInner.TopPartPixels(29f);
-            Widgets.Label(rectCostLabel, "Empire_SPW_Modifiers".Translate());
-            Widgets.DrawBox(rectCostOuter);
-            Widgets.BeginScrollView(rectCostOuter, ref costScroll, rectCostInner);
+            Rect rectFull = rectResourceInfoInner.TopPartPixels(29f);
+            Widgets.Label(rectResourceInfoLabel, "Empire_SPW_Modifiers".Translate());
+            Widgets.DrawBox(rectResourceInfoOuter);
+            Widgets.BeginScrollView(rectResourceInfoOuter, ref costScroll, rectResourceInfoInner);
 
             int count = 0;
             foreach (KeyValuePair<ResourceDef, ResourceModifier> kvp in tileMods)
@@ -139,7 +146,15 @@ namespace Empire_Rewritten.Windows
         {
             bool flag = true;
             reasons = new List<string>();
-            Tile tile = Find.WorldGrid.tiles[selectedWorldTile];
+            List<Tile> tiles = Find.WorldGrid.tiles;
+
+            if (selectedWorldTile > tiles.Count || selectedWorldTile == -1)
+            {
+                reasons.Add("Empire_SPW_TileOutOfRange".Translate());
+                return false; //Not just change the flag here because the next line would error
+            }
+
+            Tile tile = tiles[selectedWorldTile];
 
             if (tile.WaterCovered)
             {
