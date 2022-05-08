@@ -103,6 +103,9 @@ namespace Empire_Rewritten.Controllers
             return AIFactions.ContainsKey(faction) ? AIFactions[faction] : null;
         }
 
+        /// <summary>
+        /// Create the player's Empire, Faction data, and stand-in faction
+        /// </summary>
         public void CreatePlayer()
         {
             Faction faction = Faction.OfPlayer;

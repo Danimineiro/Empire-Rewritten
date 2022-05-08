@@ -41,7 +41,7 @@ namespace Empire_Rewritten.Events
         public override IEnumerable<string> ConfigErrors()
         {
             IEnumerable<string> errors = base.ConfigErrors();
-            if(eventWorker.GetType() != typeof(EventWorker))
+            if(typeof(EventWorker).IsAssignableFrom(eventWorker))
             {
                 errors.Append($"{eventWorker.Name} is not a {nameof(EventWorker)}");
             }
@@ -55,12 +55,12 @@ namespace Empire_Rewritten.Events
 
         public override void ResolveReferences()
         {
-            if (eventWorker.GetType() == typeof(EventWorker))
+            if (typeof(EventWorker).IsAssignableFrom(eventWorker))
             {
                 worker = (EventWorker)Activator.CreateInstance(eventWorker);
                 worker.def = this;
             }
-            if (aiEventWorker!=null && aiEventWorker.GetType() == typeof(EventWorker))
+            if (aiEventWorker!=null && typeof(EventWorker).IsAssignableFrom(aiEventWorker))
             {
                 aiWorker = (EventWorker)Activator.CreateInstance(aiEventWorker);
                 aiWorker.def = this;

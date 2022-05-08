@@ -16,7 +16,7 @@ namespace Empire_Rewritten.HarmonyPatches
         {
             Harmony harmony = new Harmony("EmpireRewritten.HarmonyPatches");
 
-            harmony.Patch(typeof(Settlement).GetMethod(nameof(Settlement.GetGizmos)), null, new HarmonyMethod(typeof(SettlementGizmoPatch), nameof(SettlementGizmoPatch.GizmoPatch)));
+            harmony.Patch(typeof(Settlement).GetMethod(nameof(Settlement.GetGizmos)), prefix: new HarmonyMethod(typeof(SettlementGizmoPatch), nameof(SettlementGizmoPatch.GizmoPatch)));
 
             harmony.Patch(typeof(PlaySettings).GetMethod(nameof(PlaySettings.DoPlaySettingsGlobalControls)), null,
                           new HarmonyMethod(typeof(PlaySettingsControlsPatch), nameof(PlaySettingsControlsPatch.Postfix)));
