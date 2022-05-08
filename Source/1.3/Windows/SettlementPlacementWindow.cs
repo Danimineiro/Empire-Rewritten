@@ -186,7 +186,8 @@ namespace Empire_Rewritten.Windows
         {
             if (!CanPlaceHere(out List<string> reasons, playerEmpire))
             {
-                Messages.Message(new Message(reasons.Join(newString => newString, "\n"), MessageTypeDefOf.RejectInput));
+                Messages.Message(new Message(string.Join("\n", reasons), MessageTypeDefOf.RejectInput));
+
                 return;
             }
 
