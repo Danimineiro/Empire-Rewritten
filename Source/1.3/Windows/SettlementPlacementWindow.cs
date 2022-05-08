@@ -233,7 +233,7 @@ namespace Empire_Rewritten.Windows
         {
             if (!CanPlaceHere(out List<string> reasons, playerEmpire))
             {
-                Messages.Message(new Message(string.Join("\n", reasons), MessageTypeDefOf.RejectInput));
+                Messages.Message(new Message((reasons.Count == 1) ? reasons[0] : "Empire_SPW_MultipleErrors".TranslateSimple(), MessageTypeDefOf.RejectInput));
 
                 return;
             }
