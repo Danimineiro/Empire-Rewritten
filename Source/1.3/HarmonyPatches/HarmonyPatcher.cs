@@ -3,6 +3,7 @@ using Empire_Rewritten.Utils;
 using HarmonyLib;
 using RimWorld;
 using RimWorld.Planet;
+using Verse;
 
 namespace Empire_Rewritten.HarmonyPatches
 {
@@ -24,6 +25,8 @@ namespace Empire_Rewritten.HarmonyPatches
 
             harmony.Patch(typeof(WorldInspectPane).GetProperty("TileInspectString", BindingFlags.NonPublic | BindingFlags.Instance)?.GetMethod, null,
                           new HarmonyMethod(typeof(TileInspectStringFaction), nameof(TileInspectStringFaction.AppendFactionToTileInspectString)));
+
+
 
             Logger.Log("Patches completed!");
         }

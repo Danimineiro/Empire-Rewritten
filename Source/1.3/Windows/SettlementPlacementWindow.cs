@@ -1,8 +1,13 @@
-﻿using Empire_Rewritten.Resources;
+﻿using Empire_Rewritten.Controllers;
+using Empire_Rewritten.Resources;
+using Empire_Rewritten.Settlements;
+using Empire_Rewritten.Territories;
 using Empire_Rewritten.Utils;
 using HarmonyLib;
 using RimWorld;
 using RimWorld.Planet;
+using RimWorld;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -173,7 +178,18 @@ namespace Empire_Rewritten.Windows
                 return;
             }
             //TODO: Check things inputs for validity here (name can't be empty)
+            Territory playerTerritory = TerritoryManager.GetTerritoryManager.GetTerritory(Faction.OfPlayer);
 
+            if (playerTerritory.Tiles.Contains(selectedWorldTile))
+            {
+
+                Empire playerEmpire = UpdateController.CurrentWorldInstance.FactionController.ReadOnlyFactionSettlementData.Find(x => !x.SettlementManager.IsAIPlayer).SettlementManager;
+                if (playerEmpire.StorageTracker.CanRemoveThingsFromStorage(Empire.SettlementCost))
+                {
+                    playerEmpire.StorageTracker.TryRemoveThingsFromStorage(Empire.SettlementCost);
+                    playerEmpire.BuildNewSettlementOnTile(Find.WorldGrid[selectedWorldTile]);
+                }
+            }
             Close();
         }
     }

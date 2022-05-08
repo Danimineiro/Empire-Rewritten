@@ -31,11 +31,13 @@ namespace Empire_Rewritten.Settlements
         public bool IsAIPlayer => isAIPlayer;
         public Faction Faction => faction;
 
+        public static readonly Dictionary<ThingDef, int> SettlementCost= new Dictionary<ThingDef, int>() { { ThingDefOf.WoodLog, 500 }, { ThingDefOf.Steel, 100 }, { ThingDefOf.ComponentIndustrial, 12 }, { ThingDefOf.Silver, 200 } };
+
         [UsedImplicitly]
         public Empire() { }
 
      
-        public Empire([NotNull] Faction faction, bool isAIPlayer)
+        public Empire([NotNull] Faction faction, bool isAIPlayer=true)
         {
             this.faction = faction ?? throw new ArgumentNullException(nameof(faction));
             this.isAIPlayer= isAIPlayer;

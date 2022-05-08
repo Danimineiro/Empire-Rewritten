@@ -95,7 +95,7 @@ namespace Empire_Rewritten.Controllers
         public void CreatePlayer()
         {
             Faction faction = Faction.OfPlayer;
-            FactionSettlementData factionSettlementData = new FactionSettlementData(faction, new Empire(faction, true));
+            FactionSettlementData factionSettlementData = new FactionSettlementData(faction, new Empire(faction, false));
             factionSettlementDataList.Add(factionSettlementData);
             // NOTE: Why is this unused?
             UserPlayer player = new UserPlayer(faction);

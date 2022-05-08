@@ -62,7 +62,7 @@ namespace Empire_Rewritten.Controllers
         /// <returns>A <see cref="List{T}" /> of the newly created <see cref="FactionSettlementData" /> instances</returns>
         internal static List<FactionSettlementData> CreateFactionSettlementData()
         {
-            return Find.FactionManager.AllFactionsListForReading.Select(faction => new FactionSettlementData(faction, new Empire(faction,!faction.IsPlayer))).ToList();
+            return Find.FactionManager.AllFactionsListForReading.Select(faction => new FactionSettlementData(faction, new Empire(faction))).ToList();
         }
 
         public override string ToString()
