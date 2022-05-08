@@ -16,23 +16,30 @@ namespace Empire_Rewritten.Windows
     {
         private readonly Dictionary<ResourceDef, ResourceModifier> tileMods = new Dictionary<ResourceDef, ResourceModifier>();
         private readonly Empire playerEmpire;
-        private readonly Rect rectBot;
-        private readonly Rect rectButtonApply;
-        private readonly Rect rectCostInner;
-        private readonly Rect rectCostLabel;
-        private readonly Rect rectCostOuter;
+
         private readonly Rect rectFull = new Rect(0f, 0f, 350f, 650f);
         private readonly Rect rectMain;
+        private readonly Rect rectTop;
         private readonly Rect rectMid;
-        private readonly Rect rectResourceInfoInner;
+        private readonly Rect rectBot;
+        private readonly Rect rectButtonApply;
+
+        private readonly Rect rectCostLabel;
+        private readonly Rect rectCostOuter;
+        private readonly Rect rectCostInner;
+
         private readonly Rect rectResourceInfoLabel;
         private readonly Rect rectResourceInfoOuter;
-        private readonly Rect rectTop;
+        private readonly Rect rectResourceInfoInner;
+
         private int selectedWorldTile = -1;
+        private Vector2 resourceScroll;
         private Vector2 costScroll;
 
         public SettlementPlacementWindow()
         {
+            playerEmpire = UpdateController.CurrentWorldInstance.FactionController.ReadOnlyFactionSettlementData.Find(x => !x.SettlementManager.IsAIPlayer).SettlementManager;
+
             doCloseX = true;
             onlyOneOfTypeAllowed = true;
             preventCameraMotion = false;
@@ -48,13 +55,11 @@ namespace Empire_Rewritten.Windows
 
             rectResourceInfoInner = rectResourceInfoOuter.GetInnerScrollRect(29f * DefDatabase<ResourceDef>.DefCount);
 
-            rectCostLabel = rectMid.TopPartPixels(25f).MoveRect(new Vector2(0f, rectResourceInfoLabel.height + rectResourceInfoOuter.height));
-            rectCostOuter = rectMid.BottomPartPixels(rectMid.height - rectCostLabel.yMax);
-            rectCostInner = rectCostOuter.GetInnerScrollRect(29f * 5);
+            rectCostLabel = rectMid.TopPartPixels(25f).MoveRect(new Vector2(0f, rectResourceInfoLabel.height + rectResourceInfoOuter.height + 5f));
+            rectCostOuter = rectMid.TopPartPixels(29f * 4).MoveRect(new Vector2(0f, rectResourceInfoLabel.yMax * 2f));
+            rectCostInner = rectCostOuter.GetInnerScrollRect(29f * Empire.SettlementCost.Count);
 
             CameraJumper.TryShowWorld();
-
-            playerEmpire = UpdateController.CurrentWorldInstance.FactionController.ReadOnlyFactionSettlementData.Find(x => !x.SettlementManager.IsAIPlayer).SettlementManager;
         }
 
         protected override float Margin => 0f;
@@ -75,9 +80,42 @@ namespace Empire_Rewritten.Windows
             DrawTop();
             DrawMiddle();
             DrawBottom();
+            DrawCostList();
+        }
 
-            Widgets.DrawBox(rectCostLabel);
+        private void DrawCostList()
+        {
+            Widgets.Label(rectCostLabel, "Empire_SPW_ColonyCost".Translate());
             Widgets.DrawBox(rectCostOuter);
+
+            Widgets.BeginScrollView(rectCostOuter, ref costScroll, rectCostInner);
+
+            int count = 0;
+            Rect rectFull = rectCostInner.TopPartPixels(29f);
+            foreach (KeyValuePair<ThingDef, int> kvp in Empire.SettlementCost)
+            {
+                ThingDef def = kvp.Key;
+
+                rectFull.DoRectHighlight(count % 2 == 1);
+                Rect rectIcon = new Rect(rectFull.x + 5f, rectFull.y + 2f, rectFull.height - 4f, rectFull.height - 4f);
+                Rect rectLabel = rectFull.MoveRect(new Vector2(rectFull.height + 5f, 0f));
+                Rect rectCostLabel = rectFull.LeftPartPixels(rectFull.width - rectFull.height);
+                Rect rectThingInfo = rectFull.RightPartPixels(rectFull.height).ContractedBy(4f);
+
+                Widgets.ThingIcon(rectIcon, def);
+                Widgets.Label(rectLabel, def.LabelCap);
+
+                Text.Anchor = TextAnchor.MiddleRight;
+                Widgets.Label(rectCostLabel, kvp.Value.ToString());
+                Text.Anchor = TextAnchor.UpperLeft;
+
+                Widgets.InfoCardButton(rectThingInfo, def);
+
+                rectFull = rectFull.MoveRect(new Vector2(0f, 29f));
+                count++;
+            }
+
+            Widgets.EndScrollView();
         }
 
         private void DrawMiddle()
@@ -90,7 +128,7 @@ namespace Empire_Rewritten.Windows
             Rect rectFull = rectResourceInfoInner.TopPartPixels(29f);
             Widgets.Label(rectResourceInfoLabel, "Empire_SPW_Modifiers".Translate());
             Widgets.DrawBox(rectResourceInfoOuter);
-            Widgets.BeginScrollView(rectResourceInfoOuter, ref costScroll, rectResourceInfoInner);
+            Widgets.BeginScrollView(rectResourceInfoOuter, ref resourceScroll, rectResourceInfoInner);
 
             int count = 0;
             foreach (KeyValuePair<ResourceDef, ResourceModifier> kvp in tileMods)
@@ -98,13 +136,22 @@ namespace Empire_Rewritten.Windows
                 ResourceDef def = kvp.Key;
 
                 rectFull.DoRectHighlight(count % 2 == 1);
-                Rect rectIcon = new Rect(rectFull.x + 5f, rectFull.y + 2f, rectFull.height - 4f, rectFull.height - 4f);
-                Rect rectLabel = rectFull.RightPartPixels(rectFull.width - rectIcon.xMax);
-                Rect rectModLabel = rectFull.RightPartPixels(50f);
+                Rect rectIcon = new Rect(rectFull.x + 5f, rectFull.y + 2f, rectFull.height - 4f, rectFull.height - 4f); 
+                Rect rectLabel = rectFull.MoveRect(new Vector2(rectFull.height + 5f, 0f));
+                Rect rectModLabel = rectFull.LeftPartPixels(rectFull.width - rectFull.height);
+                Rect rectThingInfo = rectFull.RightPartPixels(rectFull.height).ContractedBy(4f);
 
                 GUI.DrawTexture(rectIcon, ContentFinder<Texture2D>.Get(def.iconData.texPath));
                 Widgets.Label(rectLabel, def.LabelCap);
+
+                Text.Anchor = TextAnchor.MiddleRight;
                 Widgets.Label(rectModLabel, kvp.Value.multiplier.ToStringPercent());
+                Text.Anchor = TextAnchor.UpperLeft;
+
+                if (WindowHelper.InfoCardButtonWorker(rectThingInfo))
+                {
+                    Find.WindowStack.Add(new ResourceInfoWindow(def));
+                }
 
                 rectFull = rectFull.MoveRect(new Vector2(0f, 29f));
                 count++;
