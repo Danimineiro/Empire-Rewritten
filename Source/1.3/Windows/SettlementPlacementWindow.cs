@@ -1,4 +1,5 @@
-﻿using Empire_Rewritten.Controllers;
+﻿using System.Collections.Generic;
+using Empire_Rewritten.Controllers;
 using Empire_Rewritten.Resources;
 using Empire_Rewritten.Settlements;
 using Empire_Rewritten.Territories;
@@ -6,8 +7,6 @@ using Empire_Rewritten.Utils;
 using HarmonyLib;
 using RimWorld;
 using RimWorld.Planet;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using Verse;
 
@@ -15,34 +14,22 @@ namespace Empire_Rewritten.Windows
 {
     public class SettlementPlacementWindow : Window
     {
-        private readonly Rect rectFull = new Rect(0f, 0f, 350f, 650f);
-        private readonly Rect rectMain;
-        private readonly Rect rectTop;
-        private readonly Rect rectMid;
+        private readonly Dictionary<ResourceDef, ResourceModifier> tileMods = new Dictionary<ResourceDef, ResourceModifier>();
+        private readonly Empire playerEmpire;
         private readonly Rect rectBot;
         private readonly Rect rectButtonApply;
-        private readonly Rect rectResourceInfoLabel;
-        private readonly Rect rectResourceInfoOuter;
-        private readonly Rect rectResourceInfoInner;
+        private readonly Rect rectCostInner;
         private readonly Rect rectCostLabel;
         private readonly Rect rectCostOuter;
-        private readonly Rect rectCostInner;
-
-        private Dictionary<ResourceDef, ResourceModifier> tileMods = new Dictionary<ResourceDef, ResourceModifier>();
-        private Vector2 costScroll;
+        private readonly Rect rectFull = new Rect(0f, 0f, 350f, 650f);
+        private readonly Rect rectMain;
+        private readonly Rect rectMid;
+        private readonly Rect rectResourceInfoInner;
+        private readonly Rect rectResourceInfoLabel;
+        private readonly Rect rectResourceInfoOuter;
+        private readonly Rect rectTop;
         private int selectedWorldTile = -1;
-
-        private Empire playerEmpire;
-        protected override float Margin => 0f;
-
-        public override Vector2 InitialSize => rectFull.size;
-
-        protected override void SetInitialSizeAndPosition()
-        {
-            Vector2 initialSize = InitialSize;
-            windowRect = new Rect(UI.screenWidth - initialSize.x - 30f, (UI.screenHeight - initialSize.y) / 2f, initialSize.x, initialSize.y);
-            windowRect = windowRect.Rounded();
-        }
+        private Vector2 costScroll;
 
         public SettlementPlacementWindow()
         {
@@ -59,7 +46,7 @@ namespace Empire_Rewritten.Windows
             rectResourceInfoLabel = rectMid.TopPartPixels(25f);
             rectResourceInfoOuter = rectMid.TopPartPixels(29f * 4 /**Default ResourceDef.Count**/).MoveRect(new Vector2(0f, rectResourceInfoLabel.height));
 
-            rectResourceInfoInner = rectResourceInfoOuter.GetInnerScrollRect(29f * ResourceDef.AllResourceDefs.Count());
+            rectResourceInfoInner = rectResourceInfoOuter.GetInnerScrollRect(29f * DefDatabase<ResourceDef>.DefCount);
 
             rectCostLabel = rectMid.TopPartPixels(25f).MoveRect(new Vector2(0f, rectResourceInfoLabel.height + rectResourceInfoOuter.height));
             rectCostOuter = rectMid.BottomPartPixels(rectMid.height - rectCostLabel.yMax);
@@ -68,6 +55,17 @@ namespace Empire_Rewritten.Windows
             CameraJumper.TryShowWorld();
 
             playerEmpire = UpdateController.CurrentWorldInstance.FactionController.ReadOnlyFactionSettlementData.Find(x => !x.SettlementManager.IsAIPlayer).SettlementManager;
+        }
+
+        protected override float Margin => 0f;
+
+        public override Vector2 InitialSize => rectFull.size;
+
+        protected override void SetInitialSizeAndPosition()
+        {
+            Vector2 initialSize = InitialSize;
+            windowRect = new Rect(UI.screenWidth - initialSize.x - 30f, (UI.screenHeight - initialSize.y) / 2f, initialSize.x, initialSize.y);
+            windowRect = windowRect.Rounded();
         }
 
         public override void DoWindowContents(Rect inRect)
@@ -126,11 +124,11 @@ namespace Empire_Rewritten.Windows
 
         private void DrawBottom()
         {
-            bool canPlace = CanPlaceHere(out List<string> reasons,playerEmpire);
+            bool canPlace = CanPlaceHere(out List<string> reasons, playerEmpire);
 
             Widgets.DrawLineHorizontal(rectBot.x, rectBot.y, rectBot.width);
-            TooltipHandler.TipRegion(rectButtonApply, reasons.Join((newString) => newString, "\n"));
-            
+            TooltipHandler.TipRegion(rectButtonApply, reasons.Join(newString => newString, "\n"));
+
             if (!canPlace) GUI.color = new Color(1f, 0.4f, 0.4f);
             rectButtonApply.DrawButtonText("Empire_SPW_Apply".Translate(), ApplyAction);
             GUI.color = Color.white;
@@ -142,7 +140,7 @@ namespace Empire_Rewritten.Windows
             if (newTile == -1 || newTile == selectedWorldTile) return;
             selectedWorldTile = newTile;
 
-            foreach(ResourceDef def in ResourceDef.AllResourceDefs)
+            foreach (ResourceDef def in DefDatabase<ResourceDef>.AllDefsListForReading)
             {
                 tileMods.SetOrAdd(def, def.GetTileModifier(Find.WorldGrid.tiles[selectedWorldTile]));
             }
@@ -168,31 +166,33 @@ namespace Empire_Rewritten.Windows
                 reasons.Add("Empire_SPW_Water".Translate());
                 flag = false;
             }
+
             if (!playerEmpire.StorageTracker.CanRemoveThingsFromStorage(Empire.SettlementCost))
             {
                 reasons.Add("Empire_SPW_NoResources".Translate());
                 flag = false;
             }
+
             if (!territory.HasTile(selectedWorldTile))
             {
                 reasons.Add("Empire_SPW_TileNotInTerritory".Translate());
                 flag = false;
             }
+
             return flag;
         }
 
         public void ApplyAction()
         {
-
             if (!CanPlaceHere(out List<string> reasons, playerEmpire))
             {
-                Messages.Message(new Message(reasons.Join((newString) => newString, "\n"), MessageTypeDefOf.RejectInput));
+                Messages.Message(new Message(reasons.Join(newString => newString, "\n"), MessageTypeDefOf.RejectInput));
                 return;
             }
-         
+
             playerEmpire.StorageTracker.TryRemoveThingsFromStorage(Empire.SettlementCost);
             playerEmpire.BuildNewSettlementOnTile(Find.WorldGrid[selectedWorldTile]);
-            
+
             Close();
         }
     }
