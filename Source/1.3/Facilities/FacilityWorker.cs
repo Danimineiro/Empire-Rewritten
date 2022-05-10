@@ -23,7 +23,12 @@ namespace Empire_Rewritten.Facilities
 
         public virtual bool CanBuildAt(FacilityManager manager)
         {
-            return false;
+            return true;
+        }
+
+        public virtual bool CanBeBuiltBy(BasePlayer basePlayer)
+        {
+            return true;
         }
 
         public virtual void NotifyConstructed(Facility facility) { }

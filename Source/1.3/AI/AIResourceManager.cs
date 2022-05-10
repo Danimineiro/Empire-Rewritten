@@ -7,8 +7,6 @@ namespace Empire_Rewritten.AI
 {
     public class AIResourceManager : AIModule
     {
-        private static IEnumerable<ResourceDef> _cachedDefs;
-
         private readonly List<ResourceDef> criticalResources = new List<ResourceDef>();
         private readonly AIPlayer parentPlayer;
 
@@ -20,19 +18,6 @@ namespace Empire_Rewritten.AI
         public List<ResourceDef> ExcessResources { get; } = new List<ResourceDef>();
 
         public List<ResourceDef> LowResources { get; private set; } = new List<ResourceDef>();
-
-        private static IEnumerable<ResourceDef> AllResourceDefs
-        {
-            get
-            {
-                if (_cachedDefs.EnumerableNullOrEmpty())
-                {
-                    _cachedDefs = DefDatabase<ResourceDef>.AllDefsListForReading;
-                }
-
-                return _cachedDefs;
-            }
-        }
 
         public bool HasCriticalResource => criticalResources.Count > 0;
 
@@ -50,7 +35,7 @@ namespace Empire_Rewritten.AI
              Since producedKnown is only useful if the AI produces the def
             the calculation checks against all ResourceDefs in the database
              */
-            foreach (ResourceDef def in AllResourceDefs)
+            foreach (ResourceDef def in DefDatabase<ResourceDef>.AllDefsListForReading)
             {
                 if (producedKnown.ContainsKey(def))
                 {
@@ -83,7 +68,7 @@ namespace Empire_Rewritten.AI
                 bool first = true;
                 foreach (ResourceDef def in producedKnown.Keys)
                 {
-                    if (producedKnown[def] <= lowest || lowest == 0 && first)
+                    if (producedKnown[def] <= lowest || (lowest == 0 && first))
                     {
                         first = false;
                         lowest = producedKnown[def];
@@ -136,7 +121,7 @@ namespace Empire_Rewritten.AI
         {
             Dictionary<ResourceDef, ResourceModifier> modifiers = parentPlayer.Manager.ResourceModifiersFromAllFacilities();
             Dictionary<ResourceDef, float> result = new Dictionary<ResourceDef, float>();
-            foreach (ResourceDef def in AllResourceDefs)
+            foreach (ResourceDef def in DefDatabase<ResourceDef>.AllDefsListForReading)
             {
                 if (modifiers.ContainsKey(def))
                 {

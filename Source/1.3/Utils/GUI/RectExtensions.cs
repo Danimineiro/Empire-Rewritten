@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
@@ -33,6 +34,12 @@ namespace Empire_Rewritten.Utils
             return newRect;
         }
 
+        /// <summary>
+        ///     Devides a <see cref="Rect"/> <paramref name="rect"/> vertically into <see cref="int"/> <paramref name="times"/> amount of pieces
+        /// </summary>
+        /// <param name="rect">the initial <see cref="Rect"/> that is to be devided</param>
+        /// <param name="times">the amount of times it should be devided</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> with <paramref name="times"/> amount of pieces </returns>
         public static IEnumerable<Rect> DivideVertical(this Rect rect, int times)
         {
             for (int i = 0; i < times; i++)
@@ -41,6 +48,12 @@ namespace Empire_Rewritten.Utils
             }
         }
 
+        /// <summary>
+        ///     Devides a <see cref="Rect"/> <paramref name="rect"/> horizontally into <see cref="int"/> <paramref name="times"/> amount of pieces
+        /// </summary>
+        /// <param name="rect">the initial <see cref="Rect"/> that is to be devided</param>
+        /// <param name="times">the amount of times it should be devided</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> with <paramref name="times"/> amount of pieces </returns>
         public static IEnumerable<Rect> DivideHorizontal(this Rect rect, int times)
         {
             for (int i = 0; i < times; i++)
@@ -48,5 +61,65 @@ namespace Empire_Rewritten.Utils
                 yield return rect.LeftPartPixels(rect.width / times).MoveRect(new Vector2(rect.width / times * i, 0f));
             }
         }
+
+        /// <summary>
+        ///     Makes a text button that executes an <see cref="Action"/>
+        /// </summary>
+        /// <param name="rect">The <see cref="Rect"/> to draw the button in</param>
+        /// <param name="label">The label of the button</param>
+        /// <param name="action">The <see cref="Action"/> that is executed</param>
+        public static void DrawButtonText(this Rect rect, string label, Action action, bool disable = false)
+        {
+            if (disable) return;
+            if (Widgets.ButtonText(rect, label))
+            {
+                action();
+            }
+        }
+
+        /// <summary>
+        ///     Creates a inner rect for a scroll rect, using the outer rect as base.
+        ///     Decreases the inner rects width, if it is high enough for scroll bars to exist, by the width of scroll bars
+        /// </summary>
+        /// <param name="outerRect">the outer <see cref="Rect"/></param>
+        /// <param name="innerHeight">the height of the inner rect</param>
+        /// <returns></returns>
+        public static Rect GetInnerScrollRect(this Rect outerRect, float innerHeight) => new Rect(outerRect)
+        {
+            height = innerHeight,
+            width = outerRect.width - (innerHeight > outerRect.height ? 17f : 0f)
+        };
+
+        /// <summary>
+        ///     Draws a highlight into the selected rect, a light highlight if <paramref name="light"/> is true, dark otherwise
+        /// </summary>
+        /// <param name="rect">The rect the highlight is drawn in</param>
+        /// <param name="light">If the highlight is dark or light</param>
+        public static void DoRectHighlight(this Rect rect, bool light)
+        {
+            if (light)
+            {
+                Widgets.DrawLightHighlight(rect);
+            }
+            else
+            {
+                Widgets.DrawHighlight(rect);
+            }
+        }
+
+        /// <summary>
+        ///     Changes the <see cref="Rect"/> <paramref name="rect"/>s x and width to the x and width of the <see cref="Rect"/> <paramref name="other"/>
+        /// </summary>
+        /// <param name="rect">The <see cref="Rect"/> to be changed</param>
+        /// <param name="other">The <see cref="Rect"/> that has the variables to change to</param>
+        /// <returns></returns>
+        public static Rect AlignXWith(this Rect rect, Rect other) => new Rect(other.x, rect.y, other.width, rect.height);
+
+        /// <summary>
+        ///     Flips a <see cref="Rect"/> <paramref name="rect"/> horizontally
+        /// </summary>
+        /// <param name="rect">the rect to be flipped</param>
+        /// <returns>A flipped rect</returns>
+        public static Rect FlipHorizontal(this Rect rect) => new Rect(rect.x + rect.width, rect.y, rect.width * -1, rect.height);
     }
 }

@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Empire_Rewritten.AI;
 using Empire_Rewritten.Controllers.CivicEthic;
+using Empire_Rewritten.Events;
 using Empire_Rewritten.Player;
 using Empire_Rewritten.Settlements;
 using Empire_Rewritten.Territories;
+using Empire_Rewritten.Utils;
 using JetBrains.Annotations;
 using RimWorld;
 using RimWorld.Planet;
@@ -19,10 +21,16 @@ namespace Empire_Rewritten.Controllers
     /// </summary>
     public class FactionController : IExposable
     {
+        public const int daysPerTurn = 15;
+ 
         private readonly Dictionary<Faction, AIPlayer> AIFactions = new Dictionary<Faction, AIPlayer>();
         private readonly List<FactionCivicAndEthicData> factionCivicAndEthicDataList = new List<FactionCivicAndEthicData>();
         private List<FactionSettlementData> factionSettlementDataList = new List<FactionSettlementData>();
+        private TerritoryManager territoryManager = new TerritoryManager();
+        private Faction playerFaction;
+        private EventManager eventManager = new EventManager();
 
+        public List<FactionSettlementData> ReadOnlyFactionSettlementData => factionSettlementDataList;
         /// <summary>
         ///     Needed for loading
         /// </summary>
@@ -40,11 +48,11 @@ namespace Empire_Rewritten.Controllers
         public FactionController(List<FactionSettlementData> factionSettlementDataList)
         {
             ShouldRefreshTerritories = true;
-            TerritoryManager = new TerritoryManager();
+            territoryManager = new TerritoryManager();
             this.factionSettlementDataList = factionSettlementDataList;
         }
 
-        public TerritoryManager TerritoryManager { get; } = new TerritoryManager();
+        public TerritoryManager TerritoryManager => territoryManager;
 
         /// <summary>
         ///     Meant for things that cache the territories to check.
@@ -54,6 +62,9 @@ namespace Empire_Rewritten.Controllers
         public void ExposeData()
         {
             Scribe_Collections.Look(ref factionSettlementDataList, "factionSettlementDataList");
+            Scribe_Deep.Look(ref territoryManager, "territoryManager");
+            Scribe_References.Look(ref playerFaction, nameof(playerFaction));
+            Scribe_Deep.Look(ref eventManager, nameof(eventManager));
         }
 
         /// <param name="faction"></param>
@@ -85,26 +96,15 @@ namespace Empire_Rewritten.Controllers
         public void CreatePlayer()
         {
             Faction faction = Faction.OfPlayer;
-            FactionSettlementData factionSettlementData = new FactionSettlementData(faction, new Empire(faction));
+            FactionSettlementData factionSettlementData = new FactionSettlementData(faction, new Empire(faction, false));
             factionSettlementDataList.Add(factionSettlementData);
             UserPlayer player = new UserPlayer(faction);
+            IEnumerable<WorldObject> settlements = Find.WorldObjects.Settlements.Where(x => x.Faction == faction);
+            TerritoryManager.GetTerritory(faction).SettlementClaimTiles((Settlement)settlements.First());
 
-            IEnumerable<Settlement> settlements = Find.WorldObjects.Settlements.Where(x => x.Faction == faction);
-
-            bool first = true;
-            foreach (Settlement settlement in settlements)
-            {
-                if (first)
-                {
-                    first = false;
-                    player.Manager.AddSettlement(settlement);
-                    TerritoryManager.GetTerritory(faction).SettlementClaimTiles(settlement);
-                }
-                else
-                {
-                    settlement.Destroy();
-                }
-            }
+            //Generate a player faction
+            if (playerFaction == null)
+                playerFaction = PlayerFactionGenerator.GeneratePlayerFaction();
         }
 
         public void CreateNewAIPlayer(Faction faction)
