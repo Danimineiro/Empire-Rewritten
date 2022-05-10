@@ -68,8 +68,9 @@ namespace Empire_Rewritten.Utils
         /// <param name="rect">The <see cref="Rect"/> to draw the button in</param>
         /// <param name="label">The label of the button</param>
         /// <param name="action">The <see cref="Action"/> that is executed</param>
-        public static void DrawButtonText(this Rect rect, string label, Action action)
+        public static void DrawButtonText(this Rect rect, string label, Action action, bool disable = false)
         {
+            if (disable) return;
             if (Widgets.ButtonText(rect, label))
             {
                 action();
@@ -105,5 +106,20 @@ namespace Empire_Rewritten.Utils
                 Widgets.DrawHighlight(rect);
             }
         }
+
+        /// <summary>
+        ///     Changes the <see cref="Rect"/> <paramref name="rect"/>s x and width to the x and width of the <see cref="Rect"/> <paramref name="other"/>
+        /// </summary>
+        /// <param name="rect">The <see cref="Rect"/> to be changed</param>
+        /// <param name="other">The <see cref="Rect"/> that has the variables to change to</param>
+        /// <returns></returns>
+        public static Rect AlignXWith(this Rect rect, Rect other) => new Rect(other.x, rect.y, other.width, rect.height);
+
+        /// <summary>
+        ///     Flips a <see cref="Rect"/> <paramref name="rect"/> horizontally
+        /// </summary>
+        /// <param name="rect">the rect to be flipped</param>
+        /// <returns>A flipped rect</returns>
+        public static Rect FlipHorizontal(this Rect rect) => new Rect(rect.x + rect.width, rect.y, rect.width * -1, rect.height);
     }
 }
