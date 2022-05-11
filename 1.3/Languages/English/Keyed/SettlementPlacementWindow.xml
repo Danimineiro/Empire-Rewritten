@@ -8,6 +8,7 @@
 	<Empire_SPW_TileOutOfRange>The selected tile is out of range!</Empire_SPW_TileOutOfRange>
 	<Empire_SPW_TileNotInTerritory>The selected tile is outside of your territory!</Empire_SPW_TileNotInTerritory>
 	<Empire_SPW_NoResources>You cannot afford to build a settlement!</Empire_SPW_NoResources>
+	<Empire_SPW_TileAlreadySettled>The selected tile is already settled!</Empire_SPW_TileAlreadySettled>
 	<Empire_SPW_ColonyCost>Colony cost:</Empire_SPW_ColonyCost>
 	<Empire_SPW_MultipleErrors>There are multiple reasons as to why you can't place a colony here. Hover over the "Settle" button to see them all.</Empire_SPW_MultipleErrors>
 </LanguageData>
