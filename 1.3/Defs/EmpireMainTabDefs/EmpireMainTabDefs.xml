@@ -11,18 +11,18 @@
 	<!-- ~~~~~~~~~~~ Actual Tabs ~~~~~~~~~~~ -->
 
 	<Empire_Rewritten.Windows.MainTabWindowTabs.MainTabWindowTabDef>
-		<defName>Main</defName>
+		<defName>empire_mainTab</defName>
 		<tabClass>Empire_Rewritten.Windows.MainTabWindowTabs.OverviewTab</tabClass>
-		<label>Empire_TabName_Main</label>
-		<description>Overview over all the empire stuff plz change this string later</description>
+		<label>overview</label>
+		<description>The overview window</description>
 		<order>0</order>
 	</Empire_Rewritten.Windows.MainTabWindowTabs.MainTabWindowTabDef>
 
 	<Empire_Rewritten.Windows.MainTabWindowTabs.MainTabWindowTabDef>
 		<defName>Storage</defName>
 		<tabClass>Empire_Rewritten.Windows.MainTabWindowTabs.StorageTab</tabClass>
-		<label>Empire_TabName_Storage</label>
-		<description>Check your Empire's currently stored materials this string is also WIP</description>
+		<label>storage</label>
+		<description>List of items stored in your empire</description>
 		<order>1</order>
 	</Empire_Rewritten.Windows.MainTabWindowTabs.MainTabWindowTabDef>
 </Defs>
