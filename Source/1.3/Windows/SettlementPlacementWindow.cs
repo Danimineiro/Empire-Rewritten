@@ -136,7 +136,7 @@ namespace Empire_Rewritten.Windows
                 ResourceDef def = kvp.Key;
 
                 rectFull.DoRectHighlight(count % 2 == 1);
-                Rect rectIcon = new Rect(rectFull.x + 5f, rectFull.y + 2f, rectFull.height - 4f, rectFull.height - 4f); 
+                Rect rectIcon = new Rect(rectFull.x + 5f, rectFull.y + 2f, rectFull.height - 4f, rectFull.height - 4f);
                 Rect rectLabel = rectFull.MoveRect(new Vector2(rectFull.height + 5f, 0f));
                 Rect rectModLabel = rectFull.LeftPartPixels(rectFull.width - rectFull.height);
                 Rect rectThingInfo = rectFull.RightPartPixels(rectFull.height).ContractedBy(4f);
@@ -223,6 +223,12 @@ namespace Empire_Rewritten.Windows
             if (!territory.HasTile(selectedWorldTile))
             {
                 reasons.Add("Empire_SPW_TileNotInTerritory".Translate());
+                flag = false;
+            }
+
+            if (Find.WorldObjects.AnySettlementBaseAtOrAdjacent(selectedWorldTile))
+            {
+                reasons.Add("FactionBaseAdjacent".Translate());
                 flag = false;
             }
 
