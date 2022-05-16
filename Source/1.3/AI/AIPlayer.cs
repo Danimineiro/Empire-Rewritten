@@ -62,11 +62,11 @@ namespace Empire_Rewritten.AI
             ResourceManager.DoResourceCalculations();
             TileManager.CalculateAllUnknownTiles();
 
-            aiDecisionWorker(out BasePlayer player).MakeDecision(this, player);
+            AiDecisionWorker(out BasePlayer player).MakeDecision(this, player);
             
         }
 
-        public AiDecisionWorker aiDecisionWorker(out BasePlayer player)
+        public AiDecisionWorker AiDecisionWorker(out BasePlayer player)
         {
             player = null;
             Random weightRand = new Random();
