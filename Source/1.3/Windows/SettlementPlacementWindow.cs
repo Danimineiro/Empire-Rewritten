@@ -228,7 +228,7 @@ namespace Empire_Rewritten.Windows
 
             if (Find.WorldObjects.Settlements.Any(settlement => settlement != null && Find.WorldGrid.IsNeighborOrSame(selectedWorldTile, settlement.Tile)))
             {
-                reasons.Add("Empire_SPW_TileAlreadySettled".Translate());
+                reasons.Add("FactionBaseAdjacent".Translate());
                 flag = false;
             }
 
