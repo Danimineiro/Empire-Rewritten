@@ -65,7 +65,7 @@ namespace Empire_Rewritten.Territories
             }
         }
 
-        public void SettlementClaimTiles(Settlement settlement)
+        public void SettlementClaimTiles([NotNull] Settlement settlement)
         {
             // This could cause a race condition where two Empires claim the same Tile
             Task.Run(() => ClaimTiles(GetSurroundingTiles(settlement.Tile, (int)(faction.def.techLevel + 1))));

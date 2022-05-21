@@ -53,12 +53,25 @@ namespace Empire_Rewritten.Utils
         /// </summary>
         /// <param name="rect">the initial <see cref="Rect"/> that is to be devided</param>
         /// <param name="times">the amount of times it should be devided</param>
+        /// <param name="margin"></param>
         /// <returns>An <see cref="IEnumerable{T}"/> with <paramref name="times"/> amount of pieces </returns>
-        public static IEnumerable<Rect> DivideHorizontal(this Rect rect, int times)
+        public static IEnumerable<Rect> DivideHorizontal(this Rect rect, int times, float margin = 0)
         {
             for (int i = 0; i < times; i++)
             {
-                yield return rect.LeftPartPixels(rect.width / times).MoveRect(new Vector2(rect.width / times * i, 0f));
+                Rect returnRect = rect.LeftPartPixels(rect.width / times).MoveRect(new Vector2(rect.width / times * i, 0f));
+
+                if (i != times)
+                {
+                    returnRect.width -= (float) Math.Floor(margin / 2f);
+                }
+
+                if (i != 0)
+                {
+                    returnRect.x += (float) Math.Ceiling(margin / 2f);
+                }
+
+                yield return returnRect;
             }
         }
 

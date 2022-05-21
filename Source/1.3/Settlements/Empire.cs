@@ -50,7 +50,7 @@ namespace Empire_Rewritten.Settlements
         public Dictionary<Settlement, FacilityManager> Settlements => settlements;
         public List<int> SettlementTiles { get; } = new List<int>();
 
-        private Territory Territory
+        public Territory Territory
         {
             get
             {

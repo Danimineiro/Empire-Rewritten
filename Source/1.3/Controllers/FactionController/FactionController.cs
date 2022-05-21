@@ -69,6 +69,7 @@ namespace Empire_Rewritten.Controllers
 
         /// <param name="faction"></param>
         /// <returns>The <see cref="Empire" /> owned by a given <paramref name="faction" /></returns>
+        [Pure]
         public Empire GetOwnedSettlementManager(Faction faction)
         {
             foreach (FactionSettlementData factionSettlementData in factionSettlementDataList)
@@ -97,7 +98,6 @@ namespace Empire_Rewritten.Controllers
             Faction faction = Faction.OfPlayer;
             FactionSettlementData factionSettlementData = new FactionSettlementData(faction, new Empire(faction, false));
             factionSettlementDataList.Add(factionSettlementData);
-            // NOTE: Why is this unused?
             UserPlayer player = new UserPlayer(faction);
             IEnumerable<WorldObject> settlements = Find.WorldObjects.Settlements.Where(x => x.Faction == faction);
             TerritoryManager.GetTerritory(faction).SettlementClaimTiles((Settlement)settlements.First());
@@ -113,20 +113,20 @@ namespace Empire_Rewritten.Controllers
             AIFactions.Add(faction, aiPlayer);
 
             //Find preexisting settlements.
-            List<Settlement> settlements = Find.WorldObjects.Settlements.Where(x => x.Faction == faction).ToList();
-            if (settlements.Any())
+            IEnumerable<Settlement> settlements = Find.WorldObjects.Settlements.Where(x => x.Faction == faction);
+
+            bool first = true;
+            foreach (Settlement settlement in settlements)
             {
-                if (settlements[0] is null)
+                if (first)
                 {
-                    Logger.Error(nameof(settlements) + " has null-entry");
+                    first = false;
+                    aiPlayer.Manager.AddSettlement(settlement);
+                    TerritoryManager.GetTerritory(faction).SettlementClaimTiles(settlement);
                 }
-
-                aiPlayer.Manager.AddSettlement(settlements[0]);
-                settlements.RemoveAt(0);
-
-                foreach (Settlement item in settlements)
+                else
                 {
-                    item.Destroy();
+                    settlement.Destroy();
                 }
             }
         }

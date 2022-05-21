@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+	<!-- ~~~~~~~~~~~ MainButtonDef that doesn't deserve its own file ~~~~~~~~~~~ -->
+	<MainButtonDef>
+		<defName>Empire</defName>
+		<label>empire</label>
+		<tabWindowClass>Empire_Rewritten.Windows.EmpireMainTabWindow</tabWindowClass>
+		<order>1000</order>
+	</MainButtonDef>
+
+	<!-- ~~~~~~~~~~~ Actual Tabs ~~~~~~~~~~~ -->
+
+	<Empire_Rewritten.Windows.MainTabWindowTabs.MainTabWindowTabDef>
+		<defName>empire_mainTab</defName>
+		<tabClass>Empire_Rewritten.Windows.MainTabWindowTabs.OverviewTab</tabClass>
+		<label>overview</label>
+		<description>The overview window</description>
+		<order>0</order>
+	</Empire_Rewritten.Windows.MainTabWindowTabs.MainTabWindowTabDef>
+
+	<Empire_Rewritten.Windows.MainTabWindowTabs.MainTabWindowTabDef>
+		<defName>storage</defName>
+		<tabClass>Empire_Rewritten.Windows.MainTabWindowTabs.StorageTab</tabClass>
+		<label>storage</label>
+		<description>List of items stored in your empire</description>
+		<order>1</order>
+	</Empire_Rewritten.Windows.MainTabWindowTabs.MainTabWindowTabDef>
+	
+	<Empire_Rewritten.Windows.MainTabWindowTabs.MainTabWindowTabDef>
+		<defName>settlements</defName>
+		<tabClass>Empire_Rewritten.Windows.MainTabWindowTabs.SettlementTab</tabClass>
+		<label>settlements</label>
+		<description>Settlement management</description>
+		<order>2</order>
+	</Empire_Rewritten.Windows.MainTabWindowTabs.MainTabWindowTabDef>
+</Defs>
