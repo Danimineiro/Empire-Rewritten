@@ -19,10 +19,18 @@
 	</Empire_Rewritten.Windows.MainTabWindowTabs.MainTabWindowTabDef>
 
 	<Empire_Rewritten.Windows.MainTabWindowTabs.MainTabWindowTabDef>
-		<defName>Storage</defName>
+		<defName>storage</defName>
 		<tabClass>Empire_Rewritten.Windows.MainTabWindowTabs.StorageTab</tabClass>
 		<label>storage</label>
 		<description>List of items stored in your empire</description>
 		<order>1</order>
+	</Empire_Rewritten.Windows.MainTabWindowTabs.MainTabWindowTabDef>
+	
+	<Empire_Rewritten.Windows.MainTabWindowTabs.MainTabWindowTabDef>
+		<defName>settlements</defName>
+		<tabClass>Empire_Rewritten.Windows.MainTabWindowTabs.SettlementTab</tabClass>
+		<label>settlements</label>
+		<description>Settlement management</description>
+		<order>2</order>
 	</Empire_Rewritten.Windows.MainTabWindowTabs.MainTabWindowTabDef>
 </Defs>

@@ -12,9 +12,10 @@ namespace Empire_Rewritten.Windows
     [UsedImplicitly]
     public class EmpireMainTabWindow : MainTabWindow
     {
-        private readonly Rect rectFull = new Rect(0f, 0f, 350f, 500f);
+        private static readonly Rect rectFull = new Rect(0f, 0f, 350f, 500f);
         private readonly Rect rectMain;
         private readonly Rect rectMenuBar;
+        private readonly Rect rectTabSpace;
         private readonly Rect[] rectMenuList;
 
         private readonly List<MainTabWindowTabDef> sortedTabs;
@@ -32,8 +33,11 @@ namespace Empire_Rewritten.Windows
 
             rectMain = rectFull.ContractedBy(margin);
             rectMenuBar = rectMain.TopPartPixels(buttonHeight);
+            rectTabSpace = rectMain.BottomPartPixels(rectMain.height - buttonHeight);
             rectMenuList = rectMenuBar.DivideHorizontal(sortedTabs.Count, 5f).ToArray();
         }
+
+        public static Rect RectTabSpace => rectFull.ContractedBy(margin).BottomPartPixels(rectFull.ContractedBy(margin).height - buttonHeight);
 
         protected override float Margin => 0f;
 
@@ -57,11 +61,8 @@ namespace Empire_Rewritten.Windows
                 Widgets.DrawHighlightIfMouseover(tempRect);
             }
 
-            Rect tabRect = inRect.ContractedBy(margin);
-            tabRect.yMin += buttonHeight;
-
             WindowHelper.ResetTextAndColor();
-            selectedTab?.Draw(tabRect);
+            selectedTab?.Draw(rectTabSpace);
         }
     }
 }
