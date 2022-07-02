@@ -145,6 +145,30 @@ namespace Empire_Rewritten.Settlements
         }
 
         /// <summary>
+        ///     Checks if it can remove the given <paramref name="settlement"/> of Type <see cref="Settlement"/>, and removes it if able
+        /// </summary>
+        /// <param name="settlement"></param>
+        /// <returns>True, if it could successfully remove the settlement, and false otherwise</returns>
+        public bool RemoveSettlement(Settlement settlement)
+        {
+            if (settlement is null)
+            {
+                $"Tried to remove a null settlement from an Empire!".ErrorOnce();
+                return false;
+            }
+
+            if (!settlements.ContainsKey(settlement))
+            {
+                $"Tried to remove Settlement of name: {settlement.LabelCap} from the Empire belonging to Faction with name: {faction.Name}, but Settlement does not belong to the Empire!".ErrorOnce();
+                return false;
+            }
+
+            settlements.Remove(settlement);
+
+            return true;
+        }
+
+        /// <summary>
         ///     Add a <see cref="Settlement" /> to the <see cref="Empire" />.
         /// </summary>
         /// <param name="settlement">The <see cref="Settlement" /> to add</param>
