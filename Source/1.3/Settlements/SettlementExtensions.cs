@@ -2,6 +2,8 @@
 using System.Linq;
 using Empire_Rewritten.Controllers;
 using Empire_Rewritten.Facilities;
+using Empire_Rewritten.Utils;
+using Empire_Rewritten.Windows;
 using RimWorld;
 using RimWorld.Planet;
 using Verse;
@@ -20,6 +22,22 @@ namespace Empire_Rewritten.Settlements
             return UpdateController.CurrentWorldInstance.FactionController.GetOwnedSettlementManager(settlement.Faction);
         }
 
+        public static bool IsPlayerOperatedEmpireSettlement(this Settlement settlement)
+        {
+            List<FactionSettlementData> data = UpdateController.CurrentWorldInstance.FactionController.ReadOnlyFactionSettlementData;
+            return data.Any(element => element.SettlementManager.Faction == settlement.Faction && element.SettlementManager.Settlements.ContainsKey(settlement));
+        }
+
+        /// <summary>
+        ///     Shortcut for <see cref="GetManager(Settlement)"/> + <see cref="Empire.GetFacilityManager(Settlement)"/>
+        /// </summary>
+        /// <param name="settlement"></param>
+        /// <returns></returns>
+        public static FacilityManager GetFacilityManager (this Settlement settlement)
+        {
+            return settlement.GetManager().GetFacilityManager(settlement);
+        }
+
         /// <summary>
         ///     Gets all <see cref="Gizmo">Gizmos</see> provided by <see cref="Facility">Facilities</see> of a given
         ///     <see cref="Settlement" />.
@@ -28,7 +46,17 @@ namespace Empire_Rewritten.Settlements
         /// <returns>The <see cref="Gizmo">Gizmos</see> of <paramref name="settlement" /></returns>
         public static IEnumerable<Gizmo> GetExtendedGizmos(this Settlement settlement)
         {
-            return settlement.Faction == Faction.OfPlayer ? GetManager(settlement).GetFacilityManager(settlement).GetGizmos() : Enumerable.Empty<Gizmo>();
+            if (settlement.Faction == Faction.OfPlayer)
+            {
+                yield return SettlementInfoWindow.GetConnectionGizmo(settlement);
+
+                foreach (Gizmo gizmo in settlement.GetFacilityManager().GetGizmos())
+                {
+                    yield return gizmo;
+                }
+            }
+
+            yield break;
         }
     }
 }
