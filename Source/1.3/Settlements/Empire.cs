@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Empire_Rewritten.Controllers;
 using Empire_Rewritten.Facilities;
 using Empire_Rewritten.Resources;
 using Empire_Rewritten.Territories;
@@ -45,6 +46,8 @@ namespace Empire_Rewritten.Settlements
 
         public bool IsAIPlayer => isAIPlayer;
         public Faction Faction => faction;
+
+        public static Empire PlayerEmpire => UpdateController.CurrentWorldInstance.FactionController.ReadOnlyFactionSettlementData.Find(x => !x.SettlementManager.IsAIPlayer).SettlementManager;
 
         public StorageTracker StorageTracker => storageTracker;
         public Dictionary<Settlement, FacilityManager> Settlements => settlements;
@@ -164,7 +167,6 @@ namespace Empire_Rewritten.Settlements
             }
 
             settlements.Remove(settlement);
-
             return true;
         }
 
