@@ -3,6 +3,7 @@ using System.Linq;
 using Empire_Rewritten.Resources;
 using JetBrains.Annotations;
 using RimWorld.Planet;
+using UnityEngine;
 using Verse;
 
 namespace Empire_Rewritten.Facilities
@@ -52,9 +53,14 @@ namespace Empire_Rewritten.Facilities
         /// </summary>
         public IEnumerable<FacilityDef> FacilityDefsInstalled => installedFacilities.Keys;
 
-        public bool IsFullyUpgraded => stage >= 10;
+        public bool IsFullyUpgraded => stage >= 12;
 
         public int MaxFacilities => stage;
+
+        public void ModifyStageBy(int amount)
+        {
+            stage = Mathf.Clamp(stage + amount, 1, 12);
+        }
 
         public int FacilityCount
         {
@@ -62,13 +68,7 @@ namespace Empire_Rewritten.Facilities
             {
                 if (refreshFacilityCount)
                 {
-                    int count = 0;
-                    foreach (Facility facility in installedFacilities.Values)
-                    {
-                        count += facility.Amount;
-                    }
-
-                    facilityCount = count;
+                    facilityCount = installedFacilities.Sum((kvp) => kvp.Value.Amount);
                 }
 
                 return facilityCount;
@@ -183,6 +183,18 @@ namespace Empire_Rewritten.Facilities
         public bool HasFacility(FacilityDef facilityDef)
         {
             return installedFacilities.ContainsKey(facilityDef);
+        }
+
+        /// <summary>
+        ///     Checks whether this <see cref="FacilityManager" /> has a <see cref="Facility" /> of a given
+        ///     <see cref="FacilityDef" />
+        /// </summary>
+        /// <param name="facilityDef">The <see cref="FacilityDef" /> to check for</param>
+        /// <returns>How many of <paramref name="facilityDef"/> are installed in this <see cref="FacilityManager"/></returns>
+        public int HasFacilityAmount(FacilityDef facilityDef)
+        {
+            if (installedFacilities.TryGetValue(facilityDef, out Facility facility)) return facility.Amount;
+            return 0;
         }
     }
 }
