@@ -38,7 +38,7 @@ namespace Empire_Rewritten.Windows
 
         public SettlementPlacementWindow()
         {
-            playerEmpire = UpdateController.CurrentWorldInstance.FactionController.ReadOnlyFactionSettlementData.Find(x => !x.SettlementManager.IsAIPlayer).SettlementManager;
+            playerEmpire = Empire.PlayerEmpire;
 
             doCloseX = true;
             onlyOneOfTypeAllowed = true;
