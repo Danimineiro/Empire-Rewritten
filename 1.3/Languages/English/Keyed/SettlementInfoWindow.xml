@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+	<Empire_SIW_OpenOverviewLabel>Open the settlement overview</Empire_SIW_OpenOverviewLabel>
+	<Empire_SIW_OpenOverviewDesc>Here you can see everything about your settlement! Facilities, workers and local decisions are made here.</Empire_SIW_OpenOverviewDesc>
+	<Empire_SIW_Apply>Click to apply</Empire_SIW_Apply>
+	<Empire_SIW_AbandonSettlement>Abandon Settlement</Empire_SIW_AbandonSettlement>
+	<Empire_SIW_MoreActions>More actions...</Empire_SIW_MoreActions>
+	<Empire_SIW_BuildingsLabel>Buildings</Empire_SIW_BuildingsLabel>
+	<Empire_SIW_SlotLocked>This slot is currently locked! Upgrade your settlement to unlock it.</Empire_SIW_SlotLocked>
+	<Empire_SIW_Upgrade>Upgrade settlement</Empire_SIW_Upgrade>
+</LanguageData>
+
