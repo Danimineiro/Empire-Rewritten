@@ -48,7 +48,7 @@ namespace Empire_Rewritten.Settlements
         {
             if (settlement.Faction == Faction.OfPlayer)
             {
-                yield return SettlementInfoWindow.GetConnectionGizmo(settlement);
+                yield return SettlementInfoWindow.OpenOverviewGizmo(settlement);
 
                 foreach (Gizmo gizmo in settlement.GetFacilityManager().GetGizmos())
                 {

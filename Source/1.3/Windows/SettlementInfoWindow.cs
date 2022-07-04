@@ -322,7 +322,7 @@ namespace Empire_Rewritten.Windows
         /// <summary>
         ///     The gizmo you see when you click on the settlement of a player empire
         /// </summary>
-        public static Gizmo GetConnectionGizmo(Settlement settlement)
+        public static Gizmo OpenOverviewGizmo(Settlement settlement)
         {
             Command_Action command_Action = new Command_Action()
             {
