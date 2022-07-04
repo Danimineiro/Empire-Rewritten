@@ -89,9 +89,32 @@ namespace Empire_Rewritten.Facilities
         /// <returns>The <see cref="FacilityBuildProcess"/> as <see cref="Process"/> that builds in the given <paramref name="slotID"/></returns>
         public Process GetProcessWithSlotID(int slotID)
         {
-            int pos = processes.FirstIndexOf((p) => p is FacilityBuildProcess buildProcess && buildProcess.SlotID == slotID);
+            int pos = processes.FirstIndexOf((p) => p is ISlotID slotIDProcess && slotIDProcess.SlotID == slotID);
             if(pos == -1) return null;
             return processes[pos];
+        }
+
+        /// <summary>
+        ///     Ends a process early
+        /// </summary>
+        /// <param name="process"></param>
+        public void CancelProcess(Process process)
+        {
+            if (process == null) return;
+
+            process.Cancel();
+            int index = processes.IndexOf(process);
+            processes.Remove(process);
+
+            for (int j = index; j < processes.Count; j++)
+            {
+                if (processes[j] is ISlotID slotIDProcess)
+                {
+                    slotIDProcess.SlotID--;
+                }
+            }
+
+            NotifyProcessesChanged();
         }
 
         public void NotifyProcessesChanged()
@@ -100,6 +123,11 @@ namespace Empire_Rewritten.Facilities
             if (processes.Count > 0)
             {
                 processes[0].Suspended = false;
+            }
+
+            if (Find.WindowStack.IsOpen<Windows.SettlementInfoWindow>())
+            {
+                Find.WindowStack.WindowOfType<Windows.SettlementInfoWindow>().RecalculateScrollWidgets();
             }
         }
 
@@ -160,6 +188,7 @@ namespace Empire_Rewritten.Facilities
         public bool CanBuildNewFacilities => (FacilityCount + NumberOfFacilitiesBeingBuild) < MaxFacilities;
 
         public Settlement Settlement { get => settlement; set => settlement = value; }
+        public List<Process> Processes => processes;
 
         public void ExposeData()
         {
@@ -237,7 +266,7 @@ namespace Empire_Rewritten.Facilities
                 return;
             }
 
-            processes.Add(new FacilityBuildProcess("Empire_FM_BuildingLabel".Translate(facilityDef.LabelCap), "Empire_FM_BuildingToolTip".Translate(), facilityDef.buildDuration, this, facilityDef, FirstOpenSlotID));
+            processes.Add(new FacilityBuildProcess(facilityDef.LabelCap, "Empire_FM_BuildingToolTip".Translate(facilityDef.LabelCap), facilityDef.buildDuration, facilityDef.iconData.texPath, this, facilityDef, FirstOpenSlotID));
             NotifyProcessesChanged();
             //if (installedFacilities.ContainsKey(facilityDef))
             //{
@@ -259,9 +288,9 @@ namespace Empire_Rewritten.Facilities
         {
             foreach (Process process in processes)
             {
-                if (process is FacilityBuildProcess buildProcess)
+                if (process is ISlotID slotIDProcess)
                 {
-                    buildProcess.SlotID--;
+                    slotIDProcess.SlotID--;
                 }
             }
 

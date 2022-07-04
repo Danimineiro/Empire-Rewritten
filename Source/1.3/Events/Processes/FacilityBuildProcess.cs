@@ -8,7 +8,7 @@ using Verse;
 
 namespace Empire_Rewritten.Events.Processes
 {
-    internal class FacilityBuildProcess : Process
+    internal class FacilityBuildProcess : Process, ISlotID
     {
         private FacilityManager facilityManager;
         private FacilityDef facilityDef;
@@ -16,7 +16,7 @@ namespace Empire_Rewritten.Events.Processes
 
         public FacilityBuildProcess() { }
 
-        public FacilityBuildProcess(string label, string toolTip, int duration, FacilityManager facilityManager, FacilityDef facilityDef, int slotID) : base(label, toolTip, duration) 
+        public FacilityBuildProcess(string label, string toolTip, int duration, string iconPath, FacilityManager facilityManager, FacilityDef facilityDef, int slotID) : base(label, toolTip, duration, iconPath) 
         { 
             this.facilityManager = facilityManager; 
             this.facilityDef = facilityDef;
@@ -26,6 +26,11 @@ namespace Empire_Rewritten.Events.Processes
         protected override object[] Parms => new object[] { facilityDef, facilityManager };
 
         public int SlotID { get => slotID; set => slotID = value; }
+
+        public override void Cancel()
+        {
+            base.Cancel();
+        }
 
         protected override void Run()
         {

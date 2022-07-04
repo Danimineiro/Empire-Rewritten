@@ -32,14 +32,15 @@ namespace Empire_Rewritten.Windows
         private readonly Rect rectMidBottomLeftLeft;
         private readonly Rect rectMidBottomLeftRight;
         private readonly Rect rectMidBottomRight;
+        private readonly Rect rectMidBottomRightOuter;
 
         private readonly Rect rectFlag;
         private readonly Rect rectDesignation;
         private readonly Rect rectExtraInfo;
 
-        private readonly Rect rectBuildingsLabel;
-        private readonly Rect rectBuildingsRect;
-        private readonly Rect rectBuildingRect = new Rect(0f, 0f, 64f, 64f);
+        private readonly Rect rectFacilitiesLabel;
+        private readonly Rect rectFacilitiesRect;
+        private readonly Rect rectFacilityRect = new Rect(0f, 0f, 64f, 64f);
 
         private readonly Vector2 buildingsRectSize = new Vector2(419f, 143f);
         private readonly Settlement settlement;
@@ -54,7 +55,11 @@ namespace Empire_Rewritten.Windows
         private const float FlagSize = 64f;
         private const float DesignationWidth = 190f;
         private const float ApplyButtonWidth = 150f;
-
+        private const float ProcessRectHeight = 56f;
+        private const int ProcessRectOutlineWidth = 3;
+        private Rect rectMidBottomRightInner;
+        private Vector2 processDisplayRectSize;
+        private Vector2 ScrollVec;
         private string tempName;
         private bool nameClicked = false;
 
@@ -119,16 +124,19 @@ namespace Empire_Rewritten.Windows
             rectMidBottomLeftRight = rectMidBottomLeft.RightPartPixels(rectMidBottomLeft.width - buildingsRectSize.x).ContractedBy(CommonMargin);
 
             rectMidBottomRight = new Rect(rectMid.x + LeftPartWidth + CommonMargin, rectMid.y + MidTopPartHeight + CommonMargin, rectMid.width - LeftPartWidth - CommonMargin, rectMid.height - MidTopPartHeight - CommonMargin * 2f);
-        
+            rectMidBottomRightOuter = rectMidBottomRight.ContractedBy(CommonMargin);
+
             rectFlag = new Rect(rectMidTopLeft.x + CommonMargin, rectMidTopLeft.y + CommonMargin, FlagSize, FlagSize);
             rectDesignation = new Rect(rectMidTopLeft.x + rectFlag.width + CommonMargin * 2f, rectMidTopLeft.y + FlagSize * 0.5f, DesignationWidth, FlagSize * 0.5f);
             rectExtraInfo = new Rect( - CommonMargin, 0f, DesignationWidth * 1.5f, FlagSize * 0.5f).MoveRect(new Vector2(rectMidTopLeft.xMax - DesignationWidth * 1.5f, rectMidTopLeft.y + FlagSize * 0.5f));
 
-            rectBuildingsLabel = new Rect(rectMidBottomLeftLeft.x + CommonMargin, rectMidBottomLeftLeft.y + CommonMargin, rectMidBottomLeftLeft.width - CommonMargin * 2f, FlagSize * 0.5f);
-            rectBuildingsRect = new Rect(new Vector2(), buildingsRectSize)
+            rectFacilitiesLabel = new Rect(rectMidBottomLeftLeft.x + CommonMargin, rectMidBottomLeftLeft.y + CommonMargin, rectMidBottomLeftLeft.width - CommonMargin * 2f, FlagSize * 0.5f);
+            rectFacilitiesRect = new Rect(new Vector2(), buildingsRectSize)
             {
-                center = rectMidBottomLeftLeft.center + new Vector2(0f, rectBuildingsLabel.height + CommonMargin)
+                center = rectMidBottomLeftLeft.center + new Vector2(0f, rectFacilitiesLabel.height + CommonMargin)
             }.Rounded();
+
+            RecalculateScrollWidgets();
         }
 
         protected override float Margin => 0f;
@@ -163,13 +171,70 @@ namespace Empire_Rewritten.Windows
 
             Widgets.DrawBox(rectMidTopRight);
             Widgets.Label(rectMidTopRight, "rectMidTopRight");
-
-            Widgets.DrawBox(rectMidBottomRight);
-            Widgets.Label(rectMidBottomRight, "rectMidBottomRight");
+            
+            DrawBottomRightPart();
 
             Text.Anchor = TextAnchor.UpperLeft;
 
             DrawBottomPart();
+        }
+
+        internal void RecalculateScrollWidgets()
+        {
+            float height = -CommonMargin + (processDisplayRectSize.y + CommonMargin) * facilityManager.Processes.Count;
+            rectMidBottomRightInner = rectMidBottomRightOuter.GetInnerScrollRect(height);
+            processDisplayRectSize = new Vector2(rectMidBottomRightInner.width, ProcessRectHeight);
+        }
+
+        private void DrawBottomRightPart()
+        {
+            TextAnchor prev = Text.Anchor;
+            Widgets.DrawBox(rectMidBottomRight);
+            Rect rectProcess = new Rect(rectMidBottomRightOuter.position, processDisplayRectSize);
+            
+            GUI.color = ColorLibrary.Grey - new Color(0f, 0f, 0f, 0.6f);
+            GUI.DrawTexture(rectMidBottomRightOuter, ContentFinder<Texture2D>.Get("UI/Filler/ConstructingBig"), ScaleMode.ScaleToFit);
+            GUI.color = Color.white;
+
+            if (facilityManager.Processes.Count == 0)
+            {
+                Text.Anchor = TextAnchor.UpperCenter;
+                Widgets.Label(rectMidBottomRightOuter, $"<color=grey><b>{"Empire_SIW_NoProcesses".Translate()}</b></color>");
+                Text.Anchor = prev;
+                return;
+            }
+
+            Widgets.BeginScrollView(rectMidBottomRightOuter, ref ScrollVec, rectMidBottomRightInner);
+
+            for (int i = 0; i < facilityManager.Processes.Count; i++)
+            {
+                Rect rectProcessInner = rectProcess.ContractedBy(ProcessRectOutlineWidth);
+                Rect iconRect = new Rect(rectProcessInner.x + 2f, rectProcessInner.y + 2f, 32f, 32f);
+                Rect labelRect = new Rect(rectProcessInner.x + iconRect.width + CommonMargin, rectProcessInner.y, rectProcessInner.width - (iconRect.width + CommonMargin) * 2f, rectProcessInner.height);
+                Rect progressBar = new Rect(iconRect.x, iconRect.yMax + 2f, rectProcessInner.width - 4f, rectProcessInner.height - (2f * 3f) - iconRect.height);
+
+                Process curProcess = facilityManager.Processes[i];
+
+                Widgets.DrawBoxSolidWithOutline(rectProcess, new Color(.15f, .15f, .15f, 1f), ColorLibrary.Grey, ProcessRectOutlineWidth);
+
+                GUI.DrawTexture(iconRect, curProcess.Icon);
+                Text.Anchor = TextAnchor.UpperLeft;
+                Widgets.Label(labelRect, $"{curProcess.LabelCap}\n{"Empire_SIW_ProcessProgress".Translate((curProcess.Duration - curProcess.WorkCompleted).ToStringTicksToPeriod())}");
+                Widgets.FillableBar(progressBar, curProcess.Progress);
+                
+                if (Widgets.CloseButtonFor(rectProcessInner))
+                {
+                    facilityManager.CancelProcess(curProcess);
+                    SoundDefOf.Click.PlayOneShotOnCamera();
+                    i--;
+                }
+
+                TooltipHandler.TipRegion(rectProcess, curProcess.ToolTip);
+                rectProcess = rectProcess.MoveRect(new Vector2(0f, processDisplayRectSize.y + CommonMargin));
+            }
+
+            Text.Anchor = prev;
+            Widgets.EndScrollView();
         }
 
         private void DrawBottomLeftParts()
@@ -183,9 +248,9 @@ namespace Empire_Rewritten.Windows
             DrawActionButtons();
 
             //Widgets.DrawBox(rectBuildingsLabel);
-            Widgets.Label(rectBuildingsLabel, $"<b>{"Empire_SIW_BuildingsLabel".Translate()}</b>");
+            Widgets.Label(rectFacilitiesLabel, $"<b>{"Empire_SIW_FacilitiesLabel".Translate()}</b>");
 
-            Widgets.DrawBox(rectBuildingsRect);
+            Widgets.DrawBox(rectFacilitiesRect);
             Vector2 moveVector = new Vector2();
 
             for (int i = 0; i < 2; i++)
@@ -193,8 +258,8 @@ namespace Empire_Rewritten.Windows
                 for (int j = 0; j < 6; j++)
                 {
                     int currentSpot = i * 6 + j;
-                    Rect buildingRect = new Rect(new Vector2(rectBuildingsRect.x + CommonMargin, rectBuildingsRect.y + CommonMargin), rectBuildingRect.size).MoveRect(moveVector);
-                    moveVector += new Vector2(rectBuildingRect.width + CommonMargin, 0f);
+                    Rect buildingRect = new Rect(new Vector2(rectFacilitiesRect.x + CommonMargin, rectFacilitiesRect.y + CommonMargin), rectFacilityRect.size).MoveRect(moveVector);
+                    moveVector += new Vector2(rectFacilityRect.width + CommonMargin, 0f);
 
 
                     bool flag = TryDrawBuilding(currentSpot, buildingRect);
@@ -217,7 +282,7 @@ namespace Empire_Rewritten.Windows
                     Widgets.DrawHighlightIfMouseover(buildingRect);
                 }
 
-                moveVector += new Vector2(-(rectBuildingRect.width + CommonMargin) * 6f, rectBuildingRect.width + CommonMargin);
+                moveVector += new Vector2(-(rectFacilityRect.width + CommonMargin) * 6f, rectFacilityRect.width + CommonMargin);
             }
         }
 

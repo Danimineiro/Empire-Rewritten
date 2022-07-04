@@ -7,6 +7,7 @@ using RimWorld;
 using Verse;
 using Empire_Rewritten.Controllers;
 using Empire_Rewritten.Utils;
+using UnityEngine;
 
 namespace Empire_Rewritten.Events.Processes
 {
@@ -14,7 +15,9 @@ namespace Empire_Rewritten.Events.Processes
     {
         private string label;
         private string toolTip;
+        private string iconPath;
         private bool running = false;
+        private bool canceled = false;
         protected bool suspended = true;
         private int workCompleted;
         private int duration;
@@ -22,13 +25,14 @@ namespace Empire_Rewritten.Events.Processes
         public string Label => label;
         public string ToolTip => toolTip;
         public string LabelCap => label.CapitalizeFirst();
-
+        public Texture2D Icon => ContentFinder<Texture2D>.Get(iconPath);
         public Process() { }
 
-        public Process(string label, string toolTip, int duration)
+        public Process(string label, string toolTip, int duration, string iconPath)
         {
             this.label = label;
             this.toolTip = toolTip;
+            this.iconPath = iconPath;
 
             workCompleted = 0;
             this.duration = duration;
@@ -41,6 +45,13 @@ namespace Empire_Rewritten.Events.Processes
         protected virtual object[] Parms => new object[] { };
 
         public bool Suspended { get => suspended; set => suspended = value; }
+        public int Duration => duration;
+        public int WorkCompleted => workCompleted;
+
+        public virtual void Cancel()
+        {
+            canceled = true;
+        }
 
         private void Initialize()
         {
@@ -51,7 +62,7 @@ namespace Empire_Rewritten.Events.Processes
             running = true;
         }
 
-        private bool ShouldDiscard() => Progress > 1f;
+        private bool ShouldDiscard() => Progress > 1f || canceled;
 
         protected virtual void Run() => throw new NotImplementedException();
 
@@ -69,6 +80,7 @@ namespace Empire_Rewritten.Events.Processes
         {
             Scribe_Values.Look(ref label, nameof(label));
             Scribe_Values.Look(ref toolTip, nameof(toolTip));
+            Scribe_Values.Look(ref iconPath, nameof(iconPath));
             Scribe_Values.Look(ref workCompleted, nameof(workCompleted));
             Scribe_Values.Look(ref duration, nameof(duration));
             Scribe_Values.Look(ref suspended, nameof(suspended));
@@ -78,5 +90,10 @@ namespace Empire_Rewritten.Events.Processes
                 Initialize();
             }
         }
+    }
+
+    public interface ISlotID
+    {
+        int SlotID { get; set; }
     }
 }

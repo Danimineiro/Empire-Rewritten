@@ -1,5 +1,4 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <LanguageData>
-	<Empire_FM_BuildingLabel>Building {0}...</Empire_FM_BuildingLabel>
-	<Empire_FM_BuildingToolTip>This settlement is in the process of building a facility.</Empire_FM_BuildingToolTip>
+	<Empire_FM_BuildingToolTip>This settlement is in the process of building a {0}.</Empire_FM_BuildingToolTip>
 </LanguageData>
