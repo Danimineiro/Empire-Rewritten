@@ -25,13 +25,12 @@ namespace Empire_Rewritten.Events.Processes
 
         protected override object[] Parms => new object[] { facilityDef, facilityManager };
 
-        public int SlotID => slotID;
+        public int SlotID { get => slotID; set => slotID = value; }
 
         protected override void Run()
         {
-            if (suspended) return;
             Run(facilityDef, facilityManager);
-            facilityManager.NotifyProcessCompleted();
+            facilityManager.NotifyProcessesChanged();
         }
 
         public static void Run(FacilityDef facilityDef, FacilityManager facilityManager)

@@ -12,6 +12,7 @@ using RimWorld;
 using Verse.Sound;
 using Empire_Rewritten.Windows.Snippets;
 using Empire_Rewritten.Facilities;
+using Empire_Rewritten.Events.Processes;
 
 namespace Empire_Rewritten.Windows
 {
@@ -222,11 +223,11 @@ namespace Empire_Rewritten.Windows
 
         private bool TryBlockSpot(int currentSpot, Rect buildingRect)
         {
-            if (facilityManager.MaxFacilities > currentSpot && !facilityManager.CanBuildNewFacilities)
+            if (facilityManager.GetProcessWithSlotID(currentSpot) is Process process)
             {
                 TooltipHandler.TipRegion(buildingRect, "Empire_SIW_SlotInConstruction".TranslateSimple());
 
-                float rightSide = buildingRect.width * facilityManager.GetProcessWithSlotID(currentSpot).Progress;
+                float rightSide = buildingRect.width * process.Progress;
                 Rect progress = new Rect(buildingRect.x, buildingRect.y, rightSide, buildingRect.height);
                 GUI.DrawTexture(buildingRect, ContentFinder<Texture2D>.Get("UI/Facilities/InConstruction"));
 
@@ -242,6 +243,7 @@ namespace Empire_Rewritten.Windows
             {
                 TooltipHandler.TipRegion(buildingRect, "Empire_SIW_SlotLocked".TranslateSimple());
                 GUI.DrawTexture(buildingRect, ContentFinder<Texture2D>.Get("UI/Facilities/LockedBuildingSlot"));
+
                 return true;
             }
 

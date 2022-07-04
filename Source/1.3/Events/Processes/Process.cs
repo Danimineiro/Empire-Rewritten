@@ -15,9 +15,9 @@ namespace Empire_Rewritten.Events.Processes
         private string label;
         private string toolTip;
         private bool running = false;
-        protected bool suspended = false;
-        private int startTick;
-        private int endTick;
+        protected bool suspended = true;
+        private int workCompleted;
+        private int duration;
 
         public string Label => label;
         public string ToolTip => toolTip;
@@ -30,17 +30,19 @@ namespace Empire_Rewritten.Events.Processes
             this.label = label;
             this.toolTip = toolTip;
 
-            startTick = Find.TickManager.TicksGame;
-            endTick = Find.TickManager.TicksGame + duration;
+            workCompleted = 0;
+            this.duration = duration;
 
-            Register();
+            Initialize();
         }
 
-        public float Progress => (Find.TickManager.TicksGame - startTick) / (float)(endTick - startTick);
+        public float Progress => workCompleted / (float)duration;
 
         protected virtual object[] Parms => new object[] { };
 
-        private void Register()
+        public bool Suspended { get => suspended; set => suspended = value; }
+
+        private void Initialize()
         {
             if (running) return;
 
@@ -49,20 +51,17 @@ namespace Empire_Rewritten.Events.Processes
             running = true;
         }
 
-        private bool ShouldDiscard()
-        {
-            Log.Message($"is true { Progress > 1f}");
-            return Progress > 1f;
-        }
+        private bool ShouldDiscard() => Progress > 1f;
 
-        protected virtual void Run()
-        {
-            throw new NotImplementedException();
-        }
+        protected virtual void Run() => throw new NotImplementedException();
 
         private bool Trigger()
         {
+            if (suspended) return false;
+
+            workCompleted++;
             if (Progress > 1f) return true;
+
             return false;
         }
 
@@ -70,13 +69,13 @@ namespace Empire_Rewritten.Events.Processes
         {
             Scribe_Values.Look(ref label, nameof(label));
             Scribe_Values.Look(ref toolTip, nameof(toolTip));
-            Scribe_Values.Look(ref startTick, nameof(startTick));
-            Scribe_Values.Look(ref endTick, nameof(endTick));
+            Scribe_Values.Look(ref workCompleted, nameof(workCompleted));
+            Scribe_Values.Look(ref duration, nameof(duration));
             Scribe_Values.Look(ref suspended, nameof(suspended));
 
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
-                Register();
+                Initialize();
             }
         }
     }

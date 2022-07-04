@@ -2,6 +2,7 @@
 using System.Linq;
 using Empire_Rewritten.Events.Processes;
 using Empire_Rewritten.Resources;
+using Empire_Rewritten.Utils;
 using JetBrains.Annotations;
 using RimWorld.Planet;
 using UnityEngine;
@@ -93,9 +94,13 @@ namespace Empire_Rewritten.Facilities
             return processes[pos];
         }
 
-        public void NotifyProcessCompleted()
+        public void NotifyProcessesChanged()
         {
             processes.RemoveAll((p) => p.Progress >= 1f);
+            if (processes.Count > 0)
+            {
+                processes[0].Suspended = false;
+            }
         }
 
         /// <summary>
@@ -226,8 +231,14 @@ namespace Empire_Rewritten.Facilities
         /// <param name="facilityDef">The <see cref="FacilityDef" /> to add</param>
         public void AddFacility(FacilityDef facilityDef)
         {
-            processes.Add(new FacilityBuildProcess("Empire_FM_BuildingLabel".Translate(facilityDef.LabelCap), "Empire_FM_BuildingToolTip".Translate(), facilityDef.buildDuration, this, facilityDef, FirstOpenSlotID));
+            if (FirstOpenSlotID == -1)
+            {
+                $"Tried to add Facility {facilityDef.LabelCap} to settlement manager of {settlement.LabelCap}, but FirstOpenSlotID is -1 (Can't build more facilities!)".ErrorOnce();
+                return;
+            }
 
+            processes.Add(new FacilityBuildProcess("Empire_FM_BuildingLabel".Translate(facilityDef.LabelCap), "Empire_FM_BuildingToolTip".Translate(), facilityDef.buildDuration, this, facilityDef, FirstOpenSlotID));
+            NotifyProcessesChanged();
             //if (installedFacilities.ContainsKey(facilityDef))
             //{
             //    installedFacilities[facilityDef].AddFacility();
@@ -246,6 +257,14 @@ namespace Empire_Rewritten.Facilities
         /// <param name="facilityDef">The <see cref="FacilityDef" /> to remove</param>
         public void RemoveFacility(FacilityDef facilityDef)
         {
+            foreach (Process process in processes)
+            {
+                if (process is FacilityBuildProcess buildProcess)
+                {
+                    buildProcess.SlotID--;
+                }
+            }
+
             if (!installedFacilities.ContainsKey(facilityDef)) return;
 
             installedFacilities[facilityDef].RemoveFacility();
