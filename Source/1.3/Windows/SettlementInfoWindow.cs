@@ -54,7 +54,6 @@ namespace Empire_Rewritten.Windows
         private const float DesignationWidth = 190f;
         private const float ApplyButtonWidth = 150f;
 
-        private List<FacilityDef> installedFacilitesCached;
         private string tempName;
         private bool nameClicked = false;
 
@@ -99,11 +98,10 @@ namespace Empire_Rewritten.Windows
             doCloseX = true;
             onlyOneOfTypeAllowed = true;
             preventCameraMotion = false;
-            forcePause = true;
+            //forcePause = true;
 
             this.settlement = settlement;
             facilityManager = Empire.PlayerEmpire.GetFacilityManager(settlement);
-            installedFacilitesCached = facilityManager.FacilityDefsInstalled.ToList();
 
             rectMain = rectFull.ContractedBy(25f);
             rectTop = rectMain.TopPartPixels(UpperLowerHeight);
@@ -189,63 +187,104 @@ namespace Empire_Rewritten.Windows
             Widgets.DrawBox(rectBuildingsRect);
             Vector2 moveVector = new Vector2();
 
-            int facilityCount = facilityManager.FacilityCount;
             for (int i = 0; i < 2; i++)
             {
                 for (int j = 0; j < 6; j++)
                 {
-                    int currentSpot = i * 6 + j; 
+                    int currentSpot = i * 6 + j;
                     Rect buildingRect = new Rect(new Vector2(rectBuildingsRect.x + CommonMargin, rectBuildingsRect.y + CommonMargin), rectBuildingRect.size).MoveRect(moveVector);
                     moveVector += new Vector2(rectBuildingRect.width + CommonMargin, 0f);
 
-                    Widgets.DrawBox(buildingRect);
-                    Widgets.DrawHighlightIfMouseover(buildingRect);
-                    
-                    if (installedFacilitesCached.Count > currentSpot)
+
+                    bool flag = TryDrawBuilding(currentSpot, buildingRect);
+                    flag = flag || TryBlockSpot(currentSpot, buildingRect);
+
+                    if (!flag)
                     {
-                        FacilityDef currentFacilityDef = installedFacilitesCached[currentSpot];
-                        GUI.DrawTexture(buildingRect, ContentFinder<Texture2D>.Get(currentFacilityDef.iconData.texPath));
+                        GUI.color = new Color(1f, 1f, 1f, 0.2f);
+                        GUI.DrawTexture(buildingRect, ContentFinder<Texture2D>.Get("UI/Facilities/AddFacility"));
+                        GUI.color = Color.white;
 
-                        TextAnchor prev = Text.Anchor;
-                        Text.Anchor = TextAnchor.LowerRight;
-                        Widgets.Label(buildingRect.ContractedBy(5f), $"<b>{facilityManager.HasFacilityAmount(currentFacilityDef)}x</b>");
-                        Text.Anchor = prev;
-
-                        continue;
-                    }
-
-                    if (facilityManager.MaxFacilities - facilityCount - currentSpot < 0)
-                    {
-                        TooltipHandler.TipRegion(buildingRect, "Empire_SIW_SlotLocked".TranslateSimple());
-                        Widgets.DrawBoxSolid(buildingRect, ColorLibrary.RedReadable - new Color(0f, 0f, 0f, 0.4f));
-                        continue;
-                    }
-
-                    if (Widgets.ButtonInvisible(buildingRect))
-                    {
-                        List<FloatMenuOption> options = new List<FloatMenuOption>();
-                        
-                        foreach (FacilityDef facilityDef in DefDatabase<FacilityDef>.AllDefsListForReading)
+                        if (Widgets.ButtonInvisible(buildingRect))
                         {
-                            options.Add(new FloatMenuOption(facilityDef.LabelCap, () =>
-                            {
-                                facilityManager.AddFacility(facilityDef);
-                                RefreshCachedVariables();
-                            }, ContentFinder<Texture2D>.Get(facilityDef.iconData.texPath), Color.white));
+                            Find.WindowStack.Add(new FloatMenu(GetFacilityOptions()));
                         }
-
-                        Find.WindowStack.Add(new FloatMenu(options));
                     }
 
+                    Widgets.DrawBox(buildingRect);
+                    Widgets.DrawLightHighlight(buildingRect);
+                    Widgets.DrawHighlightIfMouseover(buildingRect);
                 }
 
                 moveVector += new Vector2(-(rectBuildingRect.width + CommonMargin) * 6f, rectBuildingRect.width + CommonMargin);
             }
         }
 
-        private void RefreshCachedVariables()
+        private bool TryBlockSpot(int currentSpot, Rect buildingRect)
         {
-            installedFacilitesCached = facilityManager.FacilityDefsInstalled.ToList();
+            if (facilityManager.MaxFacilities > currentSpot && !facilityManager.CanBuildNewFacilities)
+            {
+                TooltipHandler.TipRegion(buildingRect, "Empire_SIW_SlotInConstruction".TranslateSimple());
+
+                float rightSide = buildingRect.width * facilityManager.GetProcessWithSlotID(currentSpot).Progress;
+                Rect progress = new Rect(buildingRect.x, buildingRect.y, rightSide, buildingRect.height);
+                GUI.DrawTexture(buildingRect, ContentFinder<Texture2D>.Get("UI/Facilities/InConstruction"));
+
+                Widgets.DrawBoxSolid(progress, ColorLibrary.BrightBlue - new Color(0f, 0f, 0f, 0.8f));
+                GUI.color = ColorLibrary.BrightBlue;
+                Widgets.DrawLineVertical(progress.xMax, buildingRect.y, buildingRect.height);
+                GUI.color = Color.white;
+
+                return true;
+            }
+
+            if (facilityManager.MaxFacilities <= currentSpot)
+            {
+                TooltipHandler.TipRegion(buildingRect, "Empire_SIW_SlotLocked".TranslateSimple());
+                GUI.DrawTexture(buildingRect, ContentFinder<Texture2D>.Get("UI/Facilities/LockedBuildingSlot"));
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool TryDrawBuilding(int currentSpot, Rect buildingRect)
+        {
+            if (facilityManager[currentSpot]?.def is FacilityDef currentFacilityDef)
+            {
+                GUI.DrawTexture(buildingRect, ContentFinder<Texture2D>.Get(currentFacilityDef.iconData.texPath));
+                TooltipHandler.TipRegion(buildingRect, $"<b>{currentFacilityDef.LabelCap}</b>\n\n{currentFacilityDef.description}\n\n{"Empire_SIW_ClickToDeconstructOrChangeFacility".Translate()}");
+
+                if (Widgets.ButtonInvisible(buildingRect))
+                {
+                    List<FloatMenuOption> options = new List<FloatMenuOption>()
+                    {
+                        new FloatMenuOption("Empire_SIW_DeconstructFacility".Translate(currentFacilityDef.LabelCap), () => facilityManager.RemoveFacility(currentFacilityDef)),
+                    };
+
+                    options.AddRange(GetFacilityOptions(currentFacilityDef));
+                    Find.WindowStack.Add(new FloatMenu(options));
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private List<FloatMenuOption> GetFacilityOptions(FacilityDef skipDef = null)
+        {
+            List<FloatMenuOption> options = new List<FloatMenuOption>();
+            foreach (FacilityDef facilityDef in DefDatabase<FacilityDef>.AllDefsListForReading)
+            {
+                if (skipDef?.Equals(facilityDef) == true) continue;
+
+                options.Add(new FloatMenuOption(facilityDef.LabelCap, () =>
+                {
+                    facilityManager.AddFacility(facilityDef);
+                }, ContentFinder<Texture2D>.Get(facilityDef.iconData.texPath), Color.white));
+            }
+            return options;
         }
 
         private void DrawActionButtons()
@@ -293,7 +332,7 @@ namespace Empire_Rewritten.Windows
 
             if (!nameClicked)
             {
-                Widgets.Label(rectTopContent, settlement.LabelCap);
+                Widgets.Label(rectTopContent, $"<b>{settlement.LabelCap}</b> | Level: {facilityManager.MaxFacilities}");
                 if (Widgets.ButtonInvisible(rectTopContent, false))
                 {
                     nameClicked = true;
