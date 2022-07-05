@@ -5,14 +5,9 @@ namespace Empire_Rewritten.AI
 {
     public static class AIExtensions
     {
-        public static bool IsAIPlayer(this Faction faction)
+        public static BasePlayer GetPlayer(this Faction faction)
         {
-            return GetAIPlayer(faction) != null;
-        }
-
-        public static AIPlayer GetAIPlayer(this Faction faction)
-        {
-            return UpdateController.CurrentWorldInstance.FactionController.GetAIPlayer(faction);
+            return UpdateController.CurrentWorldInstance.FactionController.PlayerOfFaction(faction);
         }
     }
 }

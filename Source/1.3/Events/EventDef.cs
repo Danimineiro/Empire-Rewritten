@@ -31,8 +31,10 @@ namespace Empire_Rewritten.Events
                 yield return $"{eventWorker.Name} is not a {nameof(Events.EventWorker)}";
             }
 
-            if (aiEventWorker != null && aiEventWorker != typeof(EventWorker) &&
-                !aiEventWorker.IsSubclassOf(typeof(EventWorker)))
+        public override IEnumerable<string> ConfigErrors()
+        {
+            IEnumerable<string> errors = base.ConfigErrors();
+            if(eventWorker.GetType() != typeof(EventWorker))
             {
                 yield return $"{aiEventWorker.Name} is not a {nameof(Events.EventWorker)}";
             }

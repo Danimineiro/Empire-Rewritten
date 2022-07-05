@@ -5,12 +5,12 @@ using Verse;
 
 namespace Empire_Rewritten.AI
 {
-    public class AIResourceManager : AIModule
+    public class AIResourceManager
     {
         private readonly List<ResourceDef> criticalResources = new List<ResourceDef>();
         private readonly AIPlayer parentPlayer;
 
-        public AIResourceManager(AIPlayer player) : base(player)
+        public AIResourceManager(AIPlayer player)
         {
             parentPlayer = player;
         }
@@ -115,7 +115,6 @@ namespace Empire_Rewritten.AI
 
       
 
-        public override void DoModuleAction() { }
 
         /// <summary>
         ///     Search for tiles to build settlements on based off weights;
@@ -149,7 +148,7 @@ namespace Empire_Rewritten.AI
             return weight;
         }
 
-        public override void DoThreadableAction()
+        public void DoResourceCalculations()
         {
             if (!criticalResources.EnumerableNullOrEmpty())
             {

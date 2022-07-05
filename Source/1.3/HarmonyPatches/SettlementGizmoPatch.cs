@@ -3,6 +3,7 @@ using System.Linq;
 using Empire_Rewritten.Controllers;
 using Empire_Rewritten.Facilities;
 using Empire_Rewritten.Settlements;
+using RimWorld;
 using RimWorld.Planet;
 using Verse;
 
