@@ -2,6 +2,7 @@
 using System.Linq;
 using UnityEngine;
 using Verse;
+using Verse.Sound;
 
 namespace Empire_Rewritten.Utils
 {
@@ -82,6 +83,15 @@ namespace Empire_Rewritten.Utils
             {
                 Widgets.DrawBox(rect);
             }
+        }
+
+        public static bool InfoCardButtonWorker(Rect rect)
+        {
+            MouseoverSounds.DoRegion(rect);
+            TooltipHandler.TipRegionByKey(rect, "DefInfoTip");
+            bool result = Widgets.ButtonImage(rect, TexButton.Info, GUI.color, true);
+            UIHighlighter.HighlightOpportunity(rect, "InfoCard");
+            return result;
         }
     }
 }

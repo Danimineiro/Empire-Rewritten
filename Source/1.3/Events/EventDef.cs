@@ -1,70 +1,60 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Verse;
 
 namespace Empire_Rewritten.Events
 {
+    [UsedImplicitly(ImplicitUseKindFlags.Assign, ImplicitUseTargetFlags.WithMembers)]
     public class EventDef : Def
     {
-        public Type eventWorker;
-
-        private EventWorker worker;
-
-      
-        public EventWorker EventWorker
-        {
-            get
-            {
-
-                return worker;
-            }
-        }
-
-
         public bool canAffectAI = true;
-
-        public Type aiEventWorker;
 
         private EventWorker aiWorker;
 
-        public EventWorker AIWorker
+        public Type aiEventWorker;
+        public Type eventWorker;
+
+        public EventWorker EventWorker { get; private set; }
+
+        public EventWorker AIWorker => aiWorker ?? EventWorker;
+
+        public override IEnumerable<string> ConfigErrors()
         {
-            get
+            foreach (string error in base.ConfigErrors())
             {
-                return aiWorker!=null ? aiWorker : EventWorker;
+                yield return error;
             }
-        }
+
+            if (eventWorker != typeof(EventWorker) && !eventWorker.IsSubclassOf(typeof(EventWorker)))
+            {
+                yield return $"{eventWorker.Name} is not a {nameof(Events.EventWorker)}";
+            }
 
         public override IEnumerable<string> ConfigErrors()
         {
             IEnumerable<string> errors = base.ConfigErrors();
-            if(typeof(EventWorker).IsAssignableFrom(eventWorker))
+            if(eventWorker.GetType() != typeof(EventWorker))
             {
-                errors.Append($"{eventWorker.Name} is not a {nameof(EventWorker)}");
+                yield return $"{aiEventWorker.Name} is not a {nameof(Events.EventWorker)}";
             }
-            if (aiEventWorker!=null && aiEventWorker.GetType() != typeof(EventWorker))
-            {
-                errors.Append($"{aiEventWorker.Name} is not a {nameof(EventWorker)}");
-            }
-
-            return errors;
         }
 
         public override void ResolveReferences()
         {
-            if (typeof(EventWorker).IsAssignableFrom(eventWorker))
+            if (eventWorker != typeof(EventWorker) && !eventWorker.IsSubclassOf(typeof(EventWorker)))
             {
-                worker = (EventWorker)Activator.CreateInstance(eventWorker);
-                worker.def = this;
+                EventWorker = (EventWorker)Activator.CreateInstance(eventWorker);
+                EventWorker.def = this;
             }
-            if (aiEventWorker!=null && typeof(EventWorker).IsAssignableFrom(aiEventWorker))
+
+            if (aiEventWorker != null && aiEventWorker != typeof(EventWorker) &&
+                !aiEventWorker.IsSubclassOf(typeof(EventWorker)))
             {
                 aiWorker = (EventWorker)Activator.CreateInstance(aiEventWorker);
                 aiWorker.def = this;
             }
+
             base.ResolveReferences();
         }
     }

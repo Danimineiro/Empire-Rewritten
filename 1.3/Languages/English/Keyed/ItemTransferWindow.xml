@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+	<Empire_ITW_Title>Make a transfer</Empire_ITW_Title>
+	<Empire_ITW_Apply>Transfer items</Empire_ITW_Apply>
+	<Empire_ITW_StoredItems>Items stored by your settlements:</Empire_ITW_StoredItems>
+	<Empire_ITW_SelectItemsToTransfer>Select items to transfer:</Empire_ITW_SelectItemsToTransfer>
+
+	<Empire_ITW_AmountOnMap>The amount of this item available on this map</Empire_ITW_AmountOnMap>
+	<Empire_ITW_AmountOfItemsTransferred>The amount of items transferred</Empire_ITW_AmountOfItemsTransferred>
+	<Empire_ITW_AmountStoredInStorage>The amount of items stored in storage</Empire_ITW_AmountStoredInStorage>
+</LanguageData>
