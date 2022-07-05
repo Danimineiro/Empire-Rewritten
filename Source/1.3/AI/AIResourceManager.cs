@@ -29,7 +29,7 @@ namespace Empire_Rewritten.AI
         public List<ResourceDef> FindLowResources()
         {
             List<ResourceDef> result = new List<ResourceDef>();
-            Dictionary<ResourceDef, float> producedKnown = AllResourcesProduced();
+            Dictionary<ResourceDef, float> producedKnown = parentPlayer.Manager.AllResourcesProduced();
             bool resourceBelowDecider = false;
             /* 
              Since producedKnown is only useful if the AI produces the def
@@ -88,7 +88,7 @@ namespace Empire_Rewritten.AI
         public List<ResourceDef> FindExcessResources()
         {
             List<ResourceDef> result = new List<ResourceDef>();
-            Dictionary<ResourceDef, float> producedknown = AllResourcesProduced();
+            Dictionary<ResourceDef, float> producedknown = parentPlayer.Manager.AllResourcesProduced();
 
             foreach (ResourceDef def in producedknown.Keys)
             {
@@ -108,34 +108,12 @@ namespace Empire_Rewritten.AI
         /// <returns></returns>
         public float GetAmountProduced(ResourceDef def)
         {
-            Dictionary<ResourceDef, float> knownResources = AllResourcesProduced();
+            Dictionary<ResourceDef, float> knownResources = parentPlayer.Manager.AllResourcesProduced();
             float result = knownResources.ContainsKey(def) ? knownResources[def] : 0;
             return result;
         }
 
-        /// <summary>
-        ///     Find all resources produced.
-        /// </summary>
-        /// <returns></returns>
-        public Dictionary<ResourceDef, float> AllResourcesProduced()
-        {
-            Dictionary<ResourceDef, ResourceModifier> modifiers = parentPlayer.Manager.ResourceModifiersFromAllFacilities();
-            Dictionary<ResourceDef, float> result = new Dictionary<ResourceDef, float>();
-            foreach (ResourceDef def in DefDatabase<ResourceDef>.AllDefsListForReading)
-            {
-                if (modifiers.ContainsKey(def))
-                {
-                    ResourceModifier resourceModifier = modifiers[def];
-                    result.Add(def, resourceModifier.TotalProduced());
-                }
-                else
-                {
-                    result.Add(def, 0);
-                }
-            }
-
-            return result;
-        }
+      
 
         public override void DoModuleAction() { }
 
@@ -175,7 +153,7 @@ namespace Empire_Rewritten.AI
         {
             if (!criticalResources.EnumerableNullOrEmpty())
             {
-                Dictionary<ResourceDef, float> resourcesProduced = AllResourcesProduced();
+                Dictionary<ResourceDef, float> resourcesProduced = parentPlayer.Manager.AllResourcesProduced();
                 criticalResources.RemoveAll(x => resourcesProduced.ContainsKey(x) && resourcesProduced[x] > x.desiredAIMinimum / 2f);
             }
 

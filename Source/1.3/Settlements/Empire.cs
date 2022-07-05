@@ -53,6 +53,30 @@ namespace Empire_Rewritten.Settlements
         public Dictionary<Settlement, FacilityManager> Settlements => settlements;
         public List<int> SettlementTiles { get; } = new List<int>();
 
+        /// <summary>
+        ///     Find all resources produced.
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<ResourceDef, float> AllResourcesProduced()
+        {
+            Dictionary<ResourceDef, ResourceModifier> modifiers = this.ResourceModifiersFromAllFacilities();
+            Dictionary<ResourceDef, float> result = new Dictionary<ResourceDef, float>();
+            foreach (ResourceDef def in DefDatabase<ResourceDef>.AllDefsListForReading)
+            {
+                if (modifiers.ContainsKey(def))
+                {
+                    ResourceModifier resourceModifier = modifiers[def];
+                    result.Add(def, resourceModifier.TotalProduced());
+                }
+                else
+                {
+                    result.Add(def, 0);
+                }
+            }
+
+            return result;
+        }
+
         private Territory Territory
         {
             get

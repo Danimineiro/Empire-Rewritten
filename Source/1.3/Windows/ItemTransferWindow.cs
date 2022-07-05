@@ -1,9 +1,11 @@
 ﻿using Empire_Rewritten.Controllers;
+using Empire_Rewritten.Resources;
 using Empire_Rewritten.Settlements;
 using Empire_Rewritten.Utils;
 using RimWorld;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
@@ -47,8 +49,17 @@ namespace Empire_Rewritten.Windows
         private Vector2 storageManagerScroll;
         private Vector2 itemTransferScroll;
 
+        /// <summary>
+        /// Items player owns
+        /// </summary>
         private readonly Dictionary<ThingDef, int> playerItems = new Dictionary<ThingDef, int>();
+        /// <summary>
+        /// All items total
+        /// </summary>
         private readonly Dictionary<ThingDef, int> combinedItems = new Dictionary<ThingDef, int>();
+        /// <summary>
+        /// How much is going to the player and/or the storage
+        /// </summary>
         private readonly Dictionary<ThingDef, int> transferAmounts = new Dictionary<ThingDef, int>();
         private readonly Dictionary<ThingDef, string> transferBuffer = new Dictionary<ThingDef, string>();
         private readonly Map playerMap;
@@ -112,7 +123,7 @@ namespace Empire_Rewritten.Windows
 
             foreach (Thing item in mapItems)
             {
-                if (!playerItems.TryAdd(item.def, item.stackCount))
+                if (item.IsInAnyStorage() && !playerItems.TryAdd(item.def, item.stackCount))
                 {
                     playerItems[item.def] += item.stackCount;
                 }
@@ -301,7 +312,11 @@ namespace Empire_Rewritten.Windows
 
                 itemRect.DoRectHighlight(count % 2 == 1);
                 Widgets.ThingIcon(itemRectIcon, kvp.Key);
-                Widgets.Label(itemRectLabel, $"{kvp.Key.LabelCap} {kvp.Value} ({(Rand.Value > 0.5 ? "+" : "-")} {Rand.Range(0, 100)})");
+
+
+
+
+                Widgets.Label(itemRectLabel, $"{kvp.Key.LabelCap} {kvp.Value}");
                 Widgets.InfoCardButton(itemRect.RightPartPixels(itemRect.height).ContractedBy(4f), kvp.Key);
 
                 count++;
@@ -329,7 +344,25 @@ namespace Empire_Rewritten.Windows
 
         private void ApplyAction()
         {
-            throw new NotImplementedException();
+            foreach(KeyValuePair<ThingDef, int> transferPair in transferAmounts)
+            {
+                if(transferPair.Value > 0)
+                {
+                    List<Thing> mapItems = (List<Thing>)playerMap.listerThings.ThingsMatching(new ThingRequest() { group = ThingRequestGroup.HaulableEver }).Where(x => x.IsInAnyStorage() && x.def == transferPair.Key);
+                    if (mapItems.Count >= transferPair.Value)
+                        for (int a = 0; a < transferPair.Value; a++)
+                            mapItems[a].DeSpawn();
+                }
+                else
+                {
+                    bool canRemove = playerEmpire.StorageTracker.CanRemoveThingsFromStorage(transferPair.Key, transferPair.Value);
+                    if (canRemove)
+                    {
+                        playerEmpire.StorageTracker.TryRemoveThingsFromStorage(transferPair.Key, transferPair.Value);
+                        GenSpawn.Spawn(transferPair.Key,new IntVec3(0,0,0),playerMap,WipeMode.VanishOrMoveAside);
+                    }
+                }
+            }
         }
     }
 }
