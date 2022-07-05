@@ -91,7 +91,11 @@ namespace Empire_Rewritten.AI
                             player = factionSettlementDatas.Where(x => x.SettlementManager.Faction.RelationKindWith(faction) == FactionRelationKind.Hostile).RandomElement().SettlementManager.Faction.GetPlayer();
                     }
                     if (worker.CanDecide(this, player) && worker.DecisionWeight(this, player) >= weightRand.Next(0, 100))
+                    {
                         resultWorker = worker;
+
+
+                    }
                 }
             }
             return resultWorker;

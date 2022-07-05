@@ -30,14 +30,6 @@ namespace Empire_Rewritten.Events
             {
                 yield return $"{eventWorker.Name} is not a {nameof(Events.EventWorker)}";
             }
-
-        public override IEnumerable<string> ConfigErrors()
-        {
-            IEnumerable<string> errors = base.ConfigErrors();
-            if(eventWorker.GetType() != typeof(EventWorker))
-            {
-                yield return $"{aiEventWorker.Name} is not a {nameof(Events.EventWorker)}";
-            }
         }
 
         public override void ResolveReferences()

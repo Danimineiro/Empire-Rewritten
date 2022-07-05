@@ -25,7 +25,7 @@ namespace Empire_Rewritten.AI
             foreach (FacilityDef facilityDef in defs)
             {
                 float weight = 0;
-                weight += manager.FacilityDefsInstalled.Contains(facilityDef) ? 0.5f : -0.5f;
+                weight += manager.FacilityDefsInstalled.Contains(facilityDef) ? manager.FacilityDefsInstalled.Count(x=>x==facilityDef)*0.5f : -0.5f;
                 weight += player.ResourceManager.GetTileResourceWeight(tiles[player.Manager.GetSettlement(manager).Tile]);
 
                 if (facilityWeights.ContainsKey(weight))
@@ -49,22 +49,22 @@ namespace Empire_Rewritten.AI
         {
             List<ResourceDef> resourceDefs = player.ResourceManager.LowResources;
             IEnumerable<FacilityManager> managers = player.Manager.AllFacilityManagers.Where(x => x.CanBuildNewFacilities);
-            List<FacilityManager> potentialResults = new List<FacilityManager>();
+            Dictionary<FacilityManager,float> potentialResults = new Dictionary<FacilityManager,float>();
+
+
+            if (resourceDefs.NullOrEmpty())
+                return managers.RandomElement();
+
             foreach (FacilityManager facilityManager in managers)
             {
                 IEnumerable<FacilityDef> facilityDefs = facilityManager.FacilityDefsInstalled.Where(x => x.ProducedResources.Any(y => resourceDefs.Contains(y)));
-                if (facilityDefs.Any())
-                {
-                    potentialResults.Add(facilityManager);
-                }
+
+                potentialResults.Add(facilityManager, facilityManager.FacilityDefsInstalled.Count(x => x.ProducedResources.Any(y => resourceDefs.Contains(y))));
             }
 
-            if (potentialResults.Any())
-            {
-                return potentialResults.RandomElement();
-            }
-            return null;
+            return potentialResults.Keys.RandomElementByWeight(x => potentialResults[x]);
         }
+
         public override bool CanDecide(AIPlayer player, BasePlayer other = null)
         {
             return player.Manager.AllFacilityManagers.Any(x => x.CanBuildNewFacilities);
@@ -85,7 +85,11 @@ namespace Empire_Rewritten.AI
                 if(def!=null)
                     manager.AddFacility(def);
             }
-            base.MakeDecision(player, other);
+        }
+
+        public override float ImpactOnOtherEmpires(AIPlayer player)
+        {
+            return 1;
         }
     }
 }

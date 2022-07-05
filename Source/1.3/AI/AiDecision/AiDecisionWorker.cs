@@ -1,4 +1,5 @@
 ﻿
+using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,23 +8,74 @@ using System.Threading.Tasks;
 
 namespace Empire_Rewritten.AI
 {
-    public class AiDecisionWorker
+    public abstract class AiDecisionWorker
     {
+        private Settlement settlement;
+        private bool SettlementLocked = false;
 
-        public virtual bool CanDecide(AIPlayer player, BasePlayer other = null)
+        public Settlement Settlement
         {
-            return false;
+            get
+            {
+                return settlement;
+            }
+            set
+            {
+                if (!SettlementLocked)
+                {
+                    settlement = value;
+                    SettlementLocked = true;
+                }
+            }
         }
 
-        public virtual float DecisionWeight(AIPlayer player, BasePlayer other = null)
+
+        /// <summary>
+        /// Does this Decision target a settlement?
+        /// </summary>
+        public virtual bool TargetsSetSettlement
         {
-            return 0.0f;
+            get
+            {
+                return false;
+            }
         }
 
-        public virtual void MakeDecision(AIPlayer player, BasePlayer other = null)
+        /// <summary>
+        /// Get a settlement to modify.
+        /// This is good for things such as upgrading facilities, specific settlements, etc.
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public virtual Settlement GetSettlementToTarget(AIPlayer player, BasePlayer other = null)
         {
-
+            return null;
         }
+
+        /// <summary>
+        /// Can the AI make this choice?
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public abstract bool CanDecide(AIPlayer player, BasePlayer other = null);
+
+        /// <summary>
+        /// How tempting is it to do this?
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public abstract float DecisionWeight(AIPlayer player, BasePlayer other = null);
+
+        /// <summary>
+        /// Code to run when choice is made.
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="other"></param>
+        public abstract void MakeDecision(AIPlayer player, BasePlayer other = null);
+
         /// <summary>
         /// The impact scale is as follows:
         /// 20+: Only for allies
@@ -32,10 +84,7 @@ namespace Empire_Rewritten.AI
         /// </summary>
         /// <param name="player"></param>
         /// <returns></returns>
-        public virtual float ImpactOnOtherEmpires(AIPlayer player)
-        {
-            return 0.0f;
-        }
+        public abstract float ImpactOnOtherEmpires(AIPlayer player);
     }
 
 }

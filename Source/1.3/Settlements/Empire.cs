@@ -34,6 +34,17 @@ namespace Empire_Rewritten.Settlements
         private StorageTracker storageTracker = new StorageTracker();
         private Territory cachedTerritory;
 
+        public int AllFacilitiesInProgress(FacilityDef def)
+        {
+            int count = 0;
+            foreach(Settlement settlment in settlements.Keys)
+            {
+                FacilityManager manager = settlements[settlment];
+                count += manager.FacilityInProgress(def);
+            }
+            return count;
+        }
+        
         [UsedImplicitly]
         public Empire() { }
 

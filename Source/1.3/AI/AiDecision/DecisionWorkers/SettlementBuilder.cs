@@ -43,7 +43,7 @@ namespace Empire_Rewritten.AI
         public override float DecisionWeight(AIPlayer player, BasePlayer other = null)
         {
             int resourceWeight = player.Manager.StorageTracker.GetAverageExcessResources(Empire.SettlementCost);
-            return base.DecisionWeight(player, other);
+            return resourceWeight;
         }
 
         //The AI has confirmed it is going to build a new settlement. 
@@ -52,12 +52,16 @@ namespace Empire_Rewritten.AI
             SearchForTile(player);
             if(tileToBuildOn!= null)
                 player.Manager.BuildNewSettlementOnTile(tileToBuildOn);
-            base.MakeDecision(player, other);
         }
 
         public override bool CanDecide(AIPlayer player, BasePlayer other = null)
         {
             return player.Manager.StorageTracker.CanRemoveThingsFromStorage(Empire.SettlementCost);
+        }
+
+        public override float ImpactOnOtherEmpires(AIPlayer player)
+        {
+            return 1;
         }
     }
 }

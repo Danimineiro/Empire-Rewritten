@@ -32,6 +32,11 @@ namespace Empire_Rewritten.Facilities
         private int stage = 1;
         private int id;
 
+        public int FacilityInProgress(FacilityDef def)
+        {
+            return processes.Count(x => x is FacilityBuildProcess process && process.FacilityDef==def);
+        }
+
         private static int NextID
         {
             get

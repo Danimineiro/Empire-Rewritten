@@ -14,6 +14,14 @@ namespace Empire_Rewritten.Events.Processes
         private FacilityDef facilityDef;
         private int slotID;
 
+        public FacilityDef FacilityDef
+        {
+            get
+            {
+                return facilityDef;
+            }
+        }
+
         public FacilityBuildProcess() { }
 
         public FacilityBuildProcess(string label, string toolTip, int duration, string iconPath, FacilityManager facilityManager, FacilityDef facilityDef, int slotID) : base(label, toolTip, duration, iconPath) 
