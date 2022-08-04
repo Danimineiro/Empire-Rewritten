@@ -14,7 +14,8 @@ namespace Empire_Rewritten.Territories
         private List<int> tiles = new List<int>();
 
         [UsedImplicitly]
-        public Territory() { }
+        public Territory()
+        { }
 
         public Territory(Faction faction)
         {
@@ -72,7 +73,9 @@ namespace Empire_Rewritten.Territories
         }
 
         /// <summary>
-        ///     Recursively gets neighboring <see cref="int">Tile IDs</see>.
+        ///     Returns the list of <see cref="int">Tile IDs</see> of the tiles reachable within a given distance from some center tile.
+        /// Impassable tiles are removed from the output (including the center tile). If the center tile is impassable, this function returns
+        /// an empty list.
         /// </summary>
         /// <param name="centerTileId"></param>
         /// <param name="distance"></param>
@@ -80,39 +83,48 @@ namespace Empire_Rewritten.Territories
         [NotNull]
         public static List<int> GetSurroundingTiles(int centerTileId, int distance)
         {
-            if (distance <= 0)
+            if (distance < 0) return new List<int>();
+
+            if (WorldGrid[centerTileId].biome.impassable || WorldGrid[centerTileId].hilliness == Hilliness.Impassable)
+                return new List<int>();
+
+            // The perimeter of a hexagon is 6 * its radius (in this case, distance). That's the maximum number of tiles that will be in the queue.
+            Queue<int> queue = new Queue<int>(6 * distance + 6);
+
+            //Keep track of which tiles have been processed
+            HashSet<int> found = new HashSet<int>();
+
+            //Keep track of which tiles can be returned
+            List<int> res = new List<int>();
+
+            queue.Enqueue(centerTileId);
+            while (queue.Count != 0 && distance > 0)
             {
-                return new List<int> { centerTileId };
-            }
-
-            if (distance == 1)
-            {
-                return TileAndNeighborsClaimable(centerTileId);
-            }
-
-            List<int> result = TileAndNeighborsClaimable(centerTileId);
-
-            int currentDistance = 1;
-            List<int> resultCopy = new List<int>(result);
-
-            foreach (int tile in resultCopy)
-            {
-                Tile worldTile = WorldGrid[tile];
-                if (!worldTile.biome.impassable && worldTile.hilliness != Hilliness.Impassable)
+                int numTilesAtDepth = queue.Count;
+                while (numTilesAtDepth != 0)
                 {
-                    foreach (int newTileId in GetSurroundingTiles(tile, distance - currentDistance))
-                    {
-                        if (!result.Contains(newTileId) && WorldPathGrid.PassableFast(newTileId))
-                        {
-                            result.Add(newTileId);
-                        }
-                    }
+                    //Remove a tile and mark it as visited
+                    numTilesAtDepth--;
+                    int tile = queue.Dequeue();
+                    found.Add(tile);
 
-                    currentDistance++;
+                    //If the tile is impassable, move on to the next tile.
+                    if (WorldGrid[tile].biome.impassable || WorldGrid[tile].hilliness == Hilliness.Impassable) continue;
+
+                    //Add this tile to the output
+                    res.Add(tile);
+
+                    //Add all of the tiles' neighbors (except for other found tiles, which includes impassable tiles) to the queue
+                    List<int> neighbors = new List<int>(7);
+                    WorldGrid.GetTileNeighbors(tile, neighbors);
+                    foreach (int t in neighbors)
+                    {
+                        if (!found.Contains(t)) queue.Enqueue(t);
+                    }
                 }
             }
 
-            return result;
+            return res;
         }
 
         private static List<int> TileAndNeighborsClaimable(int tile)
