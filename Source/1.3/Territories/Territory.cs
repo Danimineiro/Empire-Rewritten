@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Empire_Rewritten.Utils;
 using JetBrains.Annotations;
 using RimWorld;
 using RimWorld.Planet;
@@ -67,8 +68,23 @@ namespace Empire_Rewritten.Territories
 
         public void SettlementClaimTiles(Settlement settlement)
         {
-            // This could cause a race condition where two Empires claim the same Tile
-            Task.Run(() => ClaimTiles(GetSurroundingTiles(settlement.Tile, (int)(faction.def.techLevel + 1))));
+            Logger.Log("Claiming tiles...");
+            int extra = 2;
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            var n = GetSurroundingTilesN(settlement.Tile, (int)faction.def.techLevel + extra);
+            watch.Stop();
+            long ntime = watch.ElapsedMilliseconds;
+
+            watch = System.Diagnostics.Stopwatch.StartNew();
+            var o = GetSurroundingTilesO(settlement.Tile, (int)faction.def.techLevel + extra);
+            watch.Stop();
+
+            Logger.Log(string.Format("Settlement {0} tile claims (radius {1}) took {2}/{3} ms. Found {4}/{5} tiles.",
+                settlement.HasName ? settlement.Name : "",
+                (int)faction.def.techLevel + extra,
+                ntime, watch.ElapsedMilliseconds.ToString(), n.Count, o.Count));
+
+            ClaimTiles(n);
         }
 
         /// <summary>
@@ -78,7 +94,66 @@ namespace Empire_Rewritten.Territories
         /// <param name="distance"></param>
         /// <returns></returns>
         [NotNull]
-        public static List<int> GetSurroundingTiles(int centerTileId, int distance)
+        public static List<int> GetSurroundingTilesN(int centerTileId, int distance)
+        {
+            if (distance <= 0)
+            {
+                return new List<int> { centerTileId };
+            }
+
+            if (distance == 1)
+            {
+                return TileAndNeighborsClaimable(centerTileId);
+            }
+
+<<<<<<< Updated upstream
+            List<int> result = TileAndNeighborsClaimable(centerTileId);
+
+            int currentDistance = 1;
+            List<int> resultCopy = new List<int>(result);
+
+            foreach (int tile in resultCopy)
+=======
+            //Keep track of which tiles have been found
+            HashSet<int> found = new HashSet<int>();
+
+            queue.Enqueue(centerTileId);
+            found.Add(centerTileId);
+            while (queue.Count != 0 && distance > 0)
+>>>>>>> Stashed changes
+            {
+                Tile worldTile = WorldGrid[tile];
+                if (!worldTile.biome.impassable && worldTile.hilliness != Hilliness.Impassable)
+                {
+<<<<<<< Updated upstream
+                    foreach (int newTileId in GetSurroundingTiles(tile, distance - currentDistance))
+                    {
+=======
+                    //Remove a tile and mark it as visited
+                    numTilesAtDepth--;
+                    int tile = queue.Dequeue();
+
+                    //Add all of the tiles' neighbors (except for other found tiles, which includes impassable tiles) to the queue
+                    List<int> neighbors = new List<int>(7);
+                    WorldGrid.GetTileNeighbors(tile, neighbors);
+                    foreach (int t in neighbors)
+                    {
+                        if (!(found.Contains(t) || WorldGrid[t].biome.impassable ||
+                              WorldGrid[t].hilliness == Hilliness.Impassable))
+                        {
+                            queue.Enqueue(t);
+                            found.Add(t);
+                        }
+                    }
+                }
+
+                distance -= 1;
+            }
+
+            return new List<int>(found);
+        }
+
+        public static List<int> GetSurroundingTilesO(int centerTileId, int distance)
         {
             if (distance <= 0)
             {
@@ -100,8 +175,9 @@ namespace Empire_Rewritten.Territories
                 Tile worldTile = WorldGrid[tile];
                 if (!worldTile.biome.impassable && worldTile.hilliness != Hilliness.Impassable)
                 {
-                    foreach (int newTileId in GetSurroundingTiles(tile, distance - currentDistance))
+                    foreach (int newTileId in GetSurroundingTilesO(tile, distance - currentDistance))
                     {
+>>>>>>> Stashed changes
                         if (!result.Contains(newTileId) && WorldPathGrid.PassableFast(newTileId))
                         {
                             result.Add(newTileId);

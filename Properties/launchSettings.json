@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Empire-Rewritten": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Users\\Bootcamp\\Games\\Steam\\steamapps\\common\\RimWorld\\RimWorldWin64.exe"
+    }
+  }
+}
