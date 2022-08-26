@@ -15,7 +15,8 @@ namespace Empire_Rewritten.Territories
         private List<int> tiles = new List<int>();
 
         [UsedImplicitly]
-        public Territory() { }
+        public Territory()
+        { }
 
         public Territory(Faction faction)
         {
@@ -88,7 +89,9 @@ namespace Empire_Rewritten.Territories
         }
 
         /// <summary>
-        ///     Recursively gets neighboring <see cref="int">Tile IDs</see>.
+        ///     Returns the list of <see cref="int">Tile IDs</see> of the tiles reachable within a given distance from some center tile.
+        /// Impassable tiles are removed from the output (including the center tile). If the center tile is impassable, this function returns
+        /// an empty list.
         /// </summary>
         /// <param name="centerTileId"></param>
         /// <param name="distance"></param>
@@ -96,39 +99,24 @@ namespace Empire_Rewritten.Territories
         [NotNull]
         public static List<int> GetSurroundingTilesN(int centerTileId, int distance)
         {
-            if (distance <= 0)
-            {
-                return new List<int> { centerTileId };
-            }
+            if (distance < 0) return new List<int>();
 
-            if (distance == 1)
-            {
-                return TileAndNeighborsClaimable(centerTileId);
-            }
+            if (WorldGrid[centerTileId].biome.impassable || WorldGrid[centerTileId].hilliness == Hilliness.Impassable)
+                return new List<int>();
 
-<<<<<<< Updated upstream
-            List<int> result = TileAndNeighborsClaimable(centerTileId);
+            // The perimeter of a hexagon is 6 * its radius (in this case, distance). That's the maximum number of tiles that will be in the queue.
+            Queue<int> queue = new Queue<int>(6 * distance + 6);
 
-            int currentDistance = 1;
-            List<int> resultCopy = new List<int>(result);
-
-            foreach (int tile in resultCopy)
-=======
             //Keep track of which tiles have been found
             HashSet<int> found = new HashSet<int>();
 
             queue.Enqueue(centerTileId);
             found.Add(centerTileId);
             while (queue.Count != 0 && distance > 0)
->>>>>>> Stashed changes
             {
-                Tile worldTile = WorldGrid[tile];
-                if (!worldTile.biome.impassable && worldTile.hilliness != Hilliness.Impassable)
+                int numTilesAtDepth = queue.Count;
+                while (numTilesAtDepth != 0)
                 {
-<<<<<<< Updated upstream
-                    foreach (int newTileId in GetSurroundingTiles(tile, distance - currentDistance))
-                    {
-=======
                     //Remove a tile and mark it as visited
                     numTilesAtDepth--;
                     int tile = queue.Dequeue();
@@ -177,7 +165,6 @@ namespace Empire_Rewritten.Territories
                 {
                     foreach (int newTileId in GetSurroundingTilesO(tile, distance - currentDistance))
                     {
->>>>>>> Stashed changes
                         if (!result.Contains(newTileId) && WorldPathGrid.PassableFast(newTileId))
                         {
                             result.Add(newTileId);
