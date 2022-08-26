@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Empire_Rewritten.Utils;
+﻿using Empire_Rewritten.Utils;
 using JetBrains.Annotations;
 using RimWorld;
 using RimWorld.Planet;
+using System.Collections.Generic;
 using Verse;
 
 namespace Empire_Rewritten.Territories
@@ -135,7 +134,7 @@ namespace Empire_Rewritten.Territories
                     }
                 }
 
-                distance -= 1;
+                distance--;
             }
 
             return new List<int>(found);
