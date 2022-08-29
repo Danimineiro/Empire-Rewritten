@@ -68,23 +68,7 @@ namespace Empire_Rewritten.Territories
 
         public void SettlementClaimTiles(Settlement settlement)
         {
-            Logger.Log("Claiming tiles...");
-            int extra = 2;
-            var watch = System.Diagnostics.Stopwatch.StartNew();
-            var n = GetSurroundingTilesN(settlement.Tile, (int)faction.def.techLevel + extra);
-            watch.Stop();
-            long ntime = watch.ElapsedMilliseconds;
-
-            watch = System.Diagnostics.Stopwatch.StartNew();
-            var o = GetSurroundingTilesO(settlement.Tile, (int)faction.def.techLevel + extra);
-            watch.Stop();
-
-            Logger.Log(string.Format("Settlement {0} tile claims (radius {1}) took {2}/{3} ms. Found {4}/{5} tiles.",
-                settlement.HasName ? settlement.Name : "",
-                (int)faction.def.techLevel + extra,
-                ntime, watch.ElapsedMilliseconds.ToString(), n.Count, o.Count));
-
-            ClaimTiles(n);
+            ClaimTiles(GetSurroundingTiles(settlement.Tile, (int)faction.def.techLevel + 1));
         }
 
         /// <summary>
@@ -96,7 +80,7 @@ namespace Empire_Rewritten.Territories
         /// <param name="distance"></param>
         /// <returns></returns>
         [NotNull]
-        public static List<int> GetSurroundingTilesN(int centerTileId, int distance)
+        public static List<int> GetSurroundingTiles(int centerTileId, int distance)
         {
             if (distance < 0) return new List<int>();
 
@@ -138,50 +122,6 @@ namespace Empire_Rewritten.Territories
             }
 
             return new List<int>(found);
-        }
-
-        public static List<int> GetSurroundingTilesO(int centerTileId, int distance)
-        {
-            if (distance <= 0)
-            {
-                return new List<int> { centerTileId };
-            }
-
-            if (distance == 1)
-            {
-                return TileAndNeighborsClaimable(centerTileId);
-            }
-
-            List<int> result = TileAndNeighborsClaimable(centerTileId);
-
-            int currentDistance = 1;
-            List<int> resultCopy = new List<int>(result);
-
-            foreach (int tile in resultCopy)
-            {
-                Tile worldTile = WorldGrid[tile];
-                if (!worldTile.biome.impassable && worldTile.hilliness != Hilliness.Impassable)
-                {
-                    foreach (int newTileId in GetSurroundingTilesO(tile, distance - currentDistance))
-                    {
-                        if (!result.Contains(newTileId) && WorldPathGrid.PassableFast(newTileId))
-                        {
-                            result.Add(newTileId);
-                        }
-                    }
-
-                    currentDistance++;
-                }
-            }
-
-            return result;
-        }
-
-        private static List<int> TileAndNeighborsClaimable(int tile)
-        {
-            List<int> result = TileAndNeighbors(tile);
-            result.RemoveAll(tileID => !WorldPathGrid.PassableFast(tileID));
-            return result;
         }
 
         private static List<int> TileAndNeighbors(int tile)
