@@ -332,3 +332,8 @@ ASALocalRun/
 
 # Local History for Visual Studio
 .localhistory/
+
+
+Properties/*
+1.3/Assemblies/Empire-Rewritten.dll
+Empire-Rewritten.csproj
