@@ -7,15 +7,17 @@ using Verse;
 
 namespace Empire_Rewritten.AI
 {
-    public class AITileManager : AIModule
+    public class AITileManager
     {
         private static WorldGrid _worldGrid;
 
         private readonly Dictionary<int, float> tileWeights = new Dictionary<int, float>();
         private TechLevel cachedTechLevel = TechLevel.Undefined;
+        private AIPlayer player;
 
-        public AITileManager(AIPlayer player) : base(player)
+        public AITileManager(AIPlayer player)
         {
+            this.player = player;
             _worldGrid = Find.WorldGrid;
         }
 
@@ -121,13 +123,5 @@ namespace Empire_Rewritten.AI
                 }
             }
         }
-
-        public override void DoModuleAction()
-        {
-            CalculateAllUnknownTiles();
-        }
-
-        public override void DoThreadableAction()
-        { }
     }
 }

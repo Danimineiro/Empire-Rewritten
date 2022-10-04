@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Empire_Rewritten.Resources;
 using Empire_Rewritten.Utils;
 using Verse;
@@ -78,6 +79,33 @@ namespace Empire_Rewritten
             return true;
         }
 
+        /// <summary>
+        /// Calculate the average excess amount from a Dictionary<ThingDef, int> containing the amount wanted.</ThingDef>
+        /// </summary>
+        /// <param name="amountsWanted"></param>
+        /// <returns></returns>
+        public int GetAverageExcessResources(Dictionary<ThingDef,int> amountsWanted)
+        {
+            List<int> amount = new List<int>();
+            foreach(ThingDef thingDef in amountsWanted.Keys)
+                amount.Add(GetExcessResources(thingDef, amountsWanted[thingDef]));
+            return (int)amount.Average();
+        }
+
+        /// <summary>
+        /// Get the excess amount of a thingdef in storage
+        /// </summary>
+        /// <param name="thingDef"></param>
+        /// <param name="amountWanted"></param>
+        /// <returns></returns>
+        public int GetExcessResources(ThingDef thingDef, int amountWanted)
+        {
+            if(!ContainsThing(thingDef))
+                return -amountWanted;
+
+            int count = storedThings.Count;
+            return storedThings[thingDef] - amountWanted;
+        }
         /// <summary>
         /// Check if we can remove a set of <see cref="ThingDef"/> from the <see cref="StorageTracker"/>.
         /// </summary>

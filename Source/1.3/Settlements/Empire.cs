@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Empire_Rewritten.Controllers;
 using Empire_Rewritten.Facilities;
 using Empire_Rewritten.Resources;
 using Empire_Rewritten.Territories;
@@ -33,6 +34,17 @@ namespace Empire_Rewritten.Settlements
         private StorageTracker storageTracker = new StorageTracker();
         private Territory cachedTerritory;
 
+        public int AllFacilitiesInProgress(FacilityDef def)
+        {
+            int count = 0;
+            foreach(Settlement settlment in settlements.Keys)
+            {
+                FacilityManager manager = settlements[settlment];
+                count += manager.FacilityInProgress(def);
+            }
+            return count;
+        }
+        
         [UsedImplicitly]
         public Empire() { }
 
@@ -46,9 +58,35 @@ namespace Empire_Rewritten.Settlements
         public bool IsAIPlayer => isAIPlayer;
         public Faction Faction => faction;
 
+        public static Empire PlayerEmpire => UpdateController.CurrentWorldInstance.FactionController.ReadOnlyFactionSettlementData.Find(x => !x.SettlementManager.IsAIPlayer).SettlementManager;
+
         public StorageTracker StorageTracker => storageTracker;
         public Dictionary<Settlement, FacilityManager> Settlements => settlements;
         public List<int> SettlementTiles { get; } = new List<int>();
+
+        /// <summary>
+        ///     Find all resources produced.
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<ResourceDef, float> AllResourcesProduced()
+        {
+            Dictionary<ResourceDef, ResourceModifier> modifiers = this.ResourceModifiersFromAllFacilities();
+            Dictionary<ResourceDef, float> result = new Dictionary<ResourceDef, float>();
+            foreach (ResourceDef def in DefDatabase<ResourceDef>.AllDefsListForReading)
+            {
+                if (modifiers.ContainsKey(def))
+                {
+                    ResourceModifier resourceModifier = modifiers[def];
+                    result.Add(def, resourceModifier.TotalProduced());
+                }
+                else
+                {
+                    result.Add(def, 0);
+                }
+            }
+
+            return result;
+        }
 
         private Territory Territory
         {
@@ -142,6 +180,29 @@ namespace Empire_Rewritten.Settlements
             }
 
             return false;
+        }
+
+        /// <summary>
+        ///     Checks if it can remove the given <paramref name="settlement"/> of Type <see cref="Settlement"/>, and removes it if able
+        /// </summary>
+        /// <param name="settlement"></param>
+        /// <returns>True, if it could successfully remove the settlement, and false otherwise</returns>
+        public bool RemoveSettlement(Settlement settlement)
+        {
+            if (settlement is null)
+            {
+                $"Tried to remove a null settlement from an Empire!".ErrorOnce();
+                return false;
+            }
+
+            if (!settlements.ContainsKey(settlement))
+            {
+                $"Tried to remove Settlement of name: {settlement.LabelCap} from the Empire belonging to Faction with name: {faction.Name}, but Settlement does not belong to the Empire!".ErrorOnce();
+                return false;
+            }
+
+            settlements.Remove(settlement);
+            return true;
         }
 
         /// <summary>

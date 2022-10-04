@@ -30,12 +30,6 @@ namespace Empire_Rewritten.Events
             {
                 yield return $"{eventWorker.Name} is not a {nameof(Events.EventWorker)}";
             }
-
-            if (aiEventWorker != null && aiEventWorker != typeof(EventWorker) &&
-                !aiEventWorker.IsSubclassOf(typeof(EventWorker)))
-            {
-                yield return $"{aiEventWorker.Name} is not a {nameof(Events.EventWorker)}";
-            }
         }
 
         public override void ResolveReferences()
