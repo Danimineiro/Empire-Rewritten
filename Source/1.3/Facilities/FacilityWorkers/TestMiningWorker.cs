@@ -3,9 +3,9 @@ using Verse;
 
 namespace Empire_Rewritten.Facilities.FacilityWorkers
 {
-    public class TestWorker : FacilityWorker
+    public class TestMiningWorker : FacilityWorker
     {
-        public TestWorker(FacilityDef facilityDef) : base(facilityDef) { }
+        public TestMiningWorker(FacilityDef facilityDef) : base(facilityDef) { }
 
         public override IEnumerable<Gizmo> GetGizmos()
         {

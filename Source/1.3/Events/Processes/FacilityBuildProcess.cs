@@ -8,14 +8,30 @@ using Verse;
 
 namespace Empire_Rewritten.Events.Processes
 {
-    internal class FacilityBuildProcess : Process, ISlotID
+    /// <summary>
+    ///     A type of <see cref="Process"/> used to construct a new <see cref="Facility"/> inside a <see cref="FacilityManager"/>
+    /// </summary>
+    internal class FacilityBuildProcess : Process, IProcessSlotID
     {
         private FacilityManager facilityManager;
         private FacilityDef facilityDef;
         private int slotID;
 
-        public FacilityBuildProcess() { }
+        /// <summary>
+        ///     Used for saving/loading
+        /// </summary>
+        public FacilityBuildProcess() : base() { }
 
+        /// <summary>
+        ///     Creates a new <see cref="FacilityBuildProcess"/>
+        /// </summary>
+        /// <param name="label"></param>
+        /// <param name="toolTip"></param>
+        /// <param name="duration"></param>
+        /// <param name="iconPath"></param>
+        /// <param name="facilityManager"></param>
+        /// <param name="facilityDef"></param>
+        /// <param name="slotID"></param>
         public FacilityBuildProcess(string label, string toolTip, int duration, string iconPath, FacilityManager facilityManager, FacilityDef facilityDef, int slotID) : base(label, toolTip, duration, iconPath) 
         { 
             this.facilityManager = facilityManager; 
@@ -23,22 +39,15 @@ namespace Empire_Rewritten.Events.Processes
             this.slotID = slotID;
         }
 
-        protected override object[] Parms => new object[] { facilityDef, facilityManager };
-
+        /// <summary>
+        ///     A number marking in which slot this <see cref="FacilityBuildProcess"/> works in
+        /// </summary>
         public int SlotID { get => slotID; set => slotID = value; }
 
-        public override void Cancel()
-        {
-            base.Cancel();
-        }
-
+        /// <summary>
+        ///     Overrides <see cref="Process.Run"/>; Builds a new <see cref="Facility"/>, or adds to it using <see cref="Facility.AddFacility"/> if it already exists, inside the given <see cref="FacilityManager"/> <paramref name="facilityManager"/> using the <see cref="FacilityDef"/> <paramref name="facilityDef"/>; Notifies the <see cref="facilityManager"/>
+        /// </summary>
         protected override void Run()
-        {
-            Run(facilityDef, facilityManager);
-            facilityManager.NotifyProcessesChanged();
-        }
-
-        public static void Run(FacilityDef facilityDef, FacilityManager facilityManager)
         {
             if (facilityManager[facilityDef] is Facility facility)
             {
@@ -48,6 +57,7 @@ namespace Empire_Rewritten.Events.Processes
             {
                 facilityManager[facilityDef] = new Facility(facilityDef, facilityManager.Settlement);
             }
+            facilityManager.NotifyProcessesChanged();
         }
 
         public override void ExposeData()

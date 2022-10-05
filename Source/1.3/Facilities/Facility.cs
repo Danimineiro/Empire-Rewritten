@@ -48,7 +48,7 @@ namespace Empire_Rewritten.Facilities
 
         public void ExposeData()
         {
-            Scribe_Values.Look(ref def, "def");
+            Scribe_Defs.Look(ref def, "def");
             Scribe_Values.Look(ref amount, "amount");
             Scribe_References.Look(ref settlement, "settlement");
         }

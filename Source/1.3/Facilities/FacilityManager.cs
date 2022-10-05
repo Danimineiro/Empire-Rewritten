@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Empire_Rewritten.Events.Processes;
 using Empire_Rewritten.Resources;
@@ -23,15 +24,47 @@ namespace Empire_Rewritten.Facilities
 
         private Dictionary<FacilityDef, Facility> installedFacilities = new Dictionary<FacilityDef, Facility>();
         private List<ResourceModifier> cachedModifiers = new List<ResourceModifier>();
+        private HashSet<ResourceDef> cachedProducedResources;
         private List<Process> processes = new List<Process>();
+        private Dictionary<ThingDef, int> produce = new Dictionary<ThingDef, int>();
         private Settlement settlement;
 
         private bool refreshModifiers = true;
         private bool refreshGizmos = true;
         private int facilityCount;
         private int stage = 1;
-        private int id;
+        private int id = -1;
 
+        public Dictionary<ThingDef, int> Produce => produce;
+
+        public HashSet<ResourceDef> ProducedResourceDefsReadonly 
+        { 
+            get
+            {
+                if (cachedProducedResources is null)
+                {
+                    RefreshProducedResourcesCache();
+                }
+                return cachedProducedResources;
+            }
+        }
+
+        /// <summary>
+        ///     Refreshes the internal list <see cref="cachedProducedResources"/>
+        /// </summary>
+        public void RefreshProducedResourcesCache()
+        {
+            cachedProducedResources = new HashSet<ResourceDef>();
+            cachedProducedResources.AddRange(DefDatabase<ResourceDef>.AllDefsListForReading.Where(x => !x.isFacilityResource));
+            foreach (Facility facility in installedFacilities.Values)
+            {
+                cachedProducedResources.AddRange(facility.def.ProducedResources);
+            }
+        }
+
+        /// <summary>
+        ///     Used for Loading/Saving, creates the reference ID used for <see cref="ILoadReferenceable"/>
+        /// </summary>
         private static int NextID
         {
             get
@@ -41,16 +74,21 @@ namespace Empire_Rewritten.Facilities
             }
         }
 
+        /// <summary>
+        ///     Creates a new <see cref="FacilityManager"/> that manages the given <see cref="Settlement"/> <paramref name="settlement"/>
+        /// </summary>
+        /// <param name="settlement"></param>
         public FacilityManager(Settlement settlement) : base()
         {
             this.settlement = settlement;
-        }
-
-        [UsedImplicitly]
-        public FacilityManager() 
-        {
             id = NextID;
         }
+
+        /// <summary>
+        ///     Used for Loading/Saving
+        /// </summary>
+        [UsedImplicitly]
+        public FacilityManager() => lastID = Math.Max(lastID, id);
 
         /// <summary>
         ///     Looks through all facilities to return the <see cref="Facility"/> that has something at the given position 
@@ -85,11 +123,13 @@ namespace Empire_Rewritten.Facilities
             set => installedFacilities.TryAdd(facilityDef, value);
         }
 
+
+
         /// <param name="slotID"></param>
         /// <returns>The <see cref="FacilityBuildProcess"/> as <see cref="Process"/> that builds in the given <paramref name="slotID"/></returns>
         public Process GetProcessWithSlotID(int slotID)
         {
-            int pos = processes.FirstIndexOf((p) => p is ISlotID slotIDProcess && slotIDProcess.SlotID == slotID);
+            int pos = processes.FirstIndexOf((p) => p is IProcessSlotID slotIDProcess && slotIDProcess.SlotID == slotID);
             if(pos == -1) return null;
             return processes[pos];
         }
@@ -108,7 +148,7 @@ namespace Empire_Rewritten.Facilities
 
             for (int j = index; j < processes.Count; j++)
             {
-                if (processes[j] is ISlotID slotIDProcess)
+                if (processes[j] is IProcessSlotID slotIDProcess)
                 {
                     slotIDProcess.SlotID--;
                 }
@@ -117,6 +157,9 @@ namespace Empire_Rewritten.Facilities
             NotifyProcessesChanged();
         }
 
+        /// <summary>
+        ///     This function notifies this <see cref="FacilityManager"/> that it's List of <see cref="Process"/> (<see cref="Processes"/>) has changed and requires action
+        /// </summary>
         public void NotifyProcessesChanged()
         {
             processes.RemoveAll((p) => p.Progress >= 1f);
@@ -152,15 +195,28 @@ namespace Empire_Rewritten.Facilities
         /// </summary>
         public IEnumerable<FacilityDef> FacilityDefsInstalled => installedFacilities.Keys;
 
+        /// <summary>
+        ///     Returns true if the <see cref="FacilityManager"/> has reached its final stage
+        /// </summary>
         public bool IsFullyUpgraded => stage >= 12;
 
+        /// <summary>
+        ///     Returns the amount of <see cref="Facilities"/> that can be build in this <see cref="FacilityManager"/>
+        /// </summary>
         public int MaxFacilities => stage;
 
+        /// <summary>
+        ///     Upgrades this <see cref="FacilityManager"/> by the given <paramref name="amount"/>, can also be used to downgrade. Is limited to a minimum of 1 and maximum of 12
+        /// </summary>
+        /// <param name="amount"></param>
         public void ModifyStageBy(int amount)
         {
             stage = Mathf.Clamp(stage + amount, 1, 12);
         }
 
+        /// <summary>
+        ///     Returns the first open SlotID
+        /// </summary>
         public int FirstOpenSlotID
         {
             get
@@ -170,8 +226,14 @@ namespace Empire_Rewritten.Facilities
             }
         }
 
-        public int NumberOfFacilitiesBeingBuild => processes.Sum((p) => p is FacilityBuildProcess ? 1 : 0);
+        /// <summary>
+        ///     Counts the number of <see cref="FacilityBuildProcess"/>es inside the <see cref="Processes"/> list
+        /// </summary>
+        public int NumberOfFacilitiesBeingBuild => processes.Count(p => p is FacilityBuildProcess);
 
+        /// <summary>
+        ///     Counts the amount of installed <see cref="Facilities"/>
+        /// </summary>
         public int FacilityCount
         {
             get
@@ -185,17 +247,29 @@ namespace Empire_Rewritten.Facilities
             }
         }
 
+        /// <summary>
+        ///     Determines if new <see cref="Facilities"/> can be build at this location
+        /// </summary>
         public bool CanBuildNewFacilities => (FacilityCount + NumberOfFacilitiesBeingBuild) < MaxFacilities;
 
-        public Settlement Settlement { get => settlement; set => settlement = value; }
+        /// <summary>
+        ///     Returns the internal <see cref="RimWorld.Planet.Settlement"/>
+        /// </summary>
+        public Settlement Settlement => settlement;
+        
+        /// <summary>
+        ///     Exposes the internal list of <see cref="Process"/>es
+        /// </summary>
         public List<Process> Processes => processes;
 
         public void ExposeData()
         {
-            Scribe_Collections.Look(ref installedFacilities, nameof(installedFacilities), LookMode.Deep, LookMode.Deep);
+            Scribe_Collections.Look(ref installedFacilities, nameof(installedFacilities), LookMode.Def, LookMode.Deep);
             Scribe_Collections.Look(ref processes, nameof(processes), LookMode.Deep);
+            Scribe_Collections.Look(ref produce, nameof(produce), LookMode.Def, LookMode.Value);
             Scribe_References.Look(ref settlement, nameof(settlement));
             Scribe_Values.Look(ref stage, nameof(stage));
+            Scribe_Values.Look(ref id, nameof(id));
         }
 
         /// <summary>
@@ -209,7 +283,12 @@ namespace Empire_Rewritten.Facilities
             refreshGizmos = false;
             foreach (Facility facility in installedFacilities.Values)
             {
-                gizmos.AddRange(facility.FacilityWorker.GetGizmos());
+                IEnumerable<Gizmo> facilityGizmos = facility.FacilityWorker?.GetGizmos();
+
+                if (!facilityGizmos.EnumerableNullOrEmpty())
+                {
+                    gizmos.AddRange(facility.FacilityWorker.GetGizmos());
+                }
             }
 
             return gizmos;
@@ -226,19 +305,29 @@ namespace Empire_Rewritten.Facilities
             {
                 foreach (ResourceModifier modifier in facility.ResourceModifiers)
                 {
-                    if (calculatedModifiers.ContainsKey(modifier.def))
-                    {
-                        ResourceModifier newModifier = calculatedModifiers[modifier.def].MergeWithModifier(modifier);
-                        calculatedModifiers[modifier.def] = newModifier;
-                    }
-                    else
-                    {
-                        calculatedModifiers.Add(modifier.def, modifier);
-                    }
+                    AddOrSetResourceModifier(ref calculatedModifiers, modifier);
                 }
             }
 
+            foreach (ResourceDef def in DefDatabase<ResourceDef>.AllDefsListForReading)
+            {
+                AddOrSetResourceModifier(ref calculatedModifiers, def.GetTileModifier(Find.WorldGrid.tiles[settlement.Tile]));
+            }
+
             cachedModifiers = calculatedModifiers.Values.ToList();
+        }
+
+        private void AddOrSetResourceModifier(ref Dictionary<ResourceDef, ResourceModifier> calculatedModifiers, ResourceModifier modifier)
+        {
+            if (calculatedModifiers.ContainsKey(modifier.def))
+            {
+                ResourceModifier newModifier = calculatedModifiers[modifier.def].MergeWithModifier(modifier);
+                calculatedModifiers[modifier.def] = newModifier;
+            }
+            else
+            {
+                calculatedModifiers.Add(modifier.def, modifier);
+            }
         }
 
         /// <summary>
@@ -268,15 +357,7 @@ namespace Empire_Rewritten.Facilities
 
             processes.Add(new FacilityBuildProcess(facilityDef.LabelCap, "Empire_FM_BuildingToolTip".Translate(facilityDef.LabelCap), facilityDef.buildDuration, facilityDef.iconData.texPath, this, facilityDef, FirstOpenSlotID));
             NotifyProcessesChanged();
-            //if (installedFacilities.ContainsKey(facilityDef))
-            //{
-            //    installedFacilities[facilityDef].AddFacility();
-            //}
-            //else
-            //{
-            //    installedFacilities.Add(facilityDef, new Facility(facilityDef, settlement));
-            //    SetDataDirty(true);
-            //}
+            RefreshProducedResourcesCache();
         }
 
         /// <summary>
@@ -288,7 +369,7 @@ namespace Empire_Rewritten.Facilities
         {
             foreach (Process process in processes)
             {
-                if (process is ISlotID slotIDProcess)
+                if (process is IProcessSlotID slotIDProcess)
                 {
                     slotIDProcess.SlotID--;
                 }
@@ -302,6 +383,8 @@ namespace Empire_Rewritten.Facilities
                 installedFacilities.Remove(facilityDef);
                 SetDataDirty(true);
             }
+
+            RefreshProducedResourcesCache();
         }
 
         /// <summary>

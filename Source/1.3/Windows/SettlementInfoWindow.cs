@@ -13,6 +13,9 @@ using Verse.Sound;
 using Empire_Rewritten.Windows.Snippets;
 using Empire_Rewritten.Facilities;
 using Empire_Rewritten.Events.Processes;
+using Empire_Rewritten.Windows.Textures;
+using Empire_Rewritten.Resources;
+using Empire_Rewritten.AI;
 
 namespace Empire_Rewritten.Windows
 {
@@ -28,6 +31,7 @@ namespace Empire_Rewritten.Windows
 
         private readonly Rect rectMidTopLeft;
         private readonly Rect rectMidTopRight;
+        private readonly Rect rectMidTopRightInner;
         private readonly Rect rectMidBottomLeft;
         private readonly Rect rectMidBottomLeftLeft;
         private readonly Rect rectMidBottomLeftRight;
@@ -42,9 +46,17 @@ namespace Empire_Rewritten.Windows
         private readonly Rect rectFacilitiesRect;
         private readonly Rect rectFacilityRect = new Rect(0f, 0f, 64f, 64f);
 
+        private readonly Rect rectProduceSelectionMain;
+        private readonly Rect rectProduceSelectionScrollOuter;
+
         private readonly Vector2 buildingsRectSize = new Vector2(419f, 143f);
         private readonly Settlement settlement;
         private readonly FacilityManager facilityManager;
+
+        private readonly Color transparentGrey = ColorLibrary.Grey - new Color(0f, 0f, 0f, 0.6f);
+        private readonly Color otherGrey = new Color(.15f, .15f, .15f, 1f);
+
+        private readonly float resourceHeight;
 
         private const float CommonMargin = 5f;
         private const float UpperLowerHeight = 40f;
@@ -58,8 +70,13 @@ namespace Empire_Rewritten.Windows
         private const float ProcessRectHeight = 56f;
         private const int ProcessRectOutlineWidth = 3;
         private Rect rectMidBottomRightInner;
+        private Rect rectProduceSelectionScrollInner;
+
         private Vector2 processDisplayRectSize;
-        private Vector2 ScrollVec;
+        private Vector2 processScroll;
+        private Vector2 resourceScroll;
+        private Vector2 produceScroll;
+
         private string tempName;
         private bool nameClicked = false;
 
@@ -68,32 +85,45 @@ namespace Empire_Rewritten.Windows
             new SettlementAction()
             {
                 Label = "Empire_SIW_AbandonSettlement".Translate(),
-                Action = (settlement) =>
-                {
+                Action = () =>
+                {   
+                    SettlementInfoWindow settlementInfoWindow = Find.WindowStack.WindowOfType<SettlementInfoWindow>();
+                    Settlement settlement = settlementInfoWindow.settlement;
+
                     settlement.Destroy();
                     Empire.PlayerEmpire.RemoveSettlement(settlement);
-                    Find.WindowStack.WindowOfType<SettlementInfoWindow>().Close();
+                    settlementInfoWindow.Close();
                 }
             },
 
             new SettlementAction()
             {
                 Label = "Empire_SIW_Upgrade".Translate(),
-                Action = (settlement) =>
+                Action = () =>
                 {
-                    settlement.GetFacilityManager().ModifyStageBy(1);
+                    FacilityManager facilityManager = Find.WindowStack.WindowOfType<SettlementInfoWindow>().facilityManager;
+
+                    if (facilityManager.Processes.Count(p => p is UpgradeProcess) + facilityManager.MaxFacilities + 1 > 12)
+                    {
+                        Messages.Message("Empire_SIW_CanNotUpgrade_MaxStage".Translate(), MessageTypeDefOf.RejectInput);
+                        return;
+                    }
+
+                    UpgradeProcess process = new UpgradeProcess(30000, facilityManager);
+                    facilityManager.Processes.Add(process);
+                    facilityManager.NotifyProcessesChanged();
                 }
             },
 
             new SettlementAction()
             {
                 Label = "Test Add another option",
-                Action = (settlement) =>
+                Action = () =>
                 {
                     Actions.Add(new SettlementAction()
                     {
                         Label = "Another option",
-                        Action = (_) => { }
+                        Action = () => { }
                     });
                 }
             }
@@ -101,10 +131,10 @@ namespace Empire_Rewritten.Windows
 
         public SettlementInfoWindow(Settlement settlement)
         {
-            doCloseX = true;
             onlyOneOfTypeAllowed = true;
             preventCameraMotion = false;
-            //forcePause = true;
+            closeOnAccept = false;
+            draggable = true;
 
             this.settlement = settlement;
             facilityManager = Empire.PlayerEmpire.GetFacilityManager(settlement);
@@ -119,6 +149,9 @@ namespace Empire_Rewritten.Windows
             rectMidTopLeft = new Rect(rectMid.x, rectMid.y, LeftPartWidth, MidTopPartHeight);
             rectMidTopRight = new Rect(rectMid.x + LeftPartWidth + CommonMargin, rectMid.y, rectMid.width - LeftPartWidth - CommonMargin, MidTopPartHeight);
 
+            resourceHeight = Mathf.Round(rectMidTopRight.height / 4f);
+            rectMidTopRightInner = rectMidTopRight.GetInnerScrollRect(resourceHeight * DefDatabase<ResourceDef>.DefCount);
+
             rectMidBottomLeft = new Rect(rectMid.x, rectMid.y + MidTopPartHeight + CommonMargin, LeftPartWidth, rectMid.height - MidTopPartHeight - CommonMargin * 2f);
             rectMidBottomLeftLeft = rectMidBottomLeft.LeftPartPixels(buildingsRectSize.x);
             rectMidBottomLeftRight = rectMidBottomLeft.RightPartPixels(rectMidBottomLeft.width - buildingsRectSize.x).ContractedBy(CommonMargin);
@@ -130,11 +163,11 @@ namespace Empire_Rewritten.Windows
             rectDesignation = new Rect(rectMidTopLeft.x + rectFlag.width + CommonMargin * 2f, rectMidTopLeft.y + FlagSize * 0.5f, DesignationWidth, FlagSize * 0.5f);
             rectExtraInfo = new Rect( - CommonMargin, 0f, DesignationWidth * 1.5f, FlagSize * 0.5f).MoveRect(new Vector2(rectMidTopLeft.xMax - DesignationWidth * 1.5f, rectMidTopLeft.y + FlagSize * 0.5f));
 
-            rectFacilitiesLabel = new Rect(rectMidBottomLeftLeft.x + CommonMargin, rectMidBottomLeftLeft.y + CommonMargin, rectMidBottomLeftLeft.width - CommonMargin * 2f, FlagSize * 0.5f);
-            rectFacilitiesRect = new Rect(new Vector2(), buildingsRectSize)
-            {
-                center = rectMidBottomLeftLeft.center + new Vector2(0f, rectFacilitiesLabel.height + CommonMargin)
-            }.Rounded();
+            rectFacilitiesLabel = new Rect(new Vector2(rectMidBottomLeftLeft.x, rectMidBottomLeftLeft.yMax - buildingsRectSize.y - 24f), buildingsRectSize).Rounded();
+            rectFacilitiesRect = new Rect(new Vector2(rectMidBottomLeftLeft.x, rectMidBottomLeftLeft.yMax - buildingsRectSize.y), buildingsRectSize).Rounded();
+
+            rectProduceSelectionMain = new Rect(rectMidBottomLeftLeft.x, rectMidBottomLeftLeft.y, buildingsRectSize.x, buildingsRectSize.y).Rounded();
+            rectProduceSelectionScrollOuter = rectProduceSelectionMain.ContractedBy(CommonMargin);
 
             RecalculateScrollWidgets();
         }
@@ -147,7 +180,10 @@ namespace Empire_Rewritten.Windows
 
         public override void DoWindowContents(Rect inRect)
         {
-            WindowHelper.DrawLightCorneredHighlight(rectMidBottomLeftRight);
+            if (Widgets.CloseButtonFor(rectMain))
+            {
+                Close();
+            }
 
             DrawTopPart();
 
@@ -157,9 +193,8 @@ namespace Empire_Rewritten.Windows
 
             Widgets.DrawBox(rectMidTopLeft);
             Widgets.Label(rectMidTopLeft, "rectMidTopLeft");
-
-            Widgets.DrawBox(rectFlag);
-            Widgets.Label(rectFlag, "rectFlag");
+            
+            DrawFlag();
 
             Widgets.DrawLightHighlight(rectDesignation);
             Widgets.DrawBox(rectDesignation);
@@ -168,10 +203,8 @@ namespace Empire_Rewritten.Windows
             Widgets.DrawLightHighlight(rectExtraInfo);
             Widgets.DrawBox(rectExtraInfo);
             Widgets.Label(rectExtraInfo, "rectExtraInfo");
+            DrawMidTopRight();
 
-            Widgets.DrawBox(rectMidTopRight);
-            Widgets.Label(rectMidTopRight, "rectMidTopRight");
-            
             DrawBottomRightPart();
 
             Text.Anchor = TextAnchor.UpperLeft;
@@ -179,21 +212,82 @@ namespace Empire_Rewritten.Windows
             DrawBottomPart();
         }
 
+        private void DrawFlag()
+        {
+            Text.Font = GameFont.Medium;
+            Text.Anchor = TextAnchor.MiddleCenter;
+
+            Widgets.DrawHighlight(rectFlag);
+            Widgets.DrawShadowAround(rectFlag);
+
+            GUI.color = Color.grey;
+            Widgets.DrawBox(rectFlag, 3);
+            GUI.color = Color.white;
+
+            Widgets.Label(rectFlag, facilityManager.MaxFacilities.ToString());
+
+            Text.Font = GameFont.Small;
+            Text.Anchor = TextAnchor.UpperLeft;
+        }
+
+        /// <summary>
+        ///     Resource view
+        /// </summary>
+        private void DrawMidTopRight()
+        {
+            GUI.color = Color.grey;
+            Widgets.DrawBox(rectMidTopRight, 2);
+            GUI.color = Color.white;
+            Text.Anchor = TextAnchor.MiddleLeft;
+
+            Widgets.BeginScrollView(rectMidTopRight, ref resourceScroll, rectMidTopRightInner);
+            int count = 0;
+
+            foreach (ResourceModifier resourceModifier in facilityManager.Modifiers)
+            {
+                Text.Anchor = TextAnchor.MiddleLeft;
+                Rect tempLineRect = rectMidTopRightInner.TopPartPixels(resourceHeight).MoveRect(new Vector2(0f, resourceHeight * count));
+                Rect iconRect = tempLineRect.LeftPartPixels(tempLineRect.height).ContractedBy(4f);
+                Rect thingInfoRect = tempLineRect.RightPartPixels(tempLineRect.height).ContractedBy(8f);
+                Rect labelRect = new Rect(tempLineRect.x + tempLineRect.height + 2f, tempLineRect.y, tempLineRect.width - (tempLineRect.height + 2f) - thingInfoRect.width * 2f, tempLineRect.height);
+
+                ResourceDef resource = resourceModifier.def;
+
+                tempLineRect.DoRectHighlight(count % 2 == 0);
+                GUI.DrawTexture(iconRect, ContentFinder<Texture2D>.Get(resource.iconData.texPath));
+                Widgets.Label(labelRect, resource.LabelCap);
+
+                Text.Anchor = TextAnchor.MiddleRight;
+                Widgets.Label(labelRect, resourceModifier.TotalProduced().ToStringPercent());
+                if (WindowHelper.InfoCardButtonWorker(thingInfoRect))
+                {
+                    Find.WindowStack.Add(new ResourceInfoWindow(resource));
+                }
+                count++;
+            }
+
+            Widgets.EndScrollView();
+            Text.Anchor = TextAnchor.UpperLeft;
+        }
+
         internal void RecalculateScrollWidgets()
         {
             float height = -CommonMargin + (processDisplayRectSize.y + CommonMargin) * facilityManager.Processes.Count;
             rectMidBottomRightInner = rectMidBottomRightOuter.GetInnerScrollRect(height);
             processDisplayRectSize = new Vector2(rectMidBottomRightInner.width, ProcessRectHeight);
+
+            rectProduceSelectionScrollInner = rectProduceSelectionScrollOuter.GetInnerScrollRect((facilityManager.Produce.Count + CommonMargin) * ActionButtonHeight);
         }
 
         private void DrawBottomRightPart()
         {
             TextAnchor prev = Text.Anchor;
-            Widgets.DrawBox(rectMidBottomRight);
             Rect rectProcess = new Rect(rectMidBottomRightOuter.position, processDisplayRectSize);
-            
-            GUI.color = ColorLibrary.Grey - new Color(0f, 0f, 0f, 0.6f);
-            GUI.DrawTexture(rectMidBottomRightOuter, ContentFinder<Texture2D>.Get("UI/Filler/ConstructingBig"), ScaleMode.ScaleToFit);
+
+            GUI.color = Color.grey;
+            Widgets.DrawBox(rectMidBottomRight, 2);
+            GUI.color = transparentGrey;
+            GUI.DrawTexture(rectMidBottomRightOuter, Tex.InConstruction, ScaleMode.ScaleToFit);
             GUI.color = Color.white;
 
             if (facilityManager.Processes.Count == 0)
@@ -204,7 +298,7 @@ namespace Empire_Rewritten.Windows
                 return;
             }
 
-            Widgets.BeginScrollView(rectMidBottomRightOuter, ref ScrollVec, rectMidBottomRightInner);
+            Widgets.BeginScrollView(rectMidBottomRightOuter, ref processScroll, rectMidBottomRightInner);
 
             for (int i = 0; i < facilityManager.Processes.Count; i++)
             {
@@ -215,7 +309,7 @@ namespace Empire_Rewritten.Windows
 
                 Process curProcess = facilityManager.Processes[i];
 
-                Widgets.DrawBoxSolidWithOutline(rectProcess, new Color(.15f, .15f, .15f, 1f), ColorLibrary.Grey, ProcessRectOutlineWidth);
+                Widgets.DrawBoxSolidWithOutline(rectProcess, otherGrey, Color.grey, ProcessRectOutlineWidth);
 
                 GUI.DrawTexture(iconRect, curProcess.Icon);
                 Text.Anchor = TextAnchor.UpperLeft;
@@ -239,18 +333,99 @@ namespace Empire_Rewritten.Windows
 
         private void DrawBottomLeftParts()
         {
-            Widgets.DrawBox(rectMidBottomLeft);
-            //Widgets.Label(rectMidBottomLeft, "rectMidBottomLeft");
+            GUI.color = Color.grey;
+            Widgets.DrawBox(rectMidBottomLeft, 2);
+            Widgets.DrawBox(rectMidBottomLeftLeft, 2);
+            Widgets.DrawBox(rectFacilitiesRect, 2);
+            Widgets.DrawBox(rectProduceSelectionMain, 2);
+            GUI.color = Color.white;
 
-            Widgets.DrawBox(rectMidBottomLeftLeft);
-            //Widgets.Label(rectMidBottomLeftLeft, "rectMidBottomLeftLeft");
-           
             DrawActionButtons();
+            DrawFacilitySlots();
 
-            //Widgets.DrawBox(rectBuildingsLabel);
+            Dictionary<ThingDef, int> tempDic = new Dictionary<ThingDef, int>();
+            Rect rectProduceTemp = new Rect(rectProduceSelectionScrollInner.x, rectProduceSelectionScrollInner.y, rectProduceSelectionScrollInner.width, ActionButtonHeight);
+            bool removeThings = false;
+
+            Widgets.BeginScrollView(rectProduceSelectionScrollOuter, ref produceScroll, rectProduceSelectionScrollInner);
+
+            foreach (ThingDef curThing in facilityManager.Produce.Keys)
+            {
+                GUI.color = Color.grey;
+                Widgets.DrawBox(rectProduceTemp);
+                GUI.color = Color.white;
+                
+                string buffer = facilityManager.Produce[curThing].ToString();
+                int tempAmount = facilityManager.Produce[curThing];
+
+                Rect rectProduceTempInner = rectProduceTemp.ContractedBy(CommonMargin);
+                Rect tempRectThingDefIcon = rectProduceTempInner.LeftPartPixels(rectProduceTempInner.height);
+                Rect tempRectThingDefLabel = new Rect(rectProduceTempInner.x + tempRectThingDefIcon.width + CommonMargin, rectProduceTempInner.y, 150f, rectProduceTempInner.height);
+                Rect tempRectThingDefAmount = new Rect(rectProduceTempInner.x + tempRectThingDefIcon.width + tempRectThingDefLabel.width + CommonMargin * 2f, rectProduceTempInner.y, 35f, rectProduceTempInner.height);
+                Rect tempRectThingDefButtonPlus = new Rect(rectProduceTempInner.x + tempRectThingDefIcon.width + tempRectThingDefLabel.width + tempRectThingDefAmount.width + CommonMargin * 3f, rectProduceTempInner.y, 20f, rectProduceTempInner.height);
+                Rect tempRectThingDefButtonMinus = new Rect(rectProduceTempInner.x + tempRectThingDefIcon.width + tempRectThingDefLabel.width + tempRectThingDefAmount.width + tempRectThingDefButtonPlus.width + CommonMargin * 4f, rectProduceTempInner.y, 20f, rectProduceTempInner.height); ;
+
+                Widgets.DefIcon(tempRectThingDefIcon, curThing);
+                Widgets.Label(tempRectThingDefLabel, curThing.LabelCap);
+                Widgets.IntEntry(tempRectThingDefAmount, ref tempAmount, ref buffer);
+
+                tempAmount = Mathf.Clamp(tempAmount, 0, 100); //TODO: Think of maximum
+                removeThings = tempAmount == 0 || removeThings;
+
+                tempDic.SetOrAdd(curThing, tempAmount);
+
+                rectProduceTemp = rectProduceTemp.MoveRect(new Vector2(0f, ActionButtonHeight + CommonMargin));
+            }
+
+            facilityManager.Produce.Clear();
+            facilityManager.Produce.AddRange(tempDic);
+            if (removeThings) facilityManager.Produce.RemoveAll(x => x.Value == 0);
+
+            GUI.color = Color.grey;
+            Widgets.DrawBox(rectProduceTemp);
+            GUI.color = Color.white;
+
+            if (Widgets.ButtonInvisible(rectProduceTemp))
+            {
+                List<FloatMenuOption> tempOptions = new List<FloatMenuOption>();
+                HashSet<ResourceDef> defsProduced = facilityManager.ProducedResourceDefsReadonly;
+                HashSet<ThingDef> thingsProduced = new HashSet<ThingDef>();
+                
+                foreach (ResourceDef resourceDef in defsProduced)
+                {
+                    thingsProduced.AddRange(resourceDef.ResourcesCreated.AllowedThingDefs);
+                }
+                
+                foreach (ThingDef thingDef in thingsProduced)
+                {
+                    tempOptions.Add(new FloatMenuOption(thingDef.LabelCap, () => AddProduceToManager(thingDef), thingDef));
+                }
+
+                Find.WindowStack.Add(new FloatMenu(tempOptions));
+            }
+
+            Widgets.DrawHighlightIfMouseover(rectProduceTemp);
+            Text.Anchor = TextAnchor.MiddleCenter;
+            Widgets.Label(rectProduceTemp, "<b>Add Produce</b>");
+            Text.Anchor = TextAnchor.UpperLeft;
+
+            Widgets.EndScrollView();
+        }
+
+        private bool AddProduceToManager(ThingDef thing)
+        {
+            bool result = facilityManager.Produce.TryAdd(thing, 1);
+            RecalculateScrollWidgets();
+            return result;
+        }
+
+        private void DrawFacilitySlots()
+        {
+            Text.Anchor = TextAnchor.UpperCenter;
+
             Widgets.Label(rectFacilitiesLabel, $"<b>{"Empire_SIW_FacilitiesLabel".Translate()}</b>");
 
-            Widgets.DrawBox(rectFacilitiesRect);
+            Text.Anchor = TextAnchor.MiddleCenter;
             Vector2 moveVector = new Vector2();
 
             for (int i = 0; i < 2; i++)
@@ -261,14 +436,14 @@ namespace Empire_Rewritten.Windows
                     Rect buildingRect = new Rect(new Vector2(rectFacilitiesRect.x + CommonMargin, rectFacilitiesRect.y + CommonMargin), rectFacilityRect.size).MoveRect(moveVector);
                     moveVector += new Vector2(rectFacilityRect.width + CommonMargin, 0f);
 
-
+                    Widgets.DrawBoxSolid(buildingRect, otherGrey);
                     bool flag = TryDrawBuilding(currentSpot, buildingRect);
                     flag = flag || TryBlockSpot(currentSpot, buildingRect);
 
                     if (!flag)
                     {
                         GUI.color = new Color(1f, 1f, 1f, 0.2f);
-                        GUI.DrawTexture(buildingRect, ContentFinder<Texture2D>.Get("UI/Facilities/AddFacility"));
+                        GUI.DrawTexture(buildingRect, Tex.AddFacility);
                         GUI.color = Color.white;
 
                         if (Widgets.ButtonInvisible(buildingRect))
@@ -277,8 +452,10 @@ namespace Empire_Rewritten.Windows
                         }
                     }
 
-                    Widgets.DrawBox(buildingRect);
-                    Widgets.DrawLightHighlight(buildingRect);
+                    GUI.color = Color.grey;
+                    Widgets.DrawBox(buildingRect, 2);
+                    GUI.color = Color.white;
+
                     Widgets.DrawHighlightIfMouseover(buildingRect);
                 }
 
@@ -294,7 +471,7 @@ namespace Empire_Rewritten.Windows
 
                 float rightSide = buildingRect.width * process.Progress;
                 Rect progress = new Rect(buildingRect.x, buildingRect.y, rightSide, buildingRect.height);
-                GUI.DrawTexture(buildingRect, ContentFinder<Texture2D>.Get("UI/Facilities/InConstruction"));
+                GUI.DrawTexture(buildingRect, Tex.InConstruction);
 
                 Widgets.DrawBoxSolid(progress, ColorLibrary.BrightBlue - new Color(0f, 0f, 0f, 0.8f));
                 GUI.color = ColorLibrary.BrightBlue;
@@ -307,7 +484,7 @@ namespace Empire_Rewritten.Windows
             if (facilityManager.MaxFacilities <= currentSpot)
             {
                 TooltipHandler.TipRegion(buildingRect, "Empire_SIW_SlotLocked".TranslateSimple());
-                GUI.DrawTexture(buildingRect, ContentFinder<Texture2D>.Get("UI/Facilities/LockedBuildingSlot"));
+                GUI.DrawTexture(buildingRect, Tex.LockedBuildingSlot);
 
                 return true;
             }
@@ -359,7 +536,7 @@ namespace Empire_Rewritten.Windows
             //Create buttons that display any special option that can be taken in this settlement
             for (int i = 0; i < Math.Min(Actions.Count, 8); i++)
             {
-                Rect tempRect = new Rect(rectMidBottomLeftRight.x, rectMidBottomLeftRight.y, rectMidBottomLeftRight.width, ActionButtonHeight).MoveRect(new Vector2(0f, (ActionButtonHeight + CommonMargin) * i));
+                Rect tempRect = new Rect(rectMidBottomLeftRight.x - 1f, rectMidBottomLeftRight.y, rectMidBottomLeftRight.width, ActionButtonHeight).MoveRect(new Vector2(0f, (ActionButtonHeight + CommonMargin) * i));
 
                 //If there are too many options to be displayed, create a button that can display the remaining ones using a float menu
                 if (i == 7 && Actions.Count > 8)
@@ -370,7 +547,7 @@ namespace Empire_Rewritten.Windows
 
                         for (int j = i; j < Actions.Count; j++)
                         {
-                            options.Add(new FloatMenuOption(Actions[i].LabelCap, () => Actions[i].Action(settlement)));
+                            options.Add(new FloatMenuOption(Actions[i].LabelCap, () => Actions[i].Action()));
                         }
 
                         Find.WindowStack.Add(new FloatMenu(options));
@@ -381,7 +558,7 @@ namespace Empire_Rewritten.Windows
 
                 if (Widgets.ButtonText(tempRect, Actions[i].Label))
                 {
-                    Actions[i].Action(settlement);
+                    Actions[i].Action();
                     SoundDefOf.Click.PlayOneShotOnCamera();
                 }
             }
@@ -399,7 +576,7 @@ namespace Empire_Rewritten.Windows
 
             if (!nameClicked)
             {
-                Widgets.Label(rectTopContent, $"<b>{settlement.LabelCap}</b> | Level: {facilityManager.MaxFacilities}");
+                Widgets.Label(rectTopContent, $"<b>{settlement.LabelCap}</b>");
                 if (Widgets.ButtonInvisible(rectTopContent, false))
                 {
                     nameClicked = true;
@@ -434,7 +611,7 @@ namespace Empire_Rewritten.Windows
             {
                 defaultLabel = "Empire_SIW_OpenOverviewLabel".Translate(),
                 defaultDesc = "Empire_SIW_OpenOverviewDesc".Translate(),
-                icon = ContentFinder<Texture2D>.Get("UI/Icons/QuestionMark"),
+                icon = Tex.QuestionMark,
                 action = () => Find.WindowStack.Add(new SettlementInfoWindow(settlement))
             };
             

@@ -9,6 +9,7 @@ namespace Empire_Rewritten.Utils
     /// <summary>
     ///     This class provides some useful and often used basic window operations
     /// </summary>
+    [StaticConstructorOnStartup]
     public static class WindowHelper
     {
         private static Texture2D corner;
