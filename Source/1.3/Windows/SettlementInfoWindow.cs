@@ -180,7 +180,7 @@ namespace Empire_Rewritten.Windows
 
         public override void DoWindowContents(Rect inRect)
         {
-            if (Widgets.CloseButtonFor(rectMain))  Close();
+            if (Widgets.CloseButtonFor(rectMain)) Close();
 
             DrawTopPart();
 
@@ -190,12 +190,9 @@ namespace Empire_Rewritten.Windows
 
             Widgets.DrawBox(rectMidTopLeft);
             Widgets.Label(rectMidTopLeft, "rectMidTopLeft");
-            
-            DrawFlag();
 
-            Widgets.DrawLightHighlight(rectDesignation);
-            Widgets.DrawBox(rectDesignation);
-            Widgets.Label(rectDesignation, "rectDesignation");
+            DrawFlag();
+            DrawDesignation();
 
             Widgets.DrawLightHighlight(rectExtraInfo);
             Widgets.DrawBox(rectExtraInfo);
@@ -207,6 +204,18 @@ namespace Empire_Rewritten.Windows
             Text.Anchor = TextAnchor.UpperLeft;
 
             DrawBottomPart();
+        }
+
+        private void DrawDesignation()
+        {
+            GUI.color = Color.grey;
+            Widgets.DrawBox(rectDesignation, 2);
+            GUI.color = Color.white;
+            Widgets.DrawLightHighlight(rectDesignation);
+
+            Text.Anchor = TextAnchor.MiddleCenter;
+            Widgets.Label(rectDesignation, $"<b>{facilityManager.Designation}</b>");
+            Text.Anchor = TextAnchor.UpperLeft;
         }
 
         private void DrawFlag()
@@ -347,6 +356,7 @@ namespace Empire_Rewritten.Windows
             Dictionary<ThingDef, int> tempDic = new Dictionary<ThingDef, int>();
             Rect rectProduceTemp = new Rect(rectProduceSelectionScrollInner.x, rectProduceSelectionScrollInner.y, rectProduceSelectionScrollInner.width, ActionButtonHeight);
             bool removeThings = false;
+            bool amountChanged = false;
 
             Widgets.BeginScrollView(rectProduceSelectionScrollOuter, ref produceScroll, rectProduceSelectionScrollInner);
 
@@ -370,22 +380,26 @@ namespace Empire_Rewritten.Windows
                 Widgets.InfoCardButton(tempRectInfoIcon, curThing);
 
                 tempAmount = Mathf.Clamp(tempAmount, 0, 100); //TODO: Think of maximum
-                removeThings = tempAmount == 0 || removeThings;
+                removeThings |= tempAmount == 0;
+                amountChanged |= facilityManager.Produce[curThing] != tempAmount;
 
                 tempDic.SetOrAdd(curThing, tempAmount);
 
                 rectProduceTemp = rectProduceTemp.MoveRect(new Vector2(0f, ActionButtonHeight + CommonMargin));
             }
 
-            facilityManager.Produce.Clear();
-            facilityManager.Produce.AddRange(tempDic);
+            if (amountChanged)
+            {
+                facilityManager.Produce.Clear();
+                facilityManager.Produce.AddRange(tempDic);
+                facilityManager.RefreshCachedDesignation();
+            }
+
             if (removeThings)
             {
                 facilityManager.Produce.RemoveAll(x => x.Value == 0);
                 RecalculateScrollWidgets();
             }
-
-            DrawButtonBG(rectProduceTemp);
 
             if (Widgets.ButtonInvisible(rectProduceTemp))
             {
@@ -408,6 +422,7 @@ namespace Empire_Rewritten.Windows
                 Find.WindowStack.Add(new FloatMenu(tempOptions));
             }
 
+            DrawButtonBG(rectProduceTemp);
             Widgets.DrawHighlightIfMouseover(rectProduceTemp);
             Text.Anchor = TextAnchor.MiddleCenter;
             Widgets.Label(rectProduceTemp, "<b>Add Produce</b>");
@@ -428,6 +443,7 @@ namespace Empire_Rewritten.Windows
         {
             bool result = facilityManager.Produce.TryAdd(thing, 1);
             RecalculateScrollWidgets();
+            facilityManager.RefreshCachedDesignation();
             return result;
         }
 
@@ -518,7 +534,7 @@ namespace Empire_Rewritten.Windows
                         new FloatMenuOption("Empire_SIW_DeconstructFacility".Translate(currentFacilityDef.LabelCap), () => facilityManager.RemoveFacility(currentFacilityDef)),
                     };
 
-                    options.AddRange(GetFacilityOptions(currentFacilityDef));
+                    //options.AddRange(GetFacilityOptions(currentFacilityDef)); => TODO: Replace building dialog
                     Find.WindowStack.Add(new FloatMenu(options));
                 }
 

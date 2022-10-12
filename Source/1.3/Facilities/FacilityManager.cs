@@ -29,6 +29,7 @@ namespace Empire_Rewritten.Facilities
         private Dictionary<ThingDef, int> produce = new Dictionary<ThingDef, int>();
         private Settlement settlement;
 
+        private string cachedDesignation = "Empire_FM_Undefined".Translate();
         private bool refreshModifiers = true;
         private bool refreshGizmos = true;
         private int facilityCount;
@@ -37,13 +38,13 @@ namespace Empire_Rewritten.Facilities
 
         public Dictionary<ThingDef, int> Produce => produce;
 
-        public HashSet<ResourceDef> ProducedResourceDefsReadonly 
-        { 
+        public HashSet<ResourceDef> ProducedResourceDefsReadonly
+        {
             get
             {
                 if (cachedProducedResources is null)
                 {
-                    RefreshProducedResourcesCache();
+                    RefreshCaches();
                 }
                 return cachedProducedResources;
             }
@@ -52,7 +53,7 @@ namespace Empire_Rewritten.Facilities
         /// <summary>
         ///     Refreshes the internal list <see cref="cachedProducedResources"/>
         /// </summary>
-        public void RefreshProducedResourcesCache()
+        public void RefreshCaches()
         {
             cachedProducedResources = new HashSet<ResourceDef>();
             cachedProducedResources.AddRange(DefDatabase<ResourceDef>.AllDefsListForReading.Where(x => !x.isFacilityResource));
@@ -60,7 +61,28 @@ namespace Empire_Rewritten.Facilities
             {
                 cachedProducedResources.AddRange(facility.def.ProducedResources);
             }
+
+            RefreshCachedDesignation();
         }
+
+        /// <summary>
+        ///     Refreshes the settlements <see cref="cachedDesignation"/> 
+        /// </summary>
+        public void RefreshCachedDesignation()
+        {
+            ResourceDef[] tempList = new ResourceDef[cachedProducedResources.Count];
+            cachedProducedResources.CopyTo(tempList);
+            tempList.InsertionSort((resource0, resource1) => AmountOfProduceForResourceDef(resource1) - AmountOfProduceForResourceDef(resource0));
+
+            cachedDesignation = $"{tempList[0].LabelCap} {"Empire_FM_Settlement".Translate()}";
+        }
+
+        /// <summary>
+        ///     Calculates the amount of <see cref="ThingDef"/>s a <see cref="ResourceDef"/> is producing 
+        /// </summary>
+        /// <param name="def">the given <see cref="ResourceDef"/></param>
+        /// <returns>The amount</returns>
+        private int AmountOfProduceForResourceDef(ResourceDef def) => produce.Sum(kvp => (def.ResourcesCreated.AllowedThingDefs.Contains(kvp.Key) ? 1 : 0) * kvp.Value);
 
         /// <summary>
         ///     Used for Loading/Saving, creates the reference ID used for <see cref="ILoadReferenceable"/>
@@ -130,7 +152,7 @@ namespace Empire_Rewritten.Facilities
         public Process GetProcessWithSlotID(int slotID)
         {
             int pos = processes.FirstIndexOf((p) => p is IProcessSlotID slotIDProcess && slotIDProcess.SlotID == slotID);
-            if(pos == -1) return null;
+            if (pos == -1) return null;
             return processes[pos];
         }
 
@@ -256,18 +278,26 @@ namespace Empire_Rewritten.Facilities
         ///     Returns the internal <see cref="RimWorld.Planet.Settlement"/>
         /// </summary>
         public Settlement Settlement => settlement;
-        
+
         /// <summary>
         ///     Exposes the internal list of <see cref="Process"/>es
         /// </summary>
         public List<Process> Processes => processes;
+
+        /// <summary>
+        ///     The string that describes what this settlement focuses on
+        /// </summary>
+        public string Designation => cachedDesignation;
 
         public void ExposeData()
         {
             Scribe_Collections.Look(ref installedFacilities, nameof(installedFacilities), LookMode.Def, LookMode.Deep);
             Scribe_Collections.Look(ref processes, nameof(processes), LookMode.Deep);
             Scribe_Collections.Look(ref produce, nameof(produce), LookMode.Def, LookMode.Value);
+
             Scribe_References.Look(ref settlement, nameof(settlement));
+
+            Scribe_Values.Look(ref cachedDesignation, nameof(cachedDesignation));
             Scribe_Values.Look(ref stage, nameof(stage));
             Scribe_Values.Look(ref id, nameof(id));
         }
@@ -357,7 +387,7 @@ namespace Empire_Rewritten.Facilities
 
             processes.Add(new FacilityBuildProcess(facilityDef.LabelCap, "Empire_FM_BuildingToolTip".Translate(facilityDef.LabelCap), facilityDef.buildDuration, facilityDef.iconData.texPath, this, facilityDef, FirstOpenSlotID));
             NotifyProcessesChanged();
-            RefreshProducedResourcesCache();
+            RefreshCaches();
         }
 
         /// <summary>
@@ -384,7 +414,7 @@ namespace Empire_Rewritten.Facilities
                 SetDataDirty(true);
             }
 
-            RefreshProducedResourcesCache();
+            RefreshCaches();
         }
 
         /// <summary>
