@@ -1,6 +1,7 @@
 ﻿using Empire_Rewritten.Controllers;
 using Empire_Rewritten.Settlements;
 using Empire_Rewritten.Utils;
+using Empire_Rewritten.Windows.Textures;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -12,8 +13,6 @@ namespace Empire_Rewritten.Windows
 {
     public class ItemTransferWindow : Window
     {
-        private static readonly Texture2D TradeArrow = ContentFinder<Texture2D>.Get("UI/Widgets/TradeArrow", true);
-
         private readonly Empire playerEmpire;
 
         private readonly Rect rectFull = new Rect(0f, 0f, 900f, 600f);
@@ -169,7 +168,7 @@ namespace Empire_Rewritten.Windows
                 Rect itemReduceAmountButton = itemRectTransferAmount.LeftPartPixels(itemRectTransferAmount.height).MoveRect(new Vector2(itemRectTransferAmount.height, 0));
                 Rect itemIncreaseAmountButton = itemRectTransferAmount.RightPartPixels(itemRectTransferAmount.height).MoveRect(new Vector2(-itemRectTransferAmount.height, 0));
                 Rect itemNumericFieldFull = new Rect(itemRectTransferAmount.x + itemRectTransferAmount.height * 2f, itemRectTransferAmount.y, itemRectTransferAmount.width - itemRectTransferAmount.height * 4f, itemRectTransferAmount.height);
-                Rect itemNumericFieldTexture = new Rect(0f, 0f, TradeArrow.width, TradeArrow.height).CenteredOnXIn(itemNumericFieldFull).CenteredOnYIn(itemNumericFieldFull);
+                Rect itemNumericFieldTexture = new Rect(0f, 0f, Tex.TradeArrow.width, Tex.TradeArrow.height).CenteredOnXIn(itemNumericFieldFull).CenteredOnYIn(itemNumericFieldFull);
                 Rect itemNumericFieldInput = new Rect(0f, 0f, 55f, 21f).CenteredOnXIn(itemNumericFieldFull).CenteredOnYIn(itemNumericFieldFull);
                 Rect itemRectStorageAmount = itemRect.AlignXWith(rectRestRight);
                 Rect itemInfoRect = itemRect.RightPartPixels(itemRect.height).ContractedBy(4f);
@@ -236,7 +235,7 @@ namespace Empire_Rewritten.Windows
 
                 itemIncreaseAmountButton.DrawButtonText(">", () =>
                 {
-                    Log.Message($"width: {TradeArrow.width}, height: {TradeArrow.height})");
+                    Log.Message($"width: {Tex.TradeArrow.width}, height: {Tex.TradeArrow.height})");
                     itemTransferAmount += 1 * modifier;
                     SoundDefOf.Tick_Low.PlayOneShotOnCamera();
                 }, itemTransferAmount == amountOnMap);
@@ -245,11 +244,11 @@ namespace Empire_Rewritten.Windows
                 {
                     if (amountIs0OrMore)
                     {
-                        GUI.DrawTexture(itemNumericFieldTexture, TradeArrow);
+                        GUI.DrawTexture(itemNumericFieldTexture, Tex.TradeArrow);
                     }
                     else if (amountIs0OrLess)
                     {
-                        GUI.DrawTexture(itemNumericFieldTexture.FlipHorizontal(), TradeArrow);
+                        GUI.DrawTexture(itemNumericFieldTexture.FlipHorizontal(), Tex.TradeArrow);
                     }
                 }
 

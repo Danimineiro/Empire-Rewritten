@@ -38,7 +38,7 @@ namespace Empire_Rewritten.Windows
 
         public SettlementPlacementWindow()
         {
-            playerEmpire = UpdateController.CurrentWorldInstance.FactionController.ReadOnlyFactionSettlementData.Find(x => !x.SettlementManager.IsAIPlayer).SettlementManager;
+            playerEmpire = Empire.PlayerEmpire;
 
             doCloseX = true;
             onlyOneOfTypeAllowed = true;
@@ -78,7 +78,7 @@ namespace Empire_Rewritten.Windows
             GetTileData();
 
             DrawTop();
-            DrawMiddle();
+            DrawResourceInfo();
             DrawBottom();
             DrawCostList();
         }
@@ -118,11 +118,6 @@ namespace Empire_Rewritten.Windows
             Widgets.EndScrollView();
         }
 
-        private void DrawMiddle()
-        {
-            DrawResourceInfo();
-        }
-
         private void DrawResourceInfo()
         {
             Rect rectFull = rectResourceInfoInner.TopPartPixels(29f);
@@ -145,7 +140,7 @@ namespace Empire_Rewritten.Windows
                 Widgets.Label(rectLabel, def.LabelCap);
 
                 Text.Anchor = TextAnchor.MiddleRight;
-                Widgets.Label(rectModLabel, kvp.Value.multiplier.ToStringPercent());
+                Widgets.Label(rectModLabel, kvp.Value.TotalProduced().ToStringPercent());
                 Text.Anchor = TextAnchor.UpperLeft;
 
                 if (WindowHelper.InfoCardButtonWorker(rectThingInfo))

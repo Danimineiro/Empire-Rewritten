@@ -22,6 +22,8 @@ namespace Empire_Rewritten.Facilities
         public readonly bool requiresIdeology;
         public readonly bool requiresRoyalty;
 
+        public int buildDuration;
+
         public List<ThingDefCountClass> costList;
 
         public Type facilityWorker;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Empire_Rewritten.Controllers;
 using Empire_Rewritten.Facilities;
 using Empire_Rewritten.Resources;
 using Empire_Rewritten.Territories;
@@ -45,6 +46,8 @@ namespace Empire_Rewritten.Settlements
 
         public bool IsAIPlayer => isAIPlayer;
         public Faction Faction => faction;
+
+        public static Empire PlayerEmpire => UpdateController.CurrentWorldInstance.FactionController.ReadOnlyFactionSettlementData.Find(x => !x.SettlementManager.IsAIPlayer).SettlementManager;
 
         public StorageTracker StorageTracker => storageTracker;
         public Dictionary<Settlement, FacilityManager> Settlements => settlements;
@@ -142,6 +145,29 @@ namespace Empire_Rewritten.Settlements
             }
 
             return false;
+        }
+
+        /// <summary>
+        ///     Checks if it can remove the given <paramref name="settlement"/> of Type <see cref="Settlement"/>, and removes it if able
+        /// </summary>
+        /// <param name="settlement"></param>
+        /// <returns>True, if it could successfully remove the settlement, and false otherwise</returns>
+        public bool RemoveSettlement(Settlement settlement)
+        {
+            if (settlement is null)
+            {
+                $"Tried to remove a null settlement from an Empire!".ErrorOnce();
+                return false;
+            }
+
+            if (!settlements.ContainsKey(settlement))
+            {
+                $"Tried to remove Settlement of name: {settlement.LabelCap} from the Empire belonging to Faction with name: {faction.Name}, but Settlement does not belong to the Empire!".ErrorOnce();
+                return false;
+            }
+
+            settlements.Remove(settlement);
+            return true;
         }
 
         /// <summary>

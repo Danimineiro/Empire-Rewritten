@@ -4,15 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "fece2fc32c8f3691",
+        "id": "a2fcae547dc35f67",
         "type": "leaf",
         "state": {
-          "type": "markdown",
-          "state": {
-            "file": "Resources.md",
-            "mode": "source",
-            "source": false
-          }
+          "type": "empty",
+          "state": {}
         }
       }
     ],
@@ -69,7 +65,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Resources.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -87,7 +82,7 @@
     "width": 300,
     "collapsed": true
   },
-  "active": "fece2fc32c8f3691",
+  "active": "a2fcae547dc35f67",
   "lastOpenFiles": [
     "Resources.md"
   ]
