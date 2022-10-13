@@ -7,10 +7,10 @@ namespace Empire_Rewritten.Windows.Snippets
     public class SettlementAction
     {
         private string label;
-        private Action<Settlement> action;
+        private Action action;
         private string labelCapCached;
 
-        public Action<Settlement> Action
+        public Action Action
         {
             get => action;
             set => action = value;

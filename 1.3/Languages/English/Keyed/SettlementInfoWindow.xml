@@ -13,5 +13,6 @@
 	<Empire_SIW_DeconstructFacility>Deconstruct {0}</Empire_SIW_DeconstructFacility>
 	<Empire_SIW_ProcessProgress>{0} remaining.</Empire_SIW_ProcessProgress>
 	<Empire_SIW_NoProcesses>This settlement is currently not working on any special project.</Empire_SIW_NoProcesses>
+	<Empire_SIW_CanNotUpgrade_MaxStage>You can't upgrade this settlement past the maximum stage of 12!</Empire_SIW_CanNotUpgrade_MaxStage>
 </LanguageData>
 

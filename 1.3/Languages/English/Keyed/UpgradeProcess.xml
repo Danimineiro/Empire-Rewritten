@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+	<Empire_UP_Label>Settlement Upgrade</Empire_UP_Label>
+	<Empire_UP_Desc>This settlement is being upgraded to level {0}.</Empire_UP_Desc>
+</LanguageData>

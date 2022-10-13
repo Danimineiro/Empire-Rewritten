@@ -53,12 +53,12 @@ namespace Empire_Rewritten.Resources
         // TODO: NEEDS math changes. I know this is incorrect, but for some reason I (Nesi) cannot think of a correct way.
         // Either <c>(1 + offset) * multiplier</c> or <c>(1 * multiplier) + offset</c> (<c>multiplier + offset</c>), based solely on the names? -Toby
         /// <summary>
-        ///     TODO: Document
+        ///     Shortcut for (1 + offset) * multiplier
         /// </summary>
-        /// <returns></returns>
+        /// <returns>(1 + offset) * multiplier</returns>
         public float TotalProduced()
         {
-            return multiplier * offset;
+            return (1 + offset) * multiplier;
         }
     }
 }

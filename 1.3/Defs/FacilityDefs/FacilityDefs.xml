@@ -20,4 +20,10 @@
 		<defName>Empire_TestFacility</defName>
 		<label>Test Facility</label>
 	</Empire_Rewritten.Facilities.FacilityDef>
+
+	<Empire_Rewritten.Facilities.FacilityDef ParentName="Empire_FacilityBase">
+		<defName>Empire_TestMining</defName>
+		<label>Test Mining</label>
+		<facilityWorker>Empire_Rewritten.Facilities.FacilityWorkers.TestMiningWorker</facilityWorker>
+	</Empire_Rewritten.Facilities.FacilityDef>
 </Defs>

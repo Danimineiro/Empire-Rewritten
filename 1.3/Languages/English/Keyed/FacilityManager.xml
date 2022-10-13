@@ -1,4 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <LanguageData>
 	<Empire_FM_BuildingToolTip>This settlement is in the process of building a {0}.</Empire_FM_BuildingToolTip>
+	<Empire_FM_Undefined>Small Village</Empire_FM_Undefined>
+	<Empire_FM_Settlement>Settlement</Empire_FM_Settlement>
 </LanguageData>
