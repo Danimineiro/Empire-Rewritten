@@ -188,8 +188,9 @@ namespace Empire_Rewritten.Windows
 
             DrawBottomLeftParts();
 
-            Widgets.DrawBox(rectMidTopLeft);
-            Widgets.Label(rectMidTopLeft, "rectMidTopLeft");
+            GUI.color = Color.grey;
+            Widgets.DrawBox(rectMidTopLeft, 2);
+            GUI.color = Color.white;
 
             DrawFlag();
             DrawDesignation();
