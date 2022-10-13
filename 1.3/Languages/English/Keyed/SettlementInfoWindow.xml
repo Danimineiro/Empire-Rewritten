@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+	<Empire_SIW_OpenOverviewLabel>Open the settlement overview</Empire_SIW_OpenOverviewLabel>
+	<Empire_SIW_OpenOverviewDesc>Here you can see everything about your settlement! Facilities, workers and local decisions are made here.</Empire_SIW_OpenOverviewDesc>
+	<Empire_SIW_Apply>Click to apply</Empire_SIW_Apply>
+	<Empire_SIW_AbandonSettlement>Abandon Settlement</Empire_SIW_AbandonSettlement>
+	<Empire_SIW_MoreActions>More actions...</Empire_SIW_MoreActions>
+	<Empire_SIW_FacilitiesLabel>Facilities</Empire_SIW_FacilitiesLabel>
+	<Empire_SIW_SlotLocked>This slot is currently locked!\nUpgrade your settlement to unlock it.</Empire_SIW_SlotLocked>
+	<Empire_SIW_SlotInConstruction>Something is getting built here. Wait for it to finish or cancel the production.</Empire_SIW_SlotInConstruction>
+	<Empire_SIW_Upgrade>Upgrade settlement</Empire_SIW_Upgrade>
+	<Empire_SIW_ClickToDeconstructOrChangeFacility>Click to swap the buildings or deconstruct the existing one</Empire_SIW_ClickToDeconstructOrChangeFacility>
+	<Empire_SIW_DeconstructFacility>Deconstruct {0}</Empire_SIW_DeconstructFacility>
+	<Empire_SIW_ProcessProgress>{0} remaining.</Empire_SIW_ProcessProgress>
+	<Empire_SIW_NoProcesses>This settlement is currently not working on any special project.</Empire_SIW_NoProcesses>
+	<Empire_SIW_CanNotUpgrade_MaxStage>You can't upgrade this settlement past the maximum stage of 12!</Empire_SIW_CanNotUpgrade_MaxStage>
+</LanguageData>
+

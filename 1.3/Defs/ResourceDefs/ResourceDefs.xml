@@ -63,6 +63,8 @@
 				<li>1.0, 0.80</li>
 			</points>
 		</swampinessCurve>
+
+		<isFacilityResource>False</isFacilityResource>
 	</Empire_Rewritten.Resources.ResourceDef>
 
 	<Empire_Rewritten.Resources.ResourceDef ParentName="Empire_ResourceBase">
