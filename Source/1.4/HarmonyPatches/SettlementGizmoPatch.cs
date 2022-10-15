@@ -15,9 +15,10 @@ namespace Empire_Rewritten.HarmonyPatches
         /// </summary>
         public static void GizmoPatch(Settlement __instance, ref IEnumerable<Gizmo> __result)
         {
-            List<FactionSettlementData> data = UpdateController.CurrentWorldInstance.FactionController.ReadOnlyFactionSettlementData;
-            if(data.Any(x=>x.SettlementManager.Faction==__instance.Faction && x.SettlementManager.Settlements.ContainsKey(__instance)))
+            if (__instance.IsPlayerOperatedEmpireSettlement())
+            {
                 __result = __result.Concat(__instance.GetExtendedGizmos());
+            }
         }
     }
 }

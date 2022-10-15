@@ -60,6 +60,8 @@ namespace Empire_Rewritten.Resources
 
         private ResourceWorker worker;
 
+        public bool isFacilityResource = false;
+
         public Graphic Graphic => iconData.Graphic;
 
         /// <summary>

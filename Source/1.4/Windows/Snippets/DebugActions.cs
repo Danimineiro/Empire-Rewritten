@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
-namespace Empire_Rewritten.Windows
+namespace Empire_Rewritten.Windows.Snippets
 {
     public static class DebugActions
     {
