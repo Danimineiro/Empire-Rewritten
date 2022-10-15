@@ -1,20 +1,27 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Empire_Rewritten.Utils;
 using JetBrains.Annotations;
 using RimWorld;
 using RimWorld.Planet;
+using System.Collections.Generic;
 using Verse;
 
 namespace Empire_Rewritten.Territories
 {
     public class Territory : IExposable
     {
+        /// <summary>
+        /// The <see cref="RimWorld.Faction"/> that owns this territory.
+        /// </summary>
         private Faction faction;
 
+        /// <summary>
+        /// A list of the <see cref="int">IDs</see> of the tiles that belong to this territory.
+        /// </summary>
         private List<int> tiles = new List<int>();
 
         [UsedImplicitly]
-        public Territory() { }
+        public Territory()
+        { }
 
         public Territory(Faction faction)
         {
@@ -25,8 +32,14 @@ namespace Empire_Rewritten.Territories
 
         private static WorldPathGrid WorldPathGrid => Find.WorldPathGrid;
 
+        /// <summary>
+        /// The <see cref="RimWorld.Faction"/> that owns this territory.
+        /// </summary>
         public Faction Faction => faction;
 
+        /// <summary>
+        /// A list of the <see cref="int">IDs</see> of the tiles that belong to this territory.
+        /// </summary>
         public List<int> Tiles => tiles;
 
         public void ExposeData()
@@ -35,11 +48,20 @@ namespace Empire_Rewritten.Territories
             Scribe_Collections.Look(ref tiles, "tiles");
         }
 
+        /// <summary>
+        /// Checks if this territory contains <paramref name="tile"/>.
+        /// </summary>
+        /// <param name="tile">The <see cref="int">ID</see> of the world tile to check</param>
+        /// <returns>True if <paramref name="tile"/> belongs to this territory</returns>
         public bool HasTile(int tile)
         {
             return tiles.Contains(tile);
         }
 
+        /// <summary>
+        /// Claims a given tile, adding it to the territory. Does nothing if the tile is already claimed.
+        /// </summary>
+        /// <param name="id">The <see cref="int">ID</see> of the world tile to claim</param>
         public void ClaimTile(int id)
         {
             if (!TerritoryManager.GetTerritoryManager.AnyFactionOwnsTile(id))
@@ -49,6 +71,10 @@ namespace Empire_Rewritten.Territories
             }
         }
 
+        /// <summary>
+        /// Claims a given list of tiles, adding them to the territory. Tiles that are already claimed are ignored.
+        /// </summary>
+        /// <param name="ids">The <see cref="int">IDs</see> of the world tiles to claim</param>
         public void ClaimTiles([NotNull] List<int> ids)
         {
             foreach (int tile in ids)
@@ -57,6 +83,11 @@ namespace Empire_Rewritten.Territories
             }
         }
 
+        /// <summary>
+        /// Unclaims a given tile, removing it from the territory and setting it to ownerless. If the tile is not owned by this territory,
+        /// this function does nothing
+        /// </summary>
+        /// <param name="id">The <see cref="int">ID</see> of the world tile to unclaim</param>
         public void UnclaimTile(int id)
         {
             if (tiles.Contains(id))
@@ -65,69 +96,67 @@ namespace Empire_Rewritten.Territories
             }
         }
 
+        /// <summary>
+        /// Claims all the tiles surrounding a <see cref="Settlement"/>. The radius is computed from <see cref="Faction"/>'s tech level.
+        /// This function does not check if the <see cref="RimWorld.Faction">settlement's owner</see> is the same as this
+        /// <see cref="RimWorld.Faction">territory's owner</see>.
+        /// </summary>
+        /// <param name="settlement">The settlement whose neighboring tiles should be claimed</param>
         public void SettlementClaimTiles(Settlement settlement)
         {
-            // This could cause a race condition where two Empires claim the same Tile
-            Task.Run(() => ClaimTiles(GetSurroundingTiles(settlement.Tile, (int)(faction.def.techLevel + 1))));
+            ClaimTiles(GetSurroundingTiles(settlement.Tile, (int)faction.def.techLevel + 1));
         }
 
         /// <summary>
-        ///     Recursively gets neighboring <see cref="int">Tile IDs</see>.
+        /// Returns the list of tile <see cref="int">IDs</see> of all passable tiles reachable within a given distance from some center tile.
+        /// If the center tile is impassable, this function returns an empty list.
         /// </summary>
-        /// <param name="centerTileId"></param>
-        /// <param name="distance"></param>
-        /// <returns></returns>
+        /// <param name="centerTileId">The tile <see cref="int">ID</see> of the center tile</param>
+        /// <param name="distance">The maximum allowed distance from the center tile</param> TODO Figure out if this is inclusive or exclusive
+        /// <returns>The list of tile <see cref="int">IDs</see> of the passable tiles within <paramref name="distance"/> of <paramref name="centerTileId"/></returns>
         [NotNull]
         public static List<int> GetSurroundingTiles(int centerTileId, int distance)
         {
-            if (distance <= 0)
+            if (distance < 0) return new List<int>();
+
+            if (WorldGrid[centerTileId].biome.impassable || WorldGrid[centerTileId].hilliness == Hilliness.Impassable)
+                return new List<int>();
+
+            // The perimeter of a hexagon is 6 * its radius (in this case, distance). That's the maximum number of tiles that will be in the queue.
+            Queue<int> queue = new Queue<int>(6 * distance + 6);
+
+            //Keep track of which tiles have been found
+            HashSet<int> found = new HashSet<int>();
+
+            queue.Enqueue(centerTileId);
+            found.Add(centerTileId);
+            while (queue.Count != 0 && distance > 0)
             {
-                return new List<int> { centerTileId };
-            }
-
-            if (distance == 1)
-            {
-                return TileAndNeighborsClaimable(centerTileId);
-            }
-
-            List<int> result = TileAndNeighborsClaimable(centerTileId);
-
-            int currentDistance = 1;
-            List<int> resultCopy = new List<int>(result);
-
-            foreach (int tile in resultCopy)
-            {
-                Tile worldTile = WorldGrid[tile];
-                if (!worldTile.biome.impassable && worldTile.hilliness != Hilliness.Impassable)
+                int numTilesAtDepth = queue.Count;
+                while (numTilesAtDepth != 0)
                 {
-                    foreach (int newTileId in GetSurroundingTiles(tile, distance - currentDistance))
+                    //Remove a tile and mark it as visited
+                    numTilesAtDepth--;
+                    int tile = queue.Dequeue();
+
+                    //Add all of the tiles' neighbors (except for other found tiles, which includes impassable tiles) to the queue
+                    List<int> neighbors = new List<int>(7);
+                    WorldGrid.GetTileNeighbors(tile, neighbors);
+                    foreach (int t in neighbors)
                     {
-                        if (!result.Contains(newTileId) && WorldPathGrid.PassableFast(newTileId))
+                        if (!(found.Contains(t) || WorldGrid[t].biome.impassable ||
+                              WorldGrid[t].hilliness == Hilliness.Impassable))
                         {
-                            result.Add(newTileId);
+                            queue.Enqueue(t);
+                            found.Add(t);
                         }
                     }
-
-                    currentDistance++;
                 }
+
+                distance--;
             }
 
-            return result;
-        }
-
-        private static List<int> TileAndNeighborsClaimable(int tile)
-        {
-            List<int> result = TileAndNeighbors(tile);
-            result.RemoveAll(tileID => !WorldPathGrid.PassableFast(tileID));
-            return result;
-        }
-
-        private static List<int> TileAndNeighbors(int tile)
-        {
-            List<int> result = new List<int>();
-            WorldGrid.GetTileNeighbors(tile, result);
-            result.Add(tile);
-            return result;
+            return new List<int>(found);
         }
     }
 }

@@ -98,7 +98,6 @@ namespace Empire_Rewritten.AI
                 }
             }
             */
-            
 
             weight += techWeight + hillinessOffsetWeight + randomOffsetWeight + distanceWeight;
             return weight;
@@ -128,6 +127,7 @@ namespace Empire_Rewritten.AI
             CalculateAllUnknownTiles();
         }
 
-        public override void DoThreadableAction() { }
+        public override void DoThreadableAction()
+        { }
     }
 }
