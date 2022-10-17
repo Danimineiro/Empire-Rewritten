@@ -119,7 +119,7 @@ namespace Empire_Rewritten.AI
         /// <returns></returns>
         public Dictionary<ResourceDef, float> AllResourcesProduced()
         {
-            Dictionary<ResourceDef, ResourceModifier> modifiers = parentPlayer.Manager.ResourceModifiersFromAllFacilities();
+            Dictionary<ResourceDef, ResourceModifier> modifiers = parentPlayer.Empire.ResourceModifiersFromAllFacilities();
             Dictionary<ResourceDef, float> result = new Dictionary<ResourceDef, float>();
             foreach (ResourceDef def in DefDatabase<ResourceDef>.AllDefsListForReading)
             {

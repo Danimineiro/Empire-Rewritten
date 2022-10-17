@@ -27,7 +27,7 @@ namespace Empire_Rewritten.AI
                 if (cachedFacilities.NullOrEmpty() || updateCache)
                 {
                     updateCache = false;
-                    cachedFacilities = player.Manager.AllFacilityManagers.ToList();
+                    cachedFacilities = player.Empire.AllFacilityManagers.ToList();
                     updateDefCache = true;
                 }
 
@@ -66,7 +66,7 @@ namespace Empire_Rewritten.AI
             {
                 float weight = 0;
                 weight += manager.FacilityDefsInstalled.Contains(facilityDef) ? 0.5f : -0.5f;
-                weight += player.ResourceManager.GetTileResourceWeight(tiles[player.Manager.GetSettlement(manager).Tile]);
+                weight += player.ResourceManager.GetTileResourceWeight(tiles[player.Empire.GetSettlement(manager).Tile]);
 
                 if (facilityWeights.ContainsKey(weight))
                 {
@@ -92,7 +92,7 @@ namespace Empire_Rewritten.AI
             bool allResourcesPullable = true;
             foreach (ThingDefCountClass thingDefCountClass in facilityDef.costList)
             {
-                allResourcesPullable = allResourcesPullable && player.Manager.StorageTracker.CanRemoveThingsFromStorage(thingDefCountClass.thingDef, thingDefCountClass.count);
+                allResourcesPullable = allResourcesPullable && player.Empire.StorageTracker.CanRemoveThingsFromStorage(thingDefCountClass.thingDef, thingDefCountClass.count);
             }
 
             return allResourcesPullable;
@@ -111,7 +111,7 @@ namespace Empire_Rewritten.AI
                 {
                     foreach (ThingDefCountClass thingDefCountClass in def.costList)
                     {
-                        player.Manager.StorageTracker.TryRemoveThingsFromStorage(thingDefCountClass.thingDef, thingDefCountClass.count);
+                        player.Empire.StorageTracker.TryRemoveThingsFromStorage(thingDefCountClass.thingDef, thingDefCountClass.count);
                     }
 
                     manager.AddFacility(def);
@@ -129,7 +129,7 @@ namespace Empire_Rewritten.AI
         public FacilityManager FindManagerToBuildOn()
         {
             List<ResourceDef> resourceDefs = player.ResourceManager.LowResources;
-            IEnumerable<FacilityManager> managers = player.Manager.AllFacilityManagers.Where(x => x.CanBuildNewFacilities);
+            IEnumerable<FacilityManager> managers = player.Empire.AllFacilityManagers.Where(x => x.CanBuildNewFacilities);
             List<FacilityManager> potentialResults = new List<FacilityManager>();
             foreach (FacilityManager facilityManager in managers)
             {
@@ -173,7 +173,7 @@ namespace Empire_Rewritten.AI
 
         public bool RemoveFacility(FacilityDef facilityDef)
         {
-            KeyValuePair<Settlement, FacilityManager> settlementAndManager = player.Manager.Settlements.First(x => x.Value.HasFacility(facilityDef));
+            KeyValuePair<Settlement, FacilityManager> settlementAndManager = player.Empire.Settlements.First(x => x.Value.HasFacility(facilityDef));
             Settlement settlement = settlementAndManager.Key;
             FacilityManager facilityManager = settlementAndManager.Value;
 

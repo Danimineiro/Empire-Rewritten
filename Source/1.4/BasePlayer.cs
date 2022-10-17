@@ -1,4 +1,5 @@
 ﻿using Empire_Rewritten.Controllers;
+using Empire_Rewritten.Settlements;
 using RimWorld;
 
 namespace Empire_Rewritten
@@ -8,12 +9,27 @@ namespace Empire_Rewritten
     /// </summary>
     public abstract class BasePlayer
     {
-        public Faction faction;
+        private Empire cachedEmpire;
+        public Faction Faction { get; }
+        private bool cacheDirty = true;
 
         public BasePlayer(Faction faction)
         {
-            this.faction = faction;
+            Faction = faction;
             PlayerHandler.RegisterPlayer(this);
+        }
+        
+        public Empire Empire
+        {
+            get
+            {
+                if (cachedEmpire != null && !cacheDirty) return cachedEmpire;
+                
+                cachedEmpire = UpdateController.CurrentWorldInstance.FactionController.GetOwnedSettlementManager(Faction);
+                cacheDirty = false;
+
+                return cachedEmpire;
+            }
         }
 
         /// <summary>

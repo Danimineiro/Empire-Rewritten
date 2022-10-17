@@ -7,27 +7,8 @@ namespace Empire_Rewritten.Player
 {
     public class UserPlayer : BasePlayer
     {
-        private Empire cachedManager;
-        private bool managerIsDirty;
-
         public UserPlayer(Faction faction) : base(faction) { }
 
-        public Empire Manager
-        {
-            get
-            {
-                if (cachedManager == null || managerIsDirty)
-                {
-                    managerIsDirty = false;
-                    UpdateController updateController = UpdateController.CurrentWorldInstance;
-                    FactionController factionController = updateController.FactionController;
-
-                    cachedManager = factionController.GetOwnedSettlementManager(faction);
-                }
-
-                return cachedManager;
-            }
-        }
 
         public override void MakeMove(FactionController factionController)
         {

@@ -1,15 +1,11 @@
 ﻿using System.Threading.Tasks;
 using Empire_Rewritten.Controllers;
-using Empire_Rewritten.Settlements;
 using RimWorld;
 
 namespace Empire_Rewritten.AI
 {
     public class AIPlayer : BasePlayer
     {
-        private Empire cachedManager;
-        private bool managerIsDirty = true;
-
         private int threadTick;
 
         private int tick;
@@ -24,27 +20,9 @@ namespace Empire_Rewritten.AI
 
         public AITileManager TileManager => tileManager ?? (tileManager = new AITileManager(this));
 
-        public Empire Manager
-        {
-            get
-            {
-                if (cachedManager == null || managerIsDirty)
-                {
-                    managerIsDirty = false;
-                    UpdateController updateController = UpdateController.CurrentWorldInstance;
-                    FactionController factionController = updateController.FactionController;
-
-                    cachedManager = factionController.GetOwnedSettlementManager(Faction);
-                }
-
-                return cachedManager;
-            }
-        }
-
         public AISettlementManager SettlementManager { get; }
         public AIFacilityManager FacilityManager { get; }
         public AIResourceManager ResourceManager { get; }
-        public Faction Faction => faction;
 
         public override void MakeMove(FactionController factionController)
         {
