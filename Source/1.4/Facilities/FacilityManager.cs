@@ -5,6 +5,7 @@ using Empire_Rewritten.Events.Processes;
 using Empire_Rewritten.Resources;
 using Empire_Rewritten.Utils;
 using JetBrains.Annotations;
+using RimWorld;
 using RimWorld.Planet;
 using UnityEngine;
 using Verse;
@@ -385,7 +386,7 @@ namespace Empire_Rewritten.Facilities
                 return;
             }
 
-            processes.Add(new FacilityBuildProcess(facilityDef.LabelCap, "Empire_FM_BuildingToolTip".Translate(facilityDef.LabelCap), facilityDef.buildDuration, facilityDef.iconData.texPath, this, facilityDef, FirstOpenSlotID));
+            processes.Add(new FacilityBuildProcess(facilityDef.LabelCap, "Empire_FM_BuildingToolTip".Translate(facilityDef.LabelCap), DebugSettings.godMode ? 0 : facilityDef.buildDuration, facilityDef.iconData.texPath, this, facilityDef, FirstOpenSlotID));
             NotifyProcessesChanged();
             RefreshCaches();
         }
