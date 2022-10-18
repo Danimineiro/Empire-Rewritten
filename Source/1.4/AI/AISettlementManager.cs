@@ -18,7 +18,7 @@ namespace Empire_Rewritten.AI
 
         public bool AttemptToUpgradeSettlement(Settlement settlement)
         {
-            FacilityManager facilityManager = player.Manager.GetFacilityManager(settlement);
+            FacilityManager facilityManager = player.Empire.GetFacilityManager(settlement);
 
             return AttemptToUpgradeSettlement(facilityManager);
         }
@@ -36,9 +36,9 @@ namespace Empire_Rewritten.AI
         public void BuildOrUpgradeNewSettlement()
         {
             bool upgradedSettlement = false;
-            if (player.Manager.Settlements.Count > 0)
+            if (player.Empire.Settlements.Count > 0)
             {
-                FacilityManager facilityManager = player.Manager.Settlements.Where(x => !x.Value.IsFullyUpgraded).RandomElement().Value;
+                FacilityManager facilityManager = player.Empire.Settlements.Where(x => !x.Value.IsFullyUpgraded).RandomElement().Value;
                 upgradedSettlement = AttemptToUpgradeSettlement(facilityManager);
             }
 
@@ -87,7 +87,7 @@ namespace Empire_Rewritten.AI
 
         public bool AttemptToBuildSettlement()
         {
-            if (tileToBuildOn != null && player.Manager.StorageTracker.CanRemoveThingsFromStorage(Empire.SettlementCost))
+            if (tileToBuildOn != null && player.Empire.StorageTracker.CanRemoveThingsFromStorage(Empire.SettlementCost))
             {
                 BuildSettlement();
                 return true;
@@ -99,7 +99,7 @@ namespace Empire_Rewritten.AI
         {
             if (tileToBuildOn != null)
             {
-                player.Manager.BuildNewSettlementOnTile(tileToBuildOn);
+                player.Empire.BuildNewSettlementOnTile(tileToBuildOn);
                 tileToBuildOn = null;
             }
         }

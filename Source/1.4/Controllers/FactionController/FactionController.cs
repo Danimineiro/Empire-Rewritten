@@ -22,15 +22,13 @@ namespace Empire_Rewritten.Controllers
     public class FactionController : IExposable
     {
         public const int daysPerTurn = 15;
- 
         private readonly Dictionary<Faction, AIPlayer> AIFactions = new Dictionary<Faction, AIPlayer>();
         private readonly List<FactionCivicAndEthicData> factionCivicAndEthicDataList = new List<FactionCivicAndEthicData>();
-        private List<FactionSettlementData> factionSettlementDataList = new List<FactionSettlementData>();
-        private TerritoryManager territoryManager = new TerritoryManager();
-        private Faction playerFaction;
-        private EventManager eventManager = new EventManager();
 
-        public List<FactionSettlementData> ReadOnlyFactionSettlementData => factionSettlementDataList;
+        private EventManager eventManager = new EventManager();
+        private List<FactionSettlementData> factionSettlementDataList = new List<FactionSettlementData>();
+        private Faction playerFaction;
+        private TerritoryManager territoryManager = new TerritoryManager();
         /// <summary>
         ///     Needed for loading
         /// </summary>
@@ -51,6 +49,8 @@ namespace Empire_Rewritten.Controllers
             territoryManager = new TerritoryManager();
             this.factionSettlementDataList = factionSettlementDataList;
         }
+
+        public List<FactionSettlementData> ReadOnlyFactionSettlementData => factionSettlementDataList;
 
         public TerritoryManager TerritoryManager => territoryManager;
 
@@ -89,7 +89,7 @@ namespace Empire_Rewritten.Controllers
         /// <returns></returns>
         public AIPlayer GetAIPlayer(Faction faction)
         {
-            return AIFactions.ContainsKey(faction) ? AIFactions[faction] : null;
+            return AIFactions.TryGetValue(faction);
         }
 
         public void CreatePlayer()
@@ -121,7 +121,7 @@ namespace Empire_Rewritten.Controllers
                     Logger.Error(nameof(settlements) + " has null-entry");
                 }
 
-                aiPlayer.Manager.AddSettlement(settlements[0]);
+                aiPlayer.Empire.AddSettlement(settlements[0]);
                 settlements.RemoveAt(0);
 
                 foreach (Settlement item in settlements)

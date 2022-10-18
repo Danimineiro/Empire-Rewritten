@@ -41,14 +41,12 @@ namespace Empire_Rewritten
             }
         }
 
-
-
         public bool TryRemoveThingsFromStorage(Dictionary<ThingDef, int> things)
         {
             bool hasRemovedThings = true;
-            foreach(KeyValuePair<ThingDef,int> kvp in things)
+            foreach (KeyValuePair<ThingDef, int> kvp in things)
             {
-               hasRemovedThings &= TryRemoveThingsFromStorage(kvp.Key, kvp.Value);
+                hasRemovedThings &= TryRemoveThingsFromStorage(kvp.Key, kvp.Value);
             }
             return hasRemovedThings;
         }
@@ -62,11 +60,13 @@ namespace Empire_Rewritten
         /// <returns>Whether the given <paramref name="count" /> of <paramref name="def" /> could successfully be removed</returns>
         public bool TryRemoveThingsFromStorage(ThingDef def, int count)
         {
+            if (DebugSettings.godMode) return true;
             if (!CanRemoveThingsFromStorage(def, count)) return false;
 
             int newCount = storedThings[def] -= count;
             if (newCount <= 0)
             {
+                // This can happen in God mode because CanRemoveTingsFromStorage will return true regardless.
                 if (newCount < 0)
                 {
                     Logger.Warn($"We had negative of {def.defName} after {nameof(TryRemoveThingsFromStorage)}, this shouldn't happen");
@@ -79,16 +79,17 @@ namespace Empire_Rewritten
         }
 
         /// <summary>
-        /// Check if we can remove a set of <see cref="ThingDef"/> from the <see cref="StorageTracker"/>.
+        ///     Check if we can remove a set of <see cref="ThingDef" /> from the <see cref="StorageTracker" />.
         /// </summary>
         /// <param name="thingsAndAmount"></param>
         /// <returns></returns>
         public bool CanRemoveThingsFromStorage(Dictionary<ThingDef, int> thingsAndAmount)
         {
+            if (DebugSettings.godMode) return true;
             bool canRemove = true;
-            foreach(KeyValuePair<ThingDef, int> kvp in thingsAndAmount)
+            foreach (KeyValuePair<ThingDef, int> kvp in thingsAndAmount)
             {
-               canRemove &= CanRemoveThingsFromStorage(kvp.Key, kvp.Value);
+                canRemove &= CanRemoveThingsFromStorage(kvp.Key, kvp.Value);
             }
             return canRemove;
         }
