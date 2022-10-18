@@ -60,13 +60,14 @@ namespace Empire_Rewritten
         /// <returns>Whether the given <paramref name="count" /> of <paramref name="def" /> could successfully be removed</returns>
         public bool TryRemoveThingsFromStorage(ThingDef def, int count)
         {
+            if (DebugSettings.godMode) return true;
             if (!CanRemoveThingsFromStorage(def, count)) return false;
 
             int newCount = storedThings[def] -= count;
             if (newCount <= 0)
             {
                 // This can happen in God mode because CanRemoveTingsFromStorage will return true regardless.
-                if (newCount < 0 && !DebugSettings.godMode)
+                if (newCount < 0)
                 {
                     Logger.Warn($"We had negative of {def.defName} after {nameof(TryRemoveThingsFromStorage)}, this shouldn't happen");
                 }
