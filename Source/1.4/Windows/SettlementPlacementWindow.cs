@@ -209,7 +209,7 @@ namespace Empire_Rewritten.Windows
                 flag = false;
             }
 
-            if (!DebugSettings.godMode && !playerEmpire.StorageTracker.CanRemoveThingsFromStorage(Empire.SettlementCost))
+            if (!playerEmpire.StorageTracker.CanRemoveThingsFromStorage(Empire.SettlementCost))
             {
                 reasons.Add("Empire_SPW_NoResources".Translate());
                 flag = false;
