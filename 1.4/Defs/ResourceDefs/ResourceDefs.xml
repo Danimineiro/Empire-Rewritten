@@ -389,4 +389,13 @@
 		</swampinessCurve>
 
 	</Empire_Rewritten.Resources.ResourceDef>
+
+	<Empire_Rewritten.Resources.ResourceDef ParentName="Empire_ResourceBase">
+		<defName>Empire_Stonecutting</defName>
+		<label>Stonecutting</label>
+		<thingCategoryDefs>
+			<li>StoneBlocks</li>
+		</thingCategoryDefs>
+		<isFacilityResource>True</isFacilityResource>
+	</Empire_Rewritten.Resources.ResourceDef>
 </Defs>

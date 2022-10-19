@@ -1,29 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Defs>
-	<Empire_Rewritten.Facilities.FacilityDef Name="Empire_FacilityBase" Abstract="True">
-		<description>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</description>
-		<buildDuration>600</buildDuration>
-		
-		<iconData>
-			<texPath>Error/Missing</texPath>
-		</iconData>
-		
-		<costList>
-			<Silver>87327832</Silver>
-			<MedicineHerbal>873</MedicineHerbal>
-			<MedicineIndustrial>8732</MedicineIndustrial>
-			<MedicineUltratech>8782</MedicineUltratech>
-		</costList>
-	</Empire_Rewritten.Facilities.FacilityDef>
+    <Empire_Rewritten.Facilities.FacilityDef Name="Empire_FacilityBase" Abstract="True">
+        <iconData>
+            <texPath>Error/Missing</texPath>
+        </iconData>
+    </Empire_Rewritten.Facilities.FacilityDef>
 
-	<Empire_Rewritten.Facilities.FacilityDef ParentName="Empire_FacilityBase">
-		<defName>Empire_TestFacility</defName>
-		<label>Test Facility</label>
-	</Empire_Rewritten.Facilities.FacilityDef>
-
-	<Empire_Rewritten.Facilities.FacilityDef ParentName="Empire_FacilityBase">
-		<defName>Empire_TestMining</defName>
-		<label>Test Mining</label>
-		<facilityWorker>Empire_Rewritten.Facilities.FacilityWorkers.TestMiningWorker</facilityWorker>
-	</Empire_Rewritten.Facilities.FacilityDef>
+    <Empire_Rewritten.Facilities.FacilityDef ParentName="Empire_FacilityBase">
+        <defName>Empire_FacilityStonecutting</defName>
+        <label>Stonecutting Workshop</label>
+        <description>Build a workshop dedicated to cutting pristine stone blocks from raw rock.</description>
+        <buildDuration>300000</buildDuration>
+        <costList>
+            <!-- Cost of 10 wooden stonecutter's tables plus some silver -->
+            <Silver>300</Silver>
+            <Steel>300</Steel>
+            <WoodLog>750</WoodLog>
+        </costList>
+        <resourceOffsets>
+            <li>
+                <amount>100</amount>
+                <def>Empire_Stonecutting</def>
+            </li>
+        </resourceOffsets>
+    </Empire_Rewritten.Facilities.FacilityDef>
 </Defs>
