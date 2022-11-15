@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+	<ThingDef ParentName="BuildingBase">
+		<defName>EmpireTaxSpot</defName>
+		<label>tax spot</label>
+		<description>Designates a spot for workers to deliver taxes and tithes to.</description>
+		
+		<graphicData>
+			<texPath>Things/Building/Misc/PartySpot</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+		</graphicData>
+		
+		<altitudeLayer>FloorEmplacement</altitudeLayer>
+		
+		<statBases>
+			<WorkToBuild>0</WorkToBuild>
+		</statBases>
+		
+		<rotatable>false</rotatable>
+		<scatterableOnMapGen>false</scatterableOnMapGen>
+		<useHitPoints>False</useHitPoints>
+		<designationCategory>Misc</designationCategory>
+		<passability>Standable</passability>
+		
+		<building>
+			<sowTag>SupportPlantsOnly</sowTag>
+			<canPlaceOverImpassablePlant>false</canPlaceOverImpassablePlant>
+			<ai_chillDestination>false</ai_chillDestination>
+		</building>
+	</ThingDef>
+</Defs>
