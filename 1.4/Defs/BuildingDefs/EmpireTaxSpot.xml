@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
 	<ThingDef ParentName="BuildingBase">
-		<defName>TaxSpot</defName>
+		<defName>EmpireTaxSpot</defName>
 		<label>tax spot</label>
 		<description>Designates a spot for workers to deliver taxes and tithes to.</description>
 		
