@@ -86,7 +86,7 @@ namespace Empire_Rewritten.Windows
             {
                 Label = "Empire_SIW_AbandonSettlement".Translate(),
                 Action = () =>
-                {   
+                {
                     SettlementInfoWindow settlementInfoWindow = Find.WindowStack.WindowOfType<SettlementInfoWindow>();
                     Settlement settlement = settlementInfoWindow.settlement;
 
@@ -167,7 +167,7 @@ namespace Empire_Rewritten.Windows
 
             rectFlag = new Rect(rectMidTopLeft.x + CommonMargin, rectMidTopLeft.y + CommonMargin, FlagSize, FlagSize);
             rectDesignation = new Rect(rectMidTopLeft.x + rectFlag.width + CommonMargin * 2f, rectMidTopLeft.y + FlagSize * 0.5f, DesignationWidth, FlagSize * 0.5f);
-            rectExtraInfo = new Rect( - CommonMargin, 0f, DesignationWidth * 1.5f, FlagSize * 0.5f).MoveRect(new Vector2(rectMidTopLeft.xMax - DesignationWidth * 1.5f, rectMidTopLeft.y + FlagSize * 0.5f));
+            rectExtraInfo = new Rect(-CommonMargin, 0f, DesignationWidth * 1.5f, FlagSize * 0.5f).MoveRect(new Vector2(rectMidTopLeft.xMax - DesignationWidth * 1.5f, rectMidTopLeft.y + FlagSize * 0.5f));
 
             rectFacilitiesLabel = new Rect(new Vector2(rectMidBottomLeftLeft.x, rectMidBottomLeftLeft.yMax - buildingsRectSize.y - 24f), buildingsRectSize).Rounded();
             rectFacilitiesRect = new Rect(new Vector2(rectMidBottomLeftLeft.x, rectMidBottomLeftLeft.yMax - buildingsRectSize.y), buildingsRectSize).Rounded();
@@ -322,10 +322,10 @@ namespace Empire_Rewritten.Windows
                 Text.Anchor = TextAnchor.UpperLeft;
                 Widgets.Label(labelRect, $"{curProcess.LabelCap}\n{"Empire_SIW_ProcessProgress".Translate((curProcess.Duration - curProcess.WorkCompleted).ToStringTicksToPeriod())}");
                 Widgets.FillableBar(progressBar, curProcess.Progress);
-                
+
                 if (Widgets.CloseButtonFor(rectProcessInner))
                 {
-                    facilityManager.CancelProcess(curProcess);
+                    facilityManager.CancelProcess(curProcess, CancelReason.CancelledByPlayer);
                     SoundDefOf.Click.PlayOneShotOnCamera();
                     i--;
                 }
@@ -643,7 +643,7 @@ namespace Empire_Rewritten.Windows
                 icon = Tex.QuestionMark,
                 action = () => Find.WindowStack.Add(new SettlementInfoWindow(settlement))
             };
-            
+
             return command_Action;
         }
     }

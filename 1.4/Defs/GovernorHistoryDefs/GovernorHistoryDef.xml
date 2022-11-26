@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+	<Empire_Rewritten.GovernorHistoryDef>
+		<defName>LuckySurvivor</defName>
+		<label>lucky survivor</label>
+		<description>{PAWN_nameFull} was the only survivor after a series of meteors struck the other contenders for the governor position.</description>
+		<appointed>false</appointed>
+	</Empire_Rewritten.GovernorHistoryDef>
+
+	<Empire_Rewritten.GovernorHistoryDef>
+		<defName>ThunderDome</defName>
+		<label>thunderdome survivor</label>
+		<description>{PAWN_nameFull} was locked into a cage with all other contenders, and {PAWN_pronoun} was the only one left after the bloody battle that ensued.</description>
+		<appointed>false</appointed>
+	</Empire_Rewritten.GovernorHistoryDef>
+
+	<Empire_Rewritten.GovernorHistoryDef>
+		<defName>WonWithLooks</defName>
+		<label>stunningly beautiful</label>
+		<description>{PAWN_nameFull} was voted into office because of {PAWN_possessive} magnificent looks.</description>
+		<appointed>false</appointed>
+	</Empire_Rewritten.GovernorHistoryDef>
+	
+	<Empire_Rewritten.GovernorHistoryDef>
+		<defName>AppointedByCapital</defName>
+		<label>appointed by the capital</label>
+		<description>{PAWN_nameFull} was appointed as the governor by direct order of the capital.</description>
+		<appointed>true</appointed>
+	</Empire_Rewritten.GovernorHistoryDef>
+</Defs>

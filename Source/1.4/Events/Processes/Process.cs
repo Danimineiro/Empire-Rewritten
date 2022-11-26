@@ -90,9 +90,9 @@ namespace Empire_Rewritten.Events.Processes
         }
 
         /// <summary>
-        ///     Marks the <see cref="Process"/> for deletion, effectively cancelling it
+        ///     Marks the <see cref="Process"/> for deletion, effectively cancelling it. Additionally provides a <see cref="CancelReason"/> to ease further logic.
         /// </summary>
-        public virtual void Cancel()
+        public virtual void Cancel(CancelReason reason, string log = null, string alert = null)
         {
             canceled = true;
         }
