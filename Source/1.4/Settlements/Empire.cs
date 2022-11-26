@@ -28,7 +28,9 @@ namespace Empire_Rewritten.Settlements
 
         private Dictionary<Settlement, FacilityManager> settlements = new Dictionary<Settlement, FacilityManager>();
         private Faction faction;
+        private Dictionary<Settlement, GovernorManager> governors = new Dictionary<Settlement, GovernorManager>();
         private List<FacilityManager> facilityManagersForLoading = new List<FacilityManager>();
+        private List<GovernorManager> governorManagersForLoading = new List<GovernorManager>();
 
         private List<Settlement> settlementsForLoading = new List<Settlement>();
         private StorageTracker storageTracker = new StorageTracker();
@@ -51,6 +53,8 @@ namespace Empire_Rewritten.Settlements
 
         public StorageTracker StorageTracker => storageTracker;
         public Dictionary<Settlement, FacilityManager> Settlements => settlements;
+
+        public Dictionary<Settlement, GovernorManager> Governors => governors;
         public List<int> SettlementTiles { get; } = new List<int>();
 
         private Territory Territory
@@ -68,10 +72,12 @@ namespace Empire_Rewritten.Settlements
         }
 
         public IEnumerable<FacilityManager> AllFacilityManagers => settlements.Values;
+        public IEnumerable<GovernorManager> AllGovernorManagers => governors.Values;
 
         public void ExposeData()
         {
             Scribe_Collections.Look(ref settlements, "settlements", LookMode.Reference, LookMode.Deep, ref settlementsForLoading, ref facilityManagersForLoading);
+            Scribe_Collections.Look(ref governors, "governors", LookMode.Reference, LookMode.Deep, ref settlementsForLoading, ref governorManagersForLoading);
             Scribe_References.Look(ref faction, "faction");
             Scribe_Deep.Look(ref storageTracker, "storageTracker");
             Scribe_Values.Look(ref isAIPlayer, nameof(isAIPlayer));
@@ -177,7 +183,9 @@ namespace Empire_Rewritten.Settlements
         public void AddSettlement(Settlement settlement)
         {
             FacilityManager tracker = new FacilityManager(settlement);
+            GovernorManager governor = new GovernorManager(settlement);
             settlements.Add(settlement, tracker);
+            governors.Add(settlement, governor);
             Territory.SettlementClaimTiles(settlement);
             SettlementTiles.Add(settlement.Tile);
         }
@@ -207,11 +215,35 @@ namespace Empire_Rewritten.Settlements
             return null;
         }
 
+        public Settlement GetSettlement(GovernorManager manager)
+        {
+            foreach (Settlement settlement in governors.Keys)
+            {
+                if (governors[settlement] == manager)
+                {
+                    return settlement;
+                }
+            }
+
+            return null;
+        }
+
         public FacilityManager GetFacilityManager(Settlement settlement)
         {
             if (settlements.ContainsKey(settlement))
             {
                 return settlements[settlement];
+            }
+
+            Logger.Warn($"{settlement.Name} was not in the settlement manager! Returning null.");
+            return null;
+        }
+
+        public GovernorManager GetGovernorManager(Settlement settlement)
+        {
+            if (governors.ContainsKey(settlement))
+            {
+                return governors[settlement];
             }
 
             Logger.Warn($"{settlement.Name} was not in the settlement manager! Returning null.");

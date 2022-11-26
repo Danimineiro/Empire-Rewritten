@@ -161,11 +161,11 @@ namespace Empire_Rewritten.Facilities
         ///     Ends a process early
         /// </summary>
         /// <param name="process"></param>
-        public void CancelProcess(Process process)
+        public void CancelProcess(Process process, CancelReason reason)
         {
             if (process == null) return;
 
-            process.Cancel();
+            process.Cancel(reason);
             int index = processes.IndexOf(process);
             processes.Remove(process);
 

@@ -15,6 +15,10 @@ namespace Empire_Rewritten.Events
         public Type aiEventWorker;
         public Type eventWorker;
 
+        // These two are only relevant for scheduled events, checking whether an event can be scheduled at all and whether it's fated to happen or planned by the player.
+        public bool scheduled = false;
+        public bool playerCancelable = true;
+
         public EventWorker EventWorker { get; private set; }
 
         public EventWorker AIWorker => aiWorker ?? EventWorker;

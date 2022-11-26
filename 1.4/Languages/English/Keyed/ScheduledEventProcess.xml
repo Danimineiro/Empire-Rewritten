@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+	<Empire_SchedEvent_Label>Scheduled Event: </Empire_UP_Label>
+	<Empire_SchedEvent_Description>The following event is scheduled to occur: {0}</Empire_SchedEvent_Description>
+</LanguageData>
